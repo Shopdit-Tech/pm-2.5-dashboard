@@ -34,154 +34,158 @@ export const MapDashboard = () => {
       : 0;
 
   return (
-    <Layout className="min-h-screen bg-gray-50">
-      <Content className="p-4 md:p-6">
-        {/* Header */}
-        <div className="mb-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
-                <EnvironmentOutlined className="mr-2" />
-                แผนที่ติดตามคุณภาพอากาศ
-              </h1>
-              <p className="text-gray-500">
-                แสดงค่า PM2.5 และพารามิเตอร์คุณภาพอากาศแบบเรียลไทม์
-              </p>
-            </div>
-            <Button
-              type="primary"
-              icon={<ReloadOutlined spin={refreshing} />}
-              onClick={handleRefresh}
-              loading={refreshing}
-            >
-              รีเฟรช
-            </Button>
-          </div>
-        </div>
-
-        {/* Statistics Cards */}
-        <Row gutter={[16, 16]} className="mb-4">
-          <Col xs={12} sm={6}>
-            <Card>
-              <Statistic
-                title="เซ็นเซอร์ทั้งหมด"
-                value={sensors.length}
-                suffix="จุด"
-                valueStyle={{ color: '#1890ff' }}
-              />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6}>
-            <Card>
-              <Statistic
-                title="ออนไลน์"
-                value={onlineSensors.length}
-                suffix={`/ ${sensors.length}`}
-                valueStyle={{ color: '#52c41a' }}
-              />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6}>
-            <Card>
-              <Statistic
-                title="PM2.5 เฉลี่ย (ในอาคาร)"
-                value={avgPM25Indoor.toFixed(1)}
-                suffix="µg/m³"
-                valueStyle={{ fontSize: '20px' }}
-                prefix={
-                  <Tag color={getParameterLevel('pm25', avgPM25Indoor) === 'good' ? 'green' : 'orange'}>
-                    {getLevelLabel(getParameterLevel('pm25', avgPM25Indoor))}
-                  </Tag>
-                }
-              />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6}>
-            <Card>
-              <Statistic
-                title="PM2.5 เฉลี่ย (นอกอาคาร)"
-                value={avgPM25Outdoor.toFixed(1)}
-                suffix="µg/m³"
-                valueStyle={{ fontSize: '20px' }}
-                prefix={
-                  <Tag color={getParameterLevel('pm25', avgPM25Outdoor) === 'good' ? 'green' : 'orange'}>
-                    {getLevelLabel(getParameterLevel('pm25', avgPM25Outdoor))}
-                  </Tag>
-                }
-              />
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Error Alert */}
-        {error && (
-          <Alert
-            message="เกิดข้อผิดพลาด"
-            description="ไม่สามารถโหลดข้อมูลเซ็นเซอร์ได้ กรุณาลองใหม่อีกครั้ง"
-            type="error"
-            closable
-            className="mb-4"
-          />
-        )}
-
-        {/* Offline Sensors Warning */}
-        {offlineSensors.length > 0 && (
-          <Alert
-            message={`มีเซ็นเซอร์ออฟไลน์ ${offlineSensors.length} จุด`}
-            description={
-              <Space size={[8, 8]} wrap>
-                {offlineSensors.map((sensor) => (
-                  <Tag key={sensor.id} color="red">
-                    {sensor.name}
-                  </Tag>
-                ))}
-              </Space>
-            }
-            type="warning"
-            closable
-            className="mb-4"
-          />
-        )}
-
-        {/* Map Legend */}
-        <Card className="mb-4">
-          <div className="flex flex-wrap items-center gap-4">
-            <span className="font-medium">คำอธิบาย:</span>
-            <Space>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-green-500" />
-                <span className="text-sm">ดี (0-12)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-yellow-500" />
-                <span className="text-sm">ปานกลาง (12-35)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-orange-500" />
-                <span className="text-sm">ไม่ดี (35-55)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-red-500" />
-                <span className="text-sm">อันตราย ({'>'}55)</span>
-              </div>
-            </Space>
-          </div>
-        </Card>
-
-        {/* Map Container */}
-        <Card className="shadow-lg" bodyStyle={{ padding: 0 }}>
-          <div style={{ height: 'calc(100vh - 480px)', minHeight: '500px' }}>
-            <GoogleMapComponent sensors={sensors} />
-          </div>
-        </Card>
-
-        {/* Footer Info */}
-        <div className="mt-4 text-center text-sm text-gray-500">
-          <p>
-            ข้อมูลอัพเดทอัตโนมัติทุก 60 วินาที | คลิกที่จุดบนแผนที่เพื่อดูรายละเอียด
+    <div style={{ padding: '24px', background: '#f5f7fa', minHeight: '100%' }}>
+      {/* Header */}
+      <div className="mb-6" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2 style={{ fontSize: 24, fontWeight: 600, margin: 0, color: '#262626' }}>
+            Static Sensor Monitoring
+          </h2>
+          <p style={{ margin: '4px 0 0 0', color: '#8c8c8c', fontSize: 14 }}>
+            Real-time PM2.5 and air quality parameters
           </p>
         </div>
-      </Content>
-    </Layout>
+        <Button
+          icon={<ReloadOutlined spin={refreshing} />}
+          onClick={handleRefresh}
+          loading={refreshing}
+          size="large"
+          style={{
+            borderRadius: 8,
+            height: 40,
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderColor: 'transparent',
+            color: 'white',
+            fontWeight: 500,
+          }}
+        >
+          Refresh
+        </Button>
+      </div>
+
+      {/* Statistics Cards */}
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={12} sm={12} md={6}>
+          <Card
+            style={{
+              borderRadius: 12,
+              border: 'none',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              background: 'linear-gradient(135deg, #667eea15 0%, #764ba215 100%)',
+            }}
+          >
+            <Statistic
+              title="Total Sensors"
+              value={sensors.length}
+              suffix="points"
+              valueStyle={{ color: '#667eea', fontSize: 28, fontWeight: 'bold' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={12} sm={12} md={6}>
+          <Card
+            style={{
+              borderRadius: 12,
+              border: 'none',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              background: 'linear-gradient(135deg, #52c41a15 0%, #73d13d15 100%)',
+            }}
+          >
+            <Statistic
+              title="Online"
+              value={onlineSensors.length}
+              suffix={`/ ${sensors.length}`}
+              valueStyle={{ color: '#52c41a', fontSize: 28, fontWeight: 'bold' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={12} sm={12} md={6}>
+          <Card
+            style={{
+              borderRadius: 12,
+              border: 'none',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            }}
+          >
+            <div style={{ marginBottom: 4 }}>
+              <Tag color="blue" style={{ borderRadius: 4 }}>Indoor</Tag>
+            </div>
+            <Statistic
+              title="Avg PM2.5"
+              value={avgPM25Indoor.toFixed(1)}
+              suffix="µg/m³"
+              valueStyle={{ color: '#1890ff', fontSize: 24, fontWeight: 'bold' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={12} sm={12} md={6}>
+          <Card
+            style={{
+              borderRadius: 12,
+              border: 'none',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            }}
+          >
+            <div style={{ marginBottom: 4 }}>
+              <Tag color="green" style={{ borderRadius: 4 }}>Outdoor</Tag>
+            </div>
+            <Statistic
+              title="Avg PM2.5"
+              value={avgPM25Outdoor.toFixed(1)}
+              suffix="µg/m³"
+              valueStyle={{ color: '#52c41a', fontSize: 24, fontWeight: 'bold' }}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Alerts */}
+      {error && (
+        <Alert
+          message="Error Loading Data"
+          description="Unable to load sensor data. Please try again."
+          type="error"
+          closable
+          className="mb-4"
+          style={{ borderRadius: 8 }}
+        />
+      )}
+
+      {offlineSensors.length > 0 && (
+        <Alert
+          message={`${offlineSensors.length} Sensors Offline`}
+          description={offlineSensors.map((s) => s.name).join(', ')}
+          type="warning"
+          closable
+          className="mb-4"
+          style={{ borderRadius: 8 }}
+        />
+      )}
+
+      {/* Map Container */}
+      <Card
+        style={{
+          borderRadius: 12,
+          border: 'none',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+          overflow: 'hidden',
+        }}
+        bodyStyle={{ padding: 0 }}
+      >
+        <div style={{ height: 'calc(100vh - 380px)', minHeight: '600px' }}>
+          <GoogleMapComponent sensors={sensors} />
+        </div>
+      </Card>
+
+      {/* Legend */}
+      <div style={{ marginTop: 16, textAlign: 'center', color: '#8c8c8c', fontSize: 13 }}>
+        <Space size="large">
+          <span>🟢 Good (0-12)</span>
+          <span>🟡 Moderate (12-35)</span>
+          <span>🟠 Unhealthy (35-55)</span>
+          <span>🔴 Hazardous (&gt;55)</span>
+        </Space>
+      </div>
+    </div>
   );
 };
