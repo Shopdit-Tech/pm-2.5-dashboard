@@ -8,6 +8,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   DashboardOutlined,
+  TableOutlined,
 } from '@ant-design/icons';
 
 const { Sider, Content } = Layout;
@@ -59,6 +60,12 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       icon: <LineChartOutlined />,
       label: 'Mobile Routes',
       title: 'เส้นทางอุปกรณ์เคลื่อนที่',
+    },
+    {
+      key: 'sensor-data-table',
+      icon: <TableOutlined />,
+      label: 'Data Table',
+      title: 'ตารางข้อมูลเซ็นเซอร์',
     },
   ];
 

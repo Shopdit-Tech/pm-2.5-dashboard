@@ -21,6 +21,18 @@ export type SensorData = {
   pm10: number;
   tvoc: number;
   timestamp: string;
+  // Additional metadata for table view
+  serialNumber?: string;
+  maker?: string;
+  model?: string;
+  commissioningDate?: string;
+  calibrationInfo?: CalibrationInfo;
+};
+
+export type CalibrationInfo = {
+  pm25Methods: string[];
+  pm10Methods?: string[];
+  notes?: string;
 };
 
 export type ColorRange = {

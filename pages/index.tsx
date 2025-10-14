@@ -2,6 +2,7 @@ import Head from 'next/head';
 import { MainLayout } from '@/components/MainLayout';
 import { MapDashboard } from '@/features/map-dashboard/components/MapDashboard';
 import { MobileRouteDashboard } from '@/features/mobile-routes/components/MobileRouteDashboard';
+import { SensorDataTable } from '@/features/sensor-table/components/SensorDataTable';
 
 export default function Home() {
   return (
@@ -20,6 +21,9 @@ export default function Home() {
             }
             if (activeView === 'mobile-routes') {
               return <MobileRouteDashboard />;
+            }
+            if (activeView === 'sensor-data-table') {
+              return <SensorDataTable />;
             }
             return null;
           }}

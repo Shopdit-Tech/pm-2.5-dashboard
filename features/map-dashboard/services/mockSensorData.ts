@@ -16,6 +16,13 @@ export const MOCK_SENSORS: SensorData[] = [
     pm10: 67.8,
     tvoc: 180,
     timestamp: new Date().toISOString(),
+    serialNumber: '744dbdbf4aac',
+    maker: 'AirGradient',
+    model: 'O-9PSL-DE',
+    commissioningDate: '2024-02-08',
+    calibrationInfo: {
+      pm25Methods: ['Raw Data (set at place level)', 'EPA Formula'],
+    },
   },
   {
     id: 'sensor-002',
