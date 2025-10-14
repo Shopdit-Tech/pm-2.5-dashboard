@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Layout, Menu, Typography, Badge } from 'antd';
+import { Layout, Menu, Typography, Badge, Button, Avatar, Dropdown, Space } from 'antd';
 import {
   EnvironmentOutlined,
   LineChartOutlined,
@@ -9,7 +9,15 @@ import {
   MenuUnfoldOutlined,
   DashboardOutlined,
   TableOutlined,
+  MobileOutlined,
+  BarChartOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  SettingOutlined,
+  LoginOutlined,
 } from '@ant-design/icons';
+import { useAuth } from '@/contexts/AuthContext';
+import { LoginModal } from './LoginModal';
 
 const { Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -19,9 +27,11 @@ type MainLayoutProps = {
 };
 
 export const MainLayout = ({ children }: MainLayoutProps) => {
+  const { user, logout, isAdmin } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [activeView, setActiveView] = useState<string>('static-sensors');
   const [isMobile, setIsMobile] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Load saved view from localStorage
   useEffect(() => {
@@ -48,7 +58,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     localStorage.setItem('activeView', activeView);
   }, [activeView]);
 
-  const menuItems = [
+  const baseMenuItems = [
     {
       key: 'static-sensors',
       icon: <EnvironmentOutlined />,
@@ -67,7 +77,32 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       label: 'Data Table',
       title: 'ตารางข้อมูลเซ็นเซอร์',
     },
+    {
+      key: 'mobile-data-table',
+      icon: <MobileOutlined />,
+      label: 'Mobile Data',
+      title: 'ตารางข้อมูลอุปกรณ์เคลื่อนที่',
+    },
+    {
+      key: 'analytics',
+      icon: <BarChartOutlined />,
+      label: 'Analytics',
+      title: 'กราฟวิเคราะห์',
+    },
   ];
+
+  // Add admin settings menu item for admin users
+  const menuItems = isAdmin
+    ? [
+        ...baseMenuItems,
+        {
+          key: 'admin-settings',
+          icon: <SettingOutlined />,
+          label: 'Admin Settings',
+          title: 'การตั้งค่าระบบ',
+        },
+      ]
+    : baseMenuItems;
 
   return (
     <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
@@ -224,7 +259,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             </div>
           </div>
           
-          {/* Status Badge */}
+          {/* Auth Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <Badge 
               status="success" 
@@ -232,10 +267,62 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
               style={{ 
                 fontSize: 14, 
                 fontWeight: 500,
+                marginRight: 12,
               }} 
             />
+            
+            {user ? (
+              <Dropdown
+                menu={{
+                  items: [
+                    ...(isAdmin
+                      ? [
+                          {
+                            key: 'admin',
+                            label: 'Admin Settings',
+                            icon: <SettingOutlined />,
+                            onClick: () => setActiveView('admin-settings'),
+                          },
+                          { type: 'divider' as const },
+                        ]
+                      : []),
+                    {
+                      key: 'logout',
+                      label: 'Logout',
+                      icon: <LogoutOutlined />,
+                      onClick: () => logout(),
+                    },
+                  ],
+                }}
+                placement="bottomRight"
+              >
+                <Space style={{ cursor: 'pointer' }}>
+                  <Avatar icon={<UserOutlined />} style={{ background: '#1890ff' }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                    <Text strong style={{ fontSize: 14 }}>{user.username}</Text>
+                    <Text type="secondary" style={{ fontSize: 11 }}>
+                      {user.role === 'admin' ? 'Administrator' : 'User'}
+                    </Text>
+                  </div>
+                </Space>
+              </Dropdown>
+            ) : (
+              <Button
+                type="primary"
+                icon={<LoginOutlined />}
+                onClick={() => setShowLoginModal(true)}
+              >
+                Login
+              </Button>
+            )}
           </div>
         </div>
+        
+        {/* Login Modal */}
+        <LoginModal
+          visible={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+        />
 
         {/* Content Area */}
         <Content

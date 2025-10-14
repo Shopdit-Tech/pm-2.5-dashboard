@@ -61,7 +61,7 @@ export function generateHistoricalData(
     // Daily pattern varies by parameter
     let dailyFactor = 1.0;
 
-    if (parameter === 'pm25' || parameter === 'pm10') {
+    if (parameter === 'pm1' || parameter === 'pm25' || parameter === 'pm10') {
       // PM levels: higher during rush hours (7-9am, 5-7pm), lower at night
       if ((hourOfDay >= 7 && hourOfDay <= 9) || (hourOfDay >= 17 && hourOfDay <= 19)) {
         dailyFactor = 1.4 + Math.random() * 0.3; // Rush hour spikes

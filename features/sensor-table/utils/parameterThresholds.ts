@@ -8,6 +8,15 @@ export type QualityZone = {
   opacity: number;
 };
 
+export const PM1_ZONES: QualityZone[] = [
+  { min: 0, max: 8, label: 'Good', color: '#52c41a', opacity: 0.15 },
+  { min: 8, max: 25, label: 'Moderate', color: '#fadb14', opacity: 0.15 },
+  { min: 25, max: 40, label: 'Unhealthy for Sensitive Groups', color: '#faad14', opacity: 0.15 },
+  { min: 40, max: 100, label: 'Unhealthy', color: '#ff4d4f', opacity: 0.15 },
+  { min: 100, max: 200, label: 'Very Unhealthy', color: '#722ed1', opacity: 0.15 },
+  { min: 200, max: 400, label: 'Hazardous', color: '#a0202e', opacity: 0.15 },
+];
+
 export const PM25_ZONES: QualityZone[] = [
   { min: 0, max: 12, label: 'Good', color: '#52c41a', opacity: 0.15 },
   { min: 12, max: 35, label: 'Moderate', color: '#fadb14', opacity: 0.15 },
@@ -42,6 +51,8 @@ export const TVOC_ZONES: QualityZone[] = [
 
 export function getZonesForParameter(parameter: string): QualityZone[] {
   switch (parameter) {
+    case 'pm1':
+      return PM1_ZONES;
     case 'pm25':
       return PM25_ZONES;
     case 'pm10':
@@ -57,6 +68,8 @@ export function getZonesForParameter(parameter: string): QualityZone[] {
 
 export function getParameterLabel(parameter: string): string {
   switch (parameter) {
+    case 'pm1':
+      return 'PM₁';
     case 'pm25':
       return 'PM₂.₅';
     case 'pm10':
@@ -76,6 +89,7 @@ export function getParameterLabel(parameter: string): string {
 
 export function getParameterUnit(parameter: string): string {
   switch (parameter) {
+    case 'pm1':
     case 'pm25':
     case 'pm10':
       return 'μg/m³';
