@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Card, Select, Typography, Space, Row, Col } from 'antd';
+import { Card, Select, Typography, Space, Row, Col, Spin, Alert } from 'antd';
 import {
   LineChart,
   Line,
@@ -14,8 +14,8 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { SensorData } from '@/types/sensor';
-import { TimeRange } from '../types/chartTypes';
-import { generateChartData, getLocationColor } from '../services/chartDataService';
+import { TimeRange, getTimeRangeLabel } from '../types/chartTypes';
+import { fetchRealChartData, getLocationColor } from '../services/chartDataService';
 import { getParameterLabel, getParameterUnit } from '@/features/sensor-table/utils/parameterThresholds';
 import { ParameterTabs } from './ParameterTabs';
 import { LocationSelector } from './LocationSelector';
@@ -31,7 +31,9 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
   const [parameter, setParameter] = useState('pm25');
   const [timeRange, setTimeRange] = useState<TimeRange>('48h');
   const [selectedSensorIds, setSelectedSensorIds] = useState<string[]>([]);
-  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [chartsData, setChartsData] = useState<any[]>([]);
 
   // Auto-select first 2 sensors on mount
   useEffect(() => {
@@ -41,13 +43,56 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
     }
   }, [sensors]);
 
-  // Auto-refresh every 30 seconds
+  // Fetch real data for all selected sensors
   useEffect(() => {
-    const interval = setInterval(() => {
-      setLastUpdate(new Date());
-    }, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    const fetchAllSensorsData = async () => {
+      if (selectedSensorIds.length === 0) {
+        setChartsData([]);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        console.log('📊 Fetching data for multiple sensors:', selectedSensorIds);
+
+        const promises = selectedSensorIds.map(async (sensorId, index) => {
+          const sensor = sensors.find((s) => s.id === sensorId);
+          if (!sensor) return null;
+
+          try {
+            const data = await fetchRealChartData(sensor, parameter as any, timeRange);
+            console.log(`✅ Fetched data for ${sensor.name}`);
+            
+            return {
+              ...data,
+              color: getLocationColor(index),
+            };
+          } catch (err) {
+            console.error(`❌ Failed to fetch data for ${sensor.name}:`, err);
+            return null;
+          }
+        });
+
+        const results = await Promise.all(promises);
+        const validResults = results.filter((r) => r !== null);
+        
+        setChartsData(validResults);
+        
+        if (validResults.length === 0) {
+          setError('No data available for selected sensors');
+        }
+      } catch (err) {
+        console.error('❌ Error fetching charts data:', err);
+        setError('Failed to load chart data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllSensorsData();
+  }, [sensors, selectedSensorIds, parameter, timeRange]);
 
   // Generate colors for selected sensors
   const sensorColors = useMemo(() => {
@@ -58,33 +103,6 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
     return colors;
   }, [selectedSensorIds]);
 
-  // Generate chart data for all selected sensors
-  const chartsData = useMemo(() => {
-    const results = selectedSensorIds
-      .map((sensorId) => {
-        const sensor = sensors.find((s) => s.id === sensorId);
-        if (!sensor) return null;
-
-        const data = generateChartData(sensor, parameter as any, timeRange);
-        
-        console.log(`📈 Generated data for ${sensor.name}:`, {
-          sensorId,
-          parameter,
-          dataPoints: data.data.length,
-          average: data.average,
-          sampleValue: data.data[0]?.value,
-        });
-        
-        return {
-          ...data,
-          color: sensorColors[sensorId],
-        };
-      })
-      .filter((d) => d !== null);
-    
-    console.log('📊 Total charts data:', results.length);
-    return results;
-  }, [sensors, selectedSensorIds, parameter, timeRange, sensorColors, lastUpdate]);
 
   // Merge data from all sensors into single dataset for Recharts
   const mergedChartData = useMemo(() => {
@@ -194,6 +212,18 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
 
   return (
     <div style={{ padding: '24px' }}>
+      {/* Error Alert */}
+      {error && (
+        <Alert
+          message="Error Loading Chart Data"
+          description={error}
+          type="warning"
+          showIcon
+          closable
+          onClose={() => setError(null)}
+          style={{ marginBottom: 24, borderRadius: 12 }}
+        />
+      )}
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <Title level={4} style={{ margin: 0 }}>
@@ -253,7 +283,14 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
 
       {/* Chart */}
       <Card style={{ borderRadius: '12px' }} styles={{ body: { padding: '20px' } }}>
-        {selectedSensorIds.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: 60 }}>
+            <Spin size="large" />
+            <div style={{ marginTop: 16, color: '#8c8c8c' }}>
+              Loading chart data for {selectedSensorIds.length} sensor{selectedSensorIds.length > 1 ? 's' : ''}...
+            </div>
+          </div>
+        ) : selectedSensorIds.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <Text type="secondary" style={{ fontSize: 15 }}>
               Select one or more locations to view comparison chart
@@ -342,11 +379,13 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
         )}
 
         {/* Footer */}
-        <div style={{ marginTop: 16, textAlign: 'right' }}>
-          <Text type="secondary" style={{ fontSize: 11 }}>
-            Last update: {lastUpdate.toLocaleTimeString('en-US')}
-          </Text>
-        </div>
+        {!loading && chartsData.length > 0 && (
+          <div style={{ marginTop: 16, textAlign: 'right' }}>
+            <Text type="secondary" style={{ fontSize: 11 }}>
+              Comparing {chartsData.length} sensor{chartsData.length > 1 ? 's' : ''} - {getTimeRangeLabel(timeRange)}
+            </Text>
+          </div>
+        )}
       </Card>
     </div>
   );

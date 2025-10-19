@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { Table, Card, Input, Button, Space, Checkbox, Dropdown, Tag, Typography, Badge } from 'antd';
+import { useState, useMemo } from 'react';
+import { Table, Card, Input, Button, Space, Checkbox, Dropdown, Tag, Typography, Badge, Spin, Alert } from 'antd';
 import {
   SearchOutlined,
   ReloadOutlined,
@@ -12,17 +12,18 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { SensorData } from '@/types/sensor';
-import { SENSOR_TABLE_DATA } from '../services/sensorTableData';
 import { getParameterColor } from '@/utils/airQualityUtils';
 import { SensorDetailModal } from './SensorDetailModal';
 import { ParameterHistoryModal } from './ParameterHistoryModal';
+import { useSensorTableData } from '../hooks/useSensorTableData';
 
 const { Text } = Typography;
 
 type ColumnKey = 'temperature' | 'humidity' | 'co2' | 'pm25' | 'pm10' | 'tvoc';
 
 export const SensorDataTable = () => {
-  const [sensors, setSensors] = useState<SensorData[]>(SENSOR_TABLE_DATA);
+  // Use real API data
+  const { sensors, loading, error, refetch } = useSensorTableData(60000); // Auto-refresh every 60 seconds
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSensor, setSelectedSensor] = useState<SensorData | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -46,30 +47,10 @@ export const SensorDataTable = () => {
     'tvoc',
   ]);
 
-  // Auto-refresh data every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refreshData();
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Refresh data
-  const refreshData = () => {
+  // Refresh data manually
+  const refreshData = async () => {
     setIsRefreshing(true);
-    // Simulate data refresh with slight variations
-    const refreshedData = SENSOR_TABLE_DATA.map((sensor) => ({
-      ...sensor,
-      temperature: sensor.status === 'online' ? sensor.temperature + (Math.random() - 0.5) * 0.5 : 0,
-      humidity: sensor.status === 'online' ? sensor.humidity + (Math.random() - 0.5) * 2 : 0,
-      co2: sensor.status === 'online' ? Math.max(0, sensor.co2 + Math.floor((Math.random() - 0.5) * 20)) : 0,
-      pm25: sensor.status === 'online' ? Math.max(0, sensor.pm25 + (Math.random() - 0.5) * 2) : 0,
-      pm10: sensor.status === 'online' ? Math.max(0, sensor.pm10 + (Math.random() - 0.5) * 3) : 0,
-      tvoc: sensor.status === 'online' ? Math.max(0, sensor.tvoc + Math.floor((Math.random() - 0.5) * 10)) : 0,
-      timestamp: sensor.status === 'online' ? new Date().toISOString() : sensor.timestamp,
-    }));
-    setSensors(refreshedData);
+    await refetch();
     setTimeout(() => setIsRefreshing(false), 500);
   };
 
@@ -333,8 +314,33 @@ export const SensorDataTable = () => {
 
   return (
     <div className="p-6" style={{ background: '#f5f7fa', minHeight: '100%' }}>
-      {/* Header */}
-      <Card
+      {/* Error Alert */}
+      {error && (
+        <Alert
+          message="Error Loading Sensors"
+          description="Unable to load sensor data. Please try refreshing the page."
+          type="error"
+          closable
+          showIcon
+          style={{ marginBottom: 16, borderRadius: 12 }}
+        />
+      )}
+
+      {/* Loading State */}
+      {loading && sensors.length === 0 && (
+        <Card style={{ borderRadius: 16, textAlign: 'center', padding: 60 }}>
+          <Spin size="large" />
+          <div style={{ marginTop: 16, color: '#8c8c8c' }}>
+            Loading sensor data...
+          </div>
+        </Card>
+      )}
+
+      {/* Main Content */}
+      {!loading || sensors.length > 0 ? (
+        <>
+          {/* Header */}
+          <Card
         className="mb-6"
         style={{
           borderRadius: '16px',
@@ -450,6 +456,8 @@ export const SensorDataTable = () => {
           onClose={handleCloseHistoryModal}
         />
       )}
+        </>
+      ) : null}
     </div>
   );
 };

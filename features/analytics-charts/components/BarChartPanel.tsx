@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { Card, Select, Typography, Space } from 'antd';
+import { useState, useMemo } from 'react';
+import { Card, Select, Typography, Space, Spin, Alert } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { SensorData } from '@/types/sensor';
 import { TimeRange, getTimeRangeLabel } from '../types/chartTypes';
-import { generateChartData, aggregateDataPoints } from '../services/chartDataService';
+import { aggregateDataPoints } from '../services/chartDataService';
+import { useChartData } from '../hooks/useChartData';
 import { getParameterLabel, getParameterUnit } from '@/features/sensor-table/utils/parameterThresholds';
 import { getParameterColor } from '@/utils/airQualityUtils';
 
@@ -28,35 +29,36 @@ export const BarChartPanel = ({
   const [parameter, setParameter] = useState(defaultParameter);
   const [sensorId, setSensorId] = useState(defaultSensorId || sensors[0]?.id);
   const [timeRange, setTimeRange] = useState<TimeRange>(defaultTimeRange);
-  const [lastUpdate, setLastUpdate] = useState(new Date());
 
-  // Auto-refresh every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLastUpdate(new Date());
-    }, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  // Get current sensor
+  const currentSensor = useMemo(
+    () => sensors.find((s) => s.id === sensorId),
+    [sensors, sensorId]
+  );
 
-  // Generate chart data
+  // Fetch real chart data from API
+  const { chartData: apiChartData, loading, error } = useChartData(
+    currentSensor,
+    parameter as any,
+    timeRange
+  );
+
+  // Process chart data for bar chart
   const chartData = useMemo(() => {
-    const sensor = sensors.find((s) => s.id === sensorId);
-    if (!sensor) return null;
-
-    const data = generateChartData(sensor, parameter as any, timeRange);
+    if (!apiChartData) return null;
     
     // Aggregate to ~24 bars for readability
-    const aggregated = aggregateDataPoints(data.data, 24);
+    const aggregated = aggregateDataPoints(apiChartData.data, 24);
     
     return {
-      ...data,
+      ...apiChartData,
       data: aggregated.map((point) => ({
         ...point,
         // Color based on value
         fill: getParameterColor(parameter as any, point.value),
       })),
     };
-  }, [sensors, sensorId, parameter, timeRange, lastUpdate]);
+  }, [apiChartData, parameter]);
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload }: any) => {
@@ -76,8 +78,6 @@ export const BarChartPanel = ({
     return null;
   };
 
-  if (!chartData) return null;
-
   return (
     <Card
       style={{
@@ -87,6 +87,17 @@ export const BarChartPanel = ({
       }}
       styles={{ body: { padding: '16px' } }}
     >
+      {/* Error State */}
+      {error && (
+        <Alert
+          message="Error Loading Chart Data"
+          description="Unable to load historical data. Please try selecting a different sensor or time range."
+          type="warning"
+          showIcon
+          style={{ marginBottom: 16, borderRadius: 8 }}
+        />
+      )}
+
       {/* Controls */}
       <Space direction="vertical" style={{ width: '100%', marginBottom: 16 }} size="small">
         <Space wrap>
@@ -136,8 +147,19 @@ export const BarChartPanel = ({
         </Space>
       </Space>
 
+      {/* Loading State */}
+      {loading && (
+        <div style={{ textAlign: 'center', padding: 60 }}>
+          <Spin size="large" />
+          <div style={{ marginTop: 16, color: '#8c8c8c' }}>
+            Loading chart data...
+          </div>
+        </div>
+      )}
+
       {/* Chart */}
-      <ResponsiveContainer width="100%" height={300}>
+      {!loading && chartData && (
+        <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData.data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           
@@ -180,12 +202,13 @@ export const BarChartPanel = ({
           
           <Bar dataKey="value" radius={[4, 4, 0, 0]} />
         </BarChart>
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+      )}
 
       {/* Footer */}
       <div style={{ marginTop: 8, textAlign: 'right' }}>
         <Text type="secondary" style={{ fontSize: 11 }}>
-          Last update: {lastUpdate.toLocaleTimeString('en-US')}
+          {currentSensor?.name} - {getTimeRangeLabel(timeRange)}
         </Text>
       </div>
     </Card>

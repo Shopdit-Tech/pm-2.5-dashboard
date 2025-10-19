@@ -8,6 +8,7 @@ export type AirQualityLevel = 'good' | 'moderate' | 'unhealthy' | 'hazardous';
 
 export type SensorData = {
   id: string;
+  code?: string; // Sensor code for API calls (e.g., "airgradient:744dbdbfdaac")
   name: string;
   type: SensorType;
   status: SensorStatus;
@@ -16,17 +17,19 @@ export type SensorData = {
   temperature: number;
   humidity: number;
   co2: number;
-  pm1?: number; // Only for mobile sensors
+  pm1?: number;
   pm25: number;
   pm10: number;
   tvoc: number;
   timestamp: string;
+  lastUpdate?: string; // Last update timestamp
   // Additional metadata for table view
   serialNumber?: string;
   maker?: string;
   model?: string;
   commissioningDate?: string;
   calibrationInfo?: CalibrationInfo;
+  channel?: string; // Sensor channel
 };
 
 export type CalibrationInfo = {

@@ -1,45 +1,53 @@
-// import axios from '@/lib/axios'; // TODO: Use when backend API is ready
 import { SensorData } from '@/types/sensor';
-import { MOCK_SENSORS } from './mockSensorData';
+import { getStaticSensors } from '@/services/sensorApi';
+import { mapApiSensorsToAppSensors } from '@/utils/sensorMapper';
 
 export const sensorService = {
-  // Get all sensors
+  // Get all static sensors (movable=false)
   getAllSensors: async (): Promise<SensorData[]> => {
     try {
-      // TODO: Replace with actual API call when backend is ready
-      // const response = await axios.get<SensorData[]>('/sensors');
-      // return response.data;
-
-      // For now, return mock data with random variations
-      return Promise.resolve(
-        MOCK_SENSORS.map((sensor) => ({
-          ...sensor,
-          // Add small random variations to simulate real-time changes
-          pm25: sensor.status === 'online' ? sensor.pm25 + (Math.random() - 0.5) * 2 : 0,
-          temperature:
-            sensor.status === 'online' ? sensor.temperature + (Math.random() - 0.5) * 0.5 : 0,
-          humidity: sensor.status === 'online' ? sensor.humidity + (Math.random() - 0.5) * 2 : 0,
-          timestamp: new Date().toISOString(),
-        }))
-      );
+      console.log('🔄 Fetching static sensors from real API...');
+      
+      // Call real API
+      const response = await getStaticSensors();
+      
+      // Map API response to app format
+      const sensors = mapApiSensorsToAppSensors(response.items);
+      
+      console.log(`✅ Successfully fetched ${sensors.length} static sensors`);
+      return sensors;
     } catch (error) {
-      console.error('Error fetching sensors:', error);
-      throw error;
+      console.error('❌ Error fetching sensors:', error);
+      
+      // Return empty array on error to prevent app crash
+      return [];
     }
   },
 
   // Get sensor by ID
   getSensorById: async (id: string): Promise<SensorData | null> => {
     try {
-      // TODO: Replace with actual API call
-      // const response = await axios.get<SensorData>(`/sensors/${id}`);
-      // return response.data;
-
-      const sensor = MOCK_SENSORS.find((s) => s.id === id);
-      return Promise.resolve(sensor || null);
+      // Get all sensors and find by ID
+      const allSensors = await sensorService.getAllSensors();
+      const sensor = allSensors.find((s) => s.id === id);
+      
+      return sensor || null;
     } catch (error) {
-      console.error(`Error fetching sensor ${id}:`, error);
-      throw error;
+      console.error(`❌ Error fetching sensor ${id}:`, error);
+      return null;
+    }
+  },
+
+  // Get sensor by code (for API calls)
+  getSensorByCode: async (code: string): Promise<SensorData | null> => {
+    try {
+      const allSensors = await sensorService.getAllSensors();
+      const sensor = allSensors.find((s) => s.code === code);
+      
+      return sensor || null;
+    } catch (error) {
+      console.error(`❌ Error fetching sensor ${code}:`, error);
+      return null;
     }
   },
 
@@ -49,8 +57,8 @@ export const sensorService = {
       const allSensors = await sensorService.getAllSensors();
       return allSensors.filter((sensor) => sensor.type === type);
     } catch (error) {
-      console.error(`Error fetching ${type} sensors:`, error);
-      throw error;
+      console.error(`❌ Error fetching ${type} sensors:`, error);
+      return [];
     }
   },
 };

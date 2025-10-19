@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { Table, Card, Input, Button, Space, Checkbox, Dropdown, Tag, Typography, Badge } from 'antd';
+import { useState, useMemo } from 'react';
+import { Table, Card, Input, Button, Space, Checkbox, Dropdown, Tag, Typography, Badge, Spin, Alert } from 'antd';
 import {
   SearchOutlined,
   ReloadOutlined,
@@ -10,8 +10,8 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { SensorData } from '@/types/sensor';
-import { MOBILE_SENSOR_DATA } from '../services/mobileSensorData';
 import { getParameterColor } from '@/utils/airQualityUtils';
+import { useMobileSensorTableData } from '../hooks/useMobileSensorTableData';
 import { SensorDetailModal } from '@/features/sensor-table/components/SensorDetailModal';
 import { ParameterHistoryModal } from '@/features/sensor-table/components/ParameterHistoryModal';
 
@@ -20,7 +20,8 @@ const { Text } = Typography;
 type ColumnKey = 'temperature' | 'humidity' | 'co2' | 'pm1' | 'pm25' | 'pm10' | 'tvoc';
 
 export const MobileSensorDataTable = () => {
-  const [sensors, setSensors] = useState<SensorData[]>(MOBILE_SENSOR_DATA);
+  // Use real API data
+  const { sensors, loading, error, refetch } = useMobileSensorTableData(30000); // Auto-refresh every 30 seconds
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSensor, setSelectedSensor] = useState<SensorData | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -45,31 +46,10 @@ export const MobileSensorDataTable = () => {
     'tvoc',
   ]);
 
-  // Auto-refresh data every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refreshData();
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Refresh data
-  const refreshData = () => {
+  // Refresh data manually
+  const refreshData = async () => {
     setIsRefreshing(true);
-    // Simulate data refresh with slight variations
-    const refreshedData = MOBILE_SENSOR_DATA.map((sensor) => ({
-      ...sensor,
-      temperature: sensor.status === 'online' ? sensor.temperature + (Math.random() - 0.5) * 0.5 : 0,
-      humidity: sensor.status === 'online' ? sensor.humidity + (Math.random() - 0.5) * 2 : 0,
-      co2: sensor.status === 'online' ? Math.max(0, sensor.co2 + Math.floor((Math.random() - 0.5) * 20)) : 0,
-      pm1: sensor.status === 'online' ? Math.max(0, (sensor.pm1 || 0) + (Math.random() - 0.5) * 1.5) : 0,
-      pm25: sensor.status === 'online' ? Math.max(0, sensor.pm25 + (Math.random() - 0.5) * 2) : 0,
-      pm10: sensor.status === 'online' ? Math.max(0, sensor.pm10 + (Math.random() - 0.5) * 3) : 0,
-      tvoc: sensor.status === 'online' ? Math.max(0, sensor.tvoc + Math.floor((Math.random() - 0.5) * 10)) : 0,
-      timestamp: sensor.status === 'online' ? new Date().toISOString() : sensor.timestamp,
-    }));
-    setSensors(refreshedData);
+    await refetch();
     setTimeout(() => setIsRefreshing(false), 500);
   };
 
@@ -332,8 +312,33 @@ export const MobileSensorDataTable = () => {
 
   return (
     <div className="p-6" style={{ background: '#f5f7fa', minHeight: '100%' }}>
-      {/* Header */}
-      <Card
+      {/* Error Alert */}
+      {error && (
+        <Alert
+          message="Error Loading Mobile Sensors"
+          description="Unable to load mobile sensor data. Please try refreshing the page."
+          type="error"
+          closable
+          showIcon
+          style={{ marginBottom: 16, borderRadius: 12 }}
+        />
+      )}
+
+      {/* Loading State */}
+      {loading && sensors.length === 0 && (
+        <Card style={{ borderRadius: 16, textAlign: 'center', padding: 60 }}>
+          <Spin size="large" />
+          <div style={{ marginTop: 16, color: '#8c8c8c' }}>
+            Loading mobile sensor data...
+          </div>
+        </Card>
+      )}
+
+      {/* Main Content */}
+      {!loading || sensors.length > 0 ? (
+        <>
+          {/* Header */}
+          <Card
         className="mb-6"
         style={{
           borderRadius: '16px',
@@ -449,6 +454,8 @@ export const MobileSensorDataTable = () => {
           onClose={handleCloseHistoryModal}
         />
       )}
+        </>
+      ) : null}
     </div>
   );
 };

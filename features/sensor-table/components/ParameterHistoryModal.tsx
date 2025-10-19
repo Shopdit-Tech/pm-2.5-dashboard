@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Modal, Typography, Card, Row, Col, Button, Space } from 'antd';
+import { Modal, Typography, Card, Row, Col, Button, Space, Spin, Alert } from 'antd';
 import { LineChartOutlined, RiseOutlined, FallOutlined, DashboardOutlined } from '@ant-design/icons';
 import { SensorData } from '@/types/sensor';
 import {
@@ -15,12 +15,8 @@ import {
   ReferenceArea,
   ReferenceLine,
 } from 'recharts';
-import {
-  generateHistoricalData,
-  calculateStatistics,
-  TimeRange,
-  getTimeRangeLabel,
-} from '../utils/historicalDataGenerator';
+import { useChartData } from '@/features/analytics-charts/hooks/useChartData';
+import type { TimeRange } from '@/features/analytics-charts/types/chartTypes';
 import {
   getZonesForParameter,
   getParameterLabel,
@@ -28,6 +24,19 @@ import {
 } from '../utils/parameterThresholds';
 
 const { Text, Title } = Typography;
+
+// Simple time range label helper
+const getTimeRangeLabel = (range: TimeRange): string => {
+  const labels: Record<TimeRange, string> = {
+    '1h': 'Last Hour',
+    '8h': 'Last 8 Hours',
+    '24h': 'Last 24 Hours',
+    '48h': 'Last 48 Hours',
+    '7d': 'Last 7 Days',
+    '30d': 'Last 30 Days',
+  };
+  return labels[range] || range;
+};
 
 type ParameterHistoryModalProps = {
   sensor: SensorData;
@@ -46,15 +55,46 @@ export const ParameterHistoryModal = ({
 }: ParameterHistoryModalProps) => {
   const [timeRange, setTimeRange] = useState<TimeRange>('48h');
 
-  // Generate historical data
-  const historicalData = useMemo(() => {
-    return generateHistoricalData(currentValue, parameter, timeRange);
-  }, [currentValue, parameter, timeRange]);
+  // Normalize parameter name to SensorData key
+  const normalizeParameter = (param: string): keyof Pick<SensorData, 'temperature' | 'humidity' | 'co2' | 'pm1' | 'pm25' | 'pm10' | 'tvoc'> => {
+    const map: Record<string, any> = {
+      'PM2.5': 'pm25',
+      'PM₂.₅': 'pm25',
+      'PM10': 'pm10',
+      'PM₁₀': 'pm10',
+      'PM1': 'pm1',
+      'PM₁': 'pm1',
+      'Temperature': 'temperature',
+      'Humidity': 'humidity',
+      'CO2': 'co2',
+      'CO₂': 'co2',
+      'TVOC': 'tvoc',
+    };
+    return (map[param] || param.toLowerCase()) as any;
+  };
 
-  // Calculate statistics
+  const paramKey = normalizeParameter(parameter);
+  
+  // Fetch real historical data from API
+  const { chartData, loading, error } = useChartData(sensor, paramKey, timeRange);
+
+  // Calculate statistics from real data
   const stats = useMemo(() => {
-    return calculateStatistics(historicalData);
-  }, [historicalData]);
+    if (!chartData) {
+      return {
+        current: currentValue,
+        average: currentValue,
+        min: currentValue,
+        max: currentValue,
+      };
+    }
+    return {
+      current: currentValue,
+      average: chartData.average,
+      min: chartData.min,
+      max: chartData.max,
+    };
+  }, [chartData, currentValue]);
 
   // Get quality zones for background
   const zones = useMemo(() => {
@@ -62,21 +102,15 @@ export const ParameterHistoryModal = ({
   }, [parameter]);
 
   // Format data for chart
-  const chartData = useMemo(() => {
-    return historicalData.map((point) => ({
+  const formattedChartData = useMemo(() => {
+    if (!chartData || !chartData.data) return [];
+    return chartData.data.map((point) => ({
       timestamp: new Date(point.timestamp).getTime(),
       value: point.value,
-      formattedTime: new Date(point.timestamp).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      }),
-      formattedDate: new Date(point.timestamp).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-      }),
+      formattedTime: point.formattedTime,
+      formattedDate: point.formattedDate,
     }));
-  }, [historicalData]);
+  }, [chartData]);
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload }: any) => {
@@ -144,7 +178,7 @@ export const ParameterHistoryModal = ({
               Time Range: {getTimeRangeLabel(timeRange)} (5 min intervals)
             </Text>
             <Space>
-              {(['6h', '12h', '24h', '48h'] as TimeRange[]).map((range) => (
+              {(['8h', '24h', '48h', '7d'] as TimeRange[]).map((range) => (
                 <Button
                   key={range}
                   type={timeRange === range ? 'primary' : 'default'}
@@ -157,17 +191,39 @@ export const ParameterHistoryModal = ({
             </Space>
           </div>
 
+          {/* Loading State */}
+          {loading && (
+            <Card style={{ borderRadius: 12, textAlign: 'center', padding: 60, marginBottom: 24 }}>
+              <Spin size="large" />
+              <div style={{ marginTop: 16, color: '#8c8c8c' }}>
+                Loading historical data...
+              </div>
+            </Card>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <Alert
+              message="Error Loading Historical Data"
+              description="Unable to load historical data. Showing current value only."
+              type="warning"
+              showIcon
+              style={{ marginBottom: 24, borderRadius: 12 }}
+            />
+          )}
+
           {/* Chart */}
-          <Card
-            style={{
-              borderRadius: '12px',
-              border: '1px solid #f0f0f0',
-              marginBottom: 24,
-            }}
-            bodyStyle={{ padding: '24px 16px' }}
-          >
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          {!loading && formattedChartData.length > 0 && (
+            <Card
+              style={{
+                borderRadius: '12px',
+                border: '1px solid #f0f0f0',
+                marginBottom: 24,
+              }}
+              bodyStyle={{ padding: '24px 16px' }}
+            >
+              <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={formattedChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
 
                 {/* Background quality zones */}
@@ -258,7 +314,8 @@ export const ParameterHistoryModal = ({
                 ))}
               </div>
             )}
-          </Card>
+            </Card>
+          )}
 
           {/* Statistics Cards */}
           <Row gutter={[16, 16]}>

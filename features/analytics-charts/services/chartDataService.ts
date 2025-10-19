@@ -1,4 +1,4 @@
-import { SensorData } from '@/types/sensor';
+import { SensorData, ParameterType } from '@/types/sensor';
 import {
   TimeRange,
   TimeSeriesDataPoint,
@@ -7,9 +7,94 @@ import {
   getAggregationInterval,
   getIntervalMinutes,
 } from '../types/chartTypes';
+import { getSensorHistory } from '@/services/sensorApi';
+import { mapParameterToApiMetric } from '@/utils/sensorMapper';
 
 /**
- * Generate time-series data for a sensor parameter
+ * Fetch real historical data from API for a sensor parameter
+ */
+export async function fetchRealChartData(
+  sensor: SensorData,
+  parameter: keyof Pick<SensorData, 'temperature' | 'humidity' | 'co2' | 'pm1' | 'pm25' | 'pm10' | 'tvoc'>,
+  timeRange: TimeRange
+): Promise<ChartData> {
+  try {
+    // Validate sensor has code for API call
+    if (!sensor.code) {
+      console.warn(`⚠️ Sensor ${sensor.name} has no code, falling back to mock data`);
+      return generateChartData(sensor, parameter, timeRange);
+    }
+
+    console.log(`📈 Fetching real history for ${sensor.name} - ${parameter}`);
+
+    const hours = getTimeRangeHours(timeRange);
+    const intervalMinutes = getIntervalMinutes(getAggregationInterval(timeRange));
+    
+    // Map app parameter to API metric name
+    const apiMetric = mapParameterToApiMetric(parameter as ParameterType);
+
+    // Fetch historical data from API
+    const response = await getSensorHistory({
+      sensor_code: sensor.code,
+      metric: apiMetric as any, // API accepts specific metric names
+      since_hours: hours,
+      agg_minutes: intervalMinutes,
+    });
+
+    // Find the metric in response
+    const metricData = response.metrics.find((m) => m.metric === apiMetric);
+
+    if (!metricData || metricData.points.length === 0) {
+      console.warn(`⚠️ No data for ${sensor.name} - ${parameter}, using mock data`);
+      return generateChartData(sensor, parameter, timeRange);
+    }
+
+    // Transform API data to chart format
+    const data: TimeSeriesDataPoint[] = metricData.points
+      .filter((point) => point.value !== null)
+      .map((point) => {
+        const timestamp = new Date(point.ts);
+        return {
+          timestamp: point.ts,
+          value: point.value!,
+          formattedTime: timestamp.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+          }),
+          formattedDate: timestamp.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+          }),
+        };
+      });
+
+    // Calculate statistics
+    const values = data.map((d) => d.value);
+    const average = metricData.average;
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+
+    console.log(`✅ Fetched ${data.length} points for ${sensor.name} - ${parameter}`);
+
+    return {
+      sensorId: sensor.id,
+      sensorName: sensor.name,
+      parameter,
+      data,
+      average,
+      min,
+      max,
+    };
+  } catch (error) {
+    console.error(`❌ Error fetching history for ${sensor.name}:`, error);
+    // Fallback to mock data on error
+    return generateChartData(sensor, parameter, timeRange);
+  }
+}
+
+/**
+ * Generate time-series data for a sensor parameter (MOCK DATA - Fallback)
  */
 export function generateChartData(
   sensor: SensorData,

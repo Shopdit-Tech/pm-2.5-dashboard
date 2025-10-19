@@ -1,18 +1,26 @@
+import { useMemo } from 'react';
 import Head from 'next/head';
 import { MainLayout } from '@/components/MainLayout';
 import { MapDashboard } from '@/features/map-dashboard/components/MapDashboard';
-import { MobileRouteDashboard } from '@/features/mobile-routes/components/MobileRouteDashboard';
+import { MobileSensorsDashboard } from '@/features/mobile-routes/components/MobileSensorsDashboard';
 import { SensorDataTable } from '@/features/sensor-table/components/SensorDataTable';
 import { MobileSensorDataTable } from '@/features/mobile-sensor-table/components/MobileSensorDataTable';
 import { AnalyticsView } from '@/features/analytics-charts/components/AnalyticsView';
 import { AdminSettings } from '@/features/admin/components/AdminSettings';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { SENSOR_TABLE_DATA } from '@/features/sensor-table/services/sensorTableData';
-import { MOBILE_SENSOR_DATA } from '@/features/mobile-sensor-table/services/mobileSensorData';
+import { useSensorTableData } from '@/features/sensor-table/hooks/useSensorTableData';
+import { useMobileSensorTableData } from '@/features/mobile-sensor-table/hooks/useMobileSensorTableData';
 
 export default function Home() {
+  // Fetch real sensors from both sources
+  const { sensors: staticSensors } = useSensorTableData();
+  const { sensors: mobileSensors } = useMobileSensorTableData();
+  
   // Combine all sensors for analytics
-  const allSensors = [...SENSOR_TABLE_DATA, ...MOBILE_SENSOR_DATA];
+  const allSensors = useMemo(
+    () => [...staticSensors, ...mobileSensors],
+    [staticSensors, mobileSensors]
+  );
 
   return (
     <>
@@ -29,7 +37,7 @@ export default function Home() {
               return <MapDashboard />;
             }
             if (activeView === 'mobile-routes') {
-              return <MobileRouteDashboard />;
+              return <MobileSensorsDashboard />;
             }
             if (activeView === 'sensor-data-table') {
               return <SensorDataTable />;
