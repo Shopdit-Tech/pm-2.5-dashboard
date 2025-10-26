@@ -117,10 +117,12 @@ export const GoogleMapComponent = ({
         open={!!selectedSensorId}
         onCancel={handleModalClose}
         footer={null}
-        width="90%"
-        style={{ top: 20, maxWidth: 1200 }}
-        bodyStyle={{ padding: 0 }}
+        closable={false}
+        width="auto"
+        style={{ top: 20 }}
+        bodyStyle={{ padding: 0, display: 'flex', justifyContent: 'center' }}
         destroyOnClose
+        centered
       >
         {selectedSensor && (
           <SensorInfoWindow sensor={selectedSensor} onClose={handleModalClose} />

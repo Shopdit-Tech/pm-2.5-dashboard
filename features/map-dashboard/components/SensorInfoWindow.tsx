@@ -1,240 +1,274 @@
 import { SensorData, ParameterType } from '@/types/sensor';
-import { Card, Tag, Row, Col, Typography, Divider, Space } from 'antd';
 import {
   EnvironmentOutlined,
-  ClockCircleOutlined,
-  HomeOutlined,
-  ShopOutlined,
-  DashboardOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
-import {
-  PARAMETER_LABELS,
-  PARAMETER_UNITS,
-} from '@/constants/airQualityRanges';
-import { getParameterColor, getParameterLevel, getLevelLabel } from '@/utils/airQualityUtils';
-
-const { Text, Title } = Typography;
+import { getParameterColor, getParameterLevel } from '@/utils/airQualityUtils';
 
 type SensorInfoWindowProps = {
   sensor: SensorData;
   onClose?: () => void;
 };
 
-type ParameterCardProps = {
-  label: string;
+// Circular Progress Component
+const CircularProgress = ({ value, max, size = 145, strokeWidth = 18, color = '#52c41a' }: {
   value: number;
-  unit: string;
-  parameter: ParameterType;
-  featured?: boolean;
-};
-
-const ParameterCard = ({ label, value, unit, parameter, featured = false }: ParameterCardProps) => {
-  const color = getParameterColor(parameter, value);
-  const level = getParameterLevel(parameter, value);
-  const levelLabel = getLevelLabel(level);
-
-  if (featured) {
-    return (
-      <div
-        className="rounded-2xl p-6 shadow-lg"
-        style={{
-          background: `linear-gradient(135deg, ${color}15 0%, ${color}30 100%)`,
-          border: `2px solid ${color}`,
-        }}
-      >
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <Text className="text-sm text-gray-600 font-medium">{label}</Text>
-            <div className="mt-1">
-              <Tag
-                color={color}
-                className="px-3 py-1 rounded-full text-xs font-semibold"
-                style={{ border: 'none' }}
-              >
-                {levelLabel}
-              </Tag>
-            </div>
-          </div>
-          <DashboardOutlined style={{ fontSize: 24, color: color, opacity: 0.6 }} />
-        </div>
-        <div className="flex items-baseline gap-2">
-          <span className="text-5xl font-bold" style={{ color }}>
-            {value.toFixed(1)}
-          </span>
-          <span className="text-xl text-gray-500 font-medium">{unit}</span>
-        </div>
-      </div>
-    );
-  }
+  max: number;
+  size?: number;
+  strokeWidth?: number;
+  color?: string;
+}) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const percentage = Math.min((value / max) * 100, 100);
+  const offset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="rounded-xl p-4 bg-white shadow-sm border border-gray-100 hover:shadow-md transition-all">
-      <div className="flex justify-between items-center mb-2">
-        <Text className="text-xs text-gray-500 font-medium">{label}</Text>
-        <div
-          className="w-2 h-2 rounded-full"
-          style={{ backgroundColor: color }}
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="transform -rotate-90">
+        {/* Background circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="#f0f0f0"
+          strokeWidth={strokeWidth}
+          fill="none"
         />
-      </div>
-      <div className="flex items-baseline gap-1 mb-1">
-        <span className="text-2xl font-bold" style={{ color }}>
-          {value.toFixed(1)}
-        </span>
-        <span className="text-sm text-gray-400">{unit}</span>
-      </div>
-      <Tag
-        color={color}
-        className="px-2 py-0 rounded text-xs"
-        style={{ border: 'none', fontSize: '10px' }}
+        {/* Progress circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={color}
+          strokeWidth={strokeWidth}
+          fill="none"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+        />
+      </svg>
+      <div
+        className="absolute inset-0 flex flex-col items-center justify-center"
+        style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
       >
-        {levelLabel}
-      </Tag>
+        <div className="text-xs text-gray-400 font-bold uppercase tracking-wide mb-1">PM 2.5</div>
+        <div className="text-4xl font-bold" style={{ color, lineHeight: '1.2' }}>
+          {value.toFixed(1)}
+        </div>
+        <div className="text-xs text-gray-400 font-medium mt-1">μg/m³</div>
+      </div>
     </div>
   );
 };
 
-export const SensorInfoWindow = ({ sensor }: SensorInfoWindowProps) => {
-  console.log('🎨 SensorInfoWindow rendering for:', sensor.name, sensor);
-  
-  const isOnline = sensor.status === 'online';
-  const lastUpdate = new Date(sensor.timestamp).toLocaleString('th-TH', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-  
-  console.log('📊 Sensor values:', {
-    pm25: sensor.pm25,
-    pm10: sensor.pm10,
-    temp: sensor.temperature,
-    humidity: sensor.humidity,
-    co2: sensor.co2,
-    tvoc: sensor.tvoc,
-  });
+// Quality Indicator Tabs
+const QualityIndicatorTabs = ({ currentLevel }: { currentLevel: number }) => {
+  const levels = [
+    { label: 'ดี', color: '#52c41a', level: 1 },
+    { label: 'ปานกลาง', color: '#faad14', level: 2 },
+    { label: 'เริ่มมีผลกระทบ', color: '#fa8c16', level: 3 },
+    { label: 'มีผลกระทบ', color: '#f5222d', level: 4 },
+  ];
 
   return (
-    <div className="p-6" style={{ backgroundColor: '#f8f9fa' }}>
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-2xl p-6 mb-6 text-white shadow-lg">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="bg-white bg-opacity-20 p-3 rounded-xl">
-              {sensor.type === 'indoor' ? (
-                <HomeOutlined style={{ fontSize: 24 }} />
-              ) : (
-                <ShopOutlined style={{ fontSize: 24 }} />
-              )}
-            </div>
-            <div>
-              <Title level={3} className="mb-0 text-white">
-                {sensor.name}
-              </Title>
-              <div className="flex items-center gap-2 mt-1">
-                <EnvironmentOutlined className="text-sm" />
-                <Text className="text-white text-opacity-90 text-sm">
-                  {sensor.type === 'indoor' ? 'ภายในอาคาร' : 'ภายนอกอาคาร'}
-                </Text>
-              </div>
-            </div>
-          </div>
-          <div
-            className={`px-3 py-1 rounded-full text-xs font-semibold ${
-              isOnline ? 'bg-green-500' : 'bg-red-500'
-            }`}
-          >
-            {isOnline ? '● ออนไลน์' : '● ออฟไลน์'}
-          </div>
+    <div className="flex gap-2 w-full">
+      {levels.map((level) => (
+        <div
+          key={level.level}
+          className="flex-1 text-center py-2.5 px-3 rounded-lg text-xs font-bold text-white transition-all"
+          style={{
+            backgroundColor: level.level === currentLevel ? level.color : `${level.color}80`,
+            opacity: 1,
+            transform: level.level === currentLevel ? 'scale(1.03)' : 'scale(1)',
+            boxShadow: level.level === currentLevel ? `0 4px 12px ${level.color}60` : 'none',
+          }}
+        >
+          {level.label}
         </div>
-        <div className="flex items-center gap-2 text-sm text-white text-opacity-80">
-          <ClockCircleOutlined />
-          <span>อัปเดตล่าสุด: {lastUpdate}</span>
+      ))}
+    </div>
+  );
+};
+
+// Metric Card with Progress Bar
+const MetricCardWithBar = ({ label, value, unit, parameter }: {
+  label: string;
+  value: number;
+  unit: string;
+  parameter: ParameterType;
+}) => {
+  const color = getParameterColor(parameter, value);
+  
+  // Calculate progress percentage (0-100)
+  const maxValues: Record<ParameterType, number> = {
+    pm25: 250,
+    pm10: 400,
+    pm1: 150,
+    co2: 2000,
+    temperature: 50,
+    humidity: 100,
+    tvoc: 1000,
+  };
+  const progress = Math.min((value / (maxValues[parameter] || 100)) * 100, 100);
+
+  return (
+    <div
+      style={{
+        background: '#fafafa',
+        borderRadius: '12px',
+        padding: '18px',
+        border: '1px solid #f0f0f0',
+      }}
+    >
+      <div className="text-gray-400 text-xs font-bold mb-2 uppercase tracking-wide">{label}</div>
+      <div className="flex items-baseline gap-1.5 mb-3">
+        <span className="text-2xl font-bold" style={{ color }}>
+          {value.toFixed(1)}
+        </span>
+        <span className="text-xs text-gray-400 font-medium">{unit}</span>
+      </div>
+      {/* Progress bar */}
+      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-500"
+          style={{
+            width: `${progress}%`,
+            backgroundColor: color,
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+
+export const SensorInfoWindow = ({ sensor, onClose }: SensorInfoWindowProps) => {
+  const pm25Color = getParameterColor('pm25', sensor.pm25);
+  const pm25Level = getParameterLevel('pm25', sensor.pm25);
+
+  return (
+    <div
+      className="relative rounded-2xl"
+      style={{
+        background: 'white',
+        border: '1px solid rgba(0,0,0,0.08)',
+        padding: '36px',
+        maxWidth: '560px',
+        width: '100%',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+      }}
+    >
+      {/* Close Button */}
+      <button
+        onClick={onClose}
+        className="absolute top-5 right-5 p-2 hover:bg-gray-100 rounded-full transition-all z-10"
+        style={{ background: 'transparent' }}
+      >
+        <CloseOutlined style={{ fontSize: 18, color: '#9ca3af' }} />
+      </button>
+
+      {/* Main Content: Circle + Temperature & Humidity */}
+      <div className="flex items-center gap-8 mb-8">
+        {/* Left: Circular Progress */}
+        <div className="flex-shrink-0">
+          <CircularProgress
+            value={sensor.pm25}
+            max={250}
+            size={145}
+            color={pm25Color}
+          />
+        </div>
+        
+        {/* Right: Temperature & Humidity */}
+        <div className="flex-1">
+          {/* Temperature */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-2">
+              <div style={{ 
+                width: '28px', 
+                height: '28px', 
+                borderRadius: '8px', 
+                background: 'linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 8px rgba(255,107,107,0.25)'
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                  <path d="M15 13V5c0-1.66-1.34-3-3-3S9 3.34 9 5v8c-1.21.91-2 2.37-2 4 0 2.76 2.24 5 5 5s5-2.24 5-5c0-1.63-.79-3.09-2-4zm-4-8c0-.55.45-1 1-1s1 .45 1 1h-1v1h1v2h-1v1h1v2h-2V5z"/>
+                </svg>
+              </div>
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">อุณหภูมิ</span>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 ml-1">{sensor.temperature.toFixed(0)}°</div>
+          </div>
+          
+          {/* Humidity */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <div style={{ 
+                width: '28px', 
+                height: '28px', 
+                borderRadius: '8px', 
+                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 8px rgba(79,172,254,0.25)'
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                  <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                </svg>
+              </div>
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">ความชื้น</span>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 ml-1">{sensor.humidity.toFixed(0)}%</div>
+          </div>
         </div>
       </div>
 
-      {isOnline ? (
-        <>
-          {/* Featured PM2.5 */}
-          <div className="mb-6">
-            <ParameterCard
-              label={PARAMETER_LABELS.pm25}
-              value={sensor.pm25}
-              unit={PARAMETER_UNITS.pm25}
-              parameter="pm25"
-              featured
-            />
-          </div>
+      {/* Location */}
+      <div className="text-center mb-6 py-4" style={{ borderTop: '1px solid #f3f4f6', borderBottom: '1px solid #f3f4f6' }}>
+        <div className="flex items-center justify-center gap-2 text-gray-700">
+          <EnvironmentOutlined style={{ fontSize: 14, color: '#667eea' }} />
+          <span className="text-base font-bold">{sensor.name}</span>
+        </div>
+      </div>
 
-          <Divider className="my-6">
-            <Text className="text-gray-400 text-sm">พารามิเตอร์อื่นๆ</Text>
-          </Divider>
+      {/* Quality Indicator Tabs */}
+      <div style={{ marginBottom: '28px' }}>
+        <QualityIndicatorTabs currentLevel={Number(pm25Level)} />
+      </div>
 
-          {/* Other Parameters Grid */}
-          <Row gutter={[16, 16]}>
-            <Col xs={12} sm={12} md={8}>
-              <ParameterCard
-                label={PARAMETER_LABELS.pm10}
-                value={sensor.pm10}
-                unit={PARAMETER_UNITS.pm10}
-                parameter="pm10"
-              />
-            </Col>
-            <Col xs={12} sm={12} md={8}>
-              <ParameterCard
-                label={PARAMETER_LABELS.temperature}
-                value={sensor.temperature}
-                unit={PARAMETER_UNITS.temperature}
-                parameter="temperature"
-              />
-            </Col>
-            <Col xs={12} sm={12} md={8}>
-              <ParameterCard
-                label={PARAMETER_LABELS.humidity}
-                value={sensor.humidity}
-                unit={PARAMETER_UNITS.humidity}
-                parameter="humidity"
-              />
-            </Col>
-            <Col xs={12} sm={12} md={8}>
-              <ParameterCard
-                label={PARAMETER_LABELS.co2}
-                value={sensor.co2}
-                unit={PARAMETER_UNITS.co2}
-                parameter="co2"
-              />
-            </Col>
-            <Col xs={12} sm={12} md={8}>
-              <ParameterCard
-                label={PARAMETER_LABELS.tvoc}
-                value={sensor.tvoc}
-                unit={PARAMETER_UNITS.tvoc}
-                parameter="tvoc"
-              />
-            </Col>
-            {sensor.pm1 !== undefined && (
-              <Col xs={12} sm={12} md={8}>
-                <ParameterCard
-                  label={PARAMETER_LABELS.pm1}
-                  value={sensor.pm1}
-                  unit={PARAMETER_UNITS.pm1}
-                  parameter="pm1"
-                />
-              </Col>
-            )}
-          </Row>
-        </>
-      ) : (
-        <Card className="text-center py-12 rounded-2xl">
-          <div className="text-gray-400 text-lg">
-            <DashboardOutlined style={{ fontSize: 48, marginBottom: 16 }} />
-            <div>เซ็นเซอร์ไม่ได้เชื่อมต่อ</div>
-            <Text type="secondary" className="text-sm">
-              ไม่สามารถแสดงข้อมูลได้ในขณะนี้
-            </Text>
-          </div>
-        </Card>
-      )}
+      {/* Metrics Grid (2x2) */}
+      <div className="grid grid-cols-2 gap-4">
+        <MetricCardWithBar
+          label="PM 10"
+          value={sensor.pm10}
+          unit="μg/m³"
+          parameter="pm10"
+        />
+        <MetricCardWithBar
+          label="CO2"
+          value={sensor.co2}
+          unit="ppm"
+          parameter="co2"
+        />
+        <MetricCardWithBar
+          label="PM1"
+          value={sensor.pm1 || 0}
+          unit="μg/m³"
+          parameter="pm1"
+        />
+        <MetricCardWithBar
+          label="TVOC"
+          value={sensor.tvoc}
+          unit="ppb"
+          parameter="tvoc"
+        />
+      </div>
     </div>
   );
 };

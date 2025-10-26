@@ -105,15 +105,15 @@ export const MobileSensorsDashboard = () => {
       : 0;
 
   return (
-    <div style={{ padding: '24px', background: '#f5f7fa', minHeight: '100%' }}>
+    <div style={{ padding: '32px', background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)', minHeight: '100%' }}>
       {/* Header */}
-      <div className="mb-6" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="mb-8" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2 style={{ fontSize: 24, fontWeight: 600, margin: 0, color: '#262626' }}>
-            <CarOutlined style={{ marginRight: 8, color: '#1890ff' }} />
+          <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
+            <CarOutlined style={{ marginRight: 12, color: '#f5576c' }} />
             Mobile Sensor Monitoring
           </h2>
-          <p style={{ margin: '4px 0 0 0', color: '#8c8c8c', fontSize: 14 }}>
+          <p style={{ margin: '8px 0 0 0', color: '#666', fontSize: 15 }}>
             Real-time tracking of mobile air quality sensors
           </p>
         </div>
@@ -123,12 +123,14 @@ export const MobileSensorsDashboard = () => {
           loading={refreshing}
           size="large"
           style={{
-            borderRadius: 8,
-            height: 40,
+            borderRadius: 12,
+            height: 48,
+            padding: '0 24px',
             background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
             borderColor: 'transparent',
             color: 'white',
-            fontWeight: 500,
+            fontWeight: 600,
+            boxShadow: '0 4px 12px rgba(245,87,108,0.3)',
           }}
         >
           Refresh
@@ -136,78 +138,73 @@ export const MobileSensorsDashboard = () => {
       </div>
 
       {/* Statistics Cards */}
-      <Row gutter={[16, 16]} className="mb-6">
+      <Row gutter={[20, 20]} className="mb-8">
         <Col xs={12} sm={12} md={6}>
           <Card
             style={{
-              borderRadius: 12,
-              border: 'none',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              background: 'linear-gradient(135deg, #f093fb15 0%, #f5576c15 100%)',
+              borderRadius: 16,
+              border: '1px solid rgba(255,255,255,0.6)',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              background: 'linear-gradient(135deg, rgba(240,147,251,0.1) 0%, rgba(245,87,108,0.1) 100%)',
+              backdropFilter: 'blur(10px)',
             }}
+            bodyStyle={{ padding: '24px' }}
           >
-            <Statistic
-              title="Total Mobile Sensors"
-              value={sensors.length}
-              suffix="devices"
-              valueStyle={{ color: '#f5576c', fontSize: 28, fontWeight: 'bold' }}
-              prefix={<CarOutlined />}
-            />
+            <div style={{ fontSize: 13, color: '#666', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Mobile</div>
+            <div style={{ fontSize: 36, fontWeight: 700, color: '#f5576c', marginBottom: 4 }}>{sensors.length}</div>
+            <div style={{ fontSize: 12, color: '#999' }}>🚗 tracking devices</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
           <Card
             style={{
-              borderRadius: 12,
-              border: 'none',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              background: 'linear-gradient(135deg, #52c41a15 0%, #73d13d15 100%)',
+              borderRadius: 16,
+              border: '1px solid rgba(255,255,255,0.6)',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              background: 'linear-gradient(135deg, rgba(82,196,26,0.1) 0%, rgba(115,209,61,0.1) 100%)',
+              backdropFilter: 'blur(10px)',
             }}
+            bodyStyle={{ padding: '24px' }}
           >
-            <Statistic
-              title="Active Now"
-              value={onlineSensors.length}
-              suffix={`/ ${sensors.length}`}
-              valueStyle={{ color: '#52c41a', fontSize: 28, fontWeight: 'bold' }}
-            />
+            <div style={{ fontSize: 13, color: '#666', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Active Now</div>
+            <div style={{ fontSize: 36, fontWeight: 700, color: '#52c41a', marginBottom: 4 }}>{onlineSensors.length}</div>
+            <div style={{ fontSize: 12, color: '#999' }}>of {sensors.length} online</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
           <Card
             style={{
-              borderRadius: 12,
-              border: 'none',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              borderRadius: 16,
+              border: '1px solid rgba(255,255,255,0.6)',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              background: 'linear-gradient(135deg, rgba(24,144,255,0.08) 0%, rgba(24,144,255,0.05) 100%)',
+              backdropFilter: 'blur(10px)',
             }}
+            bodyStyle={{ padding: '24px' }}
           >
-            <div style={{ marginBottom: 4 }}>
-              <Tag color="blue" style={{ borderRadius: 4 }}>Average</Tag>
+            <div style={{ marginBottom: 8 }}>
+              <Tag color="blue" style={{ borderRadius: 8, padding: '4px 12px', fontWeight: 600, border: 'none' }}>📊 Average</Tag>
             </div>
-            <Statistic
-              title="PM2.5"
-              value={avgPM25.toFixed(1)}
-              suffix="µg/m³"
-              valueStyle={{ color: '#1890ff', fontSize: 24, fontWeight: 'bold' }}
-            />
+            <div style={{ fontSize: 32, fontWeight: 700, color: '#1890ff', marginBottom: 4 }}>{avgPM25.toFixed(1)}</div>
+            <div style={{ fontSize: 12, color: '#999' }}>µg/m³ PM2.5</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
           <Card
             style={{
-              borderRadius: 12,
-              border: 'none',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              borderRadius: 16,
+              border: '1px solid rgba(255,255,255,0.6)',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              background: 'linear-gradient(135deg, rgba(255,77,79,0.08) 0%, rgba(255,77,79,0.05) 100%)',
+              backdropFilter: 'blur(10px)',
             }}
+            bodyStyle={{ padding: '24px' }}
           >
-            <div style={{ marginBottom: 4 }}>
-              <Tag color="red" style={{ borderRadius: 4 }}>Maximum</Tag>
+            <div style={{ marginBottom: 8 }}>
+              <Tag color="red" style={{ borderRadius: 8, padding: '4px 12px', fontWeight: 600, border: 'none' }}>⚠️ Maximum</Tag>
             </div>
-            <Statistic
-              title="PM2.5"
-              value={maxPM25.toFixed(1)}
-              suffix="µg/m³"
-              valueStyle={{ color: '#ff4d4f', fontSize: 24, fontWeight: 'bold' }}
-            />
+            <div style={{ fontSize: 32, fontWeight: 700, color: '#ff4d4f', marginBottom: 4 }}>{maxPM25.toFixed(1)}</div>
+            <div style={{ fontSize: 12, color: '#999' }}>µg/m³ PM2.5</div>
           </Card>
         </Col>
       </Row>
