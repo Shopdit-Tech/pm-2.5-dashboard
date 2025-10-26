@@ -4,7 +4,8 @@ import { useState, useMemo } from 'react';
 import { Card, Select, Typography, Space, Spin, Alert } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { SensorData } from '@/types/sensor';
-import { TimeRange, getTimeRangeLabel } from '../types/chartTypes';
+import { TimeRange, getTimeRangeLabel, getTimeRangeId } from '../types/chartTypes';
+import { TIME_RANGES, getTimeRangeByIdOrDefault } from '../constants/timeRanges';
 import { aggregateDataPoints } from '../services/chartDataService';
 import { useChartData } from '../hooks/useChartData';
 import { getParameterLabel, getParameterUnit } from '@/features/sensor-table/utils/parameterThresholds';
@@ -28,7 +29,12 @@ export const BarChartPanel = ({
 }: BarChartPanelProps) => {
   const [parameter, setParameter] = useState(defaultParameter);
   const [sensorId, setSensorId] = useState(defaultSensorId || sensors[0]?.id);
-  const [timeRange, setTimeRange] = useState<TimeRange>(defaultTimeRange);
+  
+  // Handle both legacy string and new TimeRangeConfig
+  const initialTimeRangeId = typeof defaultTimeRange === 'string' 
+    ? defaultTimeRange 
+    : getTimeRangeId(defaultTimeRange);
+  const [timeRange, setTimeRange] = useState<TimeRange>(getTimeRangeByIdOrDefault(initialTimeRangeId));
 
   // Get current sensor
   const currentSensor = useMemo(
@@ -54,8 +60,8 @@ export const BarChartPanel = ({
       ...apiChartData,
       data: aggregated.map((point) => ({
         ...point,
-        // Color based on value
-        fill: getParameterColor(parameter as any, point.value),
+        // Color based on value - Use 0 for null values
+        fill: getParameterColor(parameter as any, point.value ?? 0),
       })),
     };
   }, [apiChartData, parameter]);
@@ -132,17 +138,16 @@ export const BarChartPanel = ({
           </Select>
 
           <Select
-            value={timeRange}
-            onChange={setTimeRange}
-            style={{ width: 150 }}
+            value={getTimeRangeId(timeRange)}
+            onChange={(id) => setTimeRange(getTimeRangeByIdOrDefault(id))}
+            style={{ width: 250 }}
             size="middle"
           >
-            <Option value="1h">Last 1 Hour</Option>
-            <Option value="8h">Last 8 Hours</Option>
-            <Option value="24h">Last 24 Hours</Option>
-            <Option value="48h">Last 48 Hours</Option>
-            <Option value="7d">Last 7 Days</Option>
-            <Option value="30d">Last 30 Days</Option>
+            {TIME_RANGES.map((range) => (
+              <Option key={range.id} value={range.id}>
+                {range.label}
+              </Option>
+            ))}
           </Select>
         </Space>
       </Space>

@@ -19,6 +19,7 @@ export const MobileSensorsDashboard = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [selectedRoute, setSelectedRoute] = useState<MobileRoute | null>(null);
   const [loadingRoute, setLoadingRoute] = useState(false);
+  const [routeError, setRouteError] = useState<string | null>(null);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -42,6 +43,7 @@ export const MobileSensorsDashboard = () => {
   const loadRoute = async (sensorId: string | null, date: Dayjs | null) => {
     if (!sensorId || !date) {
       setSelectedRoute(null);
+      setRouteError(null);
       return;
     }
 
@@ -49,10 +51,13 @@ export const MobileSensorsDashboard = () => {
     if (!sensor) {
       console.error('❌ Sensor not found:', sensorId);
       setSelectedRoute(null);
+      setRouteError('Sensor not found');
       return;
     }
 
     setLoadingRoute(true);
+    setRouteError(null);
+    
     try {
       console.log('📍 Loading route for sensor:', sensor.name, 'on date:', date.format('YYYY-MM-DD'));
       
@@ -61,14 +66,17 @@ export const MobileSensorsDashboard = () => {
       
       if (route) {
         setSelectedRoute(route);
+        setRouteError(null);
         console.log('✅ Successfully loaded route with', route.points.length, 'points');
       } else {
         setSelectedRoute(null);
+        setRouteError('No route data available for this sensor and date');
         console.log('⚠️ No route data available for this sensor and date');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error loading route:', error);
       setSelectedRoute(null);
+      setRouteError(error.message || 'Failed to load route data');
     } finally {
       setLoadingRoute(false);
     }
@@ -79,6 +87,7 @@ export const MobileSensorsDashboard = () => {
     setSelectedSensorId(null);
     setSelectedDate(null);
     setSelectedRoute(null);
+    setRouteError(null);
   };
 
   // Calculate statistics
@@ -318,6 +327,28 @@ export const MobileSensorsDashboard = () => {
             <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
               <ReloadOutlined spin style={{ fontSize: 48, color: '#1890ff' }} />
               <div style={{ fontSize: 16, color: '#595959' }}>Loading route data...</div>
+            </div>
+          ) : routeError ? (
+            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+              <Alert
+                type="error"
+                message="Failed to Load Route"
+                description={
+                  <div>
+                    <p style={{ marginBottom: 12 }}>{routeError}</p>
+                    {routeError.includes('GPS coordinates') && (
+                      <div style={{ marginTop: 12, padding: 12, background: '#fff7e6', border: '1px solid #ffd591', borderRadius: 4 }}>
+                        <strong>💡 Solution:</strong>
+                        <p style={{ marginTop: 8, marginBottom: 0 }}>
+                          Update your Supabase function to include <code>latitude</code> and <code>longitude</code> fields in each data point.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                }
+                showIcon
+                style={{ maxWidth: 600 }}
+              />
             </div>
           ) : selectedRoute ? (
             <RouteMap route={selectedRoute} />

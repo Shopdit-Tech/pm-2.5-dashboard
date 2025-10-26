@@ -15,6 +15,7 @@ import {
   LogoutOutlined,
   SettingOutlined,
   LoginOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginModal } from './LoginModal';
@@ -91,10 +92,16 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     },
   ];
 
-  // Add admin settings menu item for admin users
+  // Add admin menu items for admin users
   const menuItems = isAdmin
     ? [
         ...baseMenuItems,
+        {
+          key: 'data-export',
+          icon: <DownloadOutlined />,
+          label: 'Data Export',
+          title: 'ส่งออกข้อมูล',
+        },
         {
           key: 'admin-settings',
           icon: <SettingOutlined />,

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Modal, Typography, Card, Row, Col, Button, Space, Spin, Alert } from 'antd';
+import { Modal, Typography, Card, Row, Col, Spin, Alert, Select } from 'antd';
 import { LineChartOutlined, RiseOutlined, FallOutlined, DashboardOutlined } from '@ant-design/icons';
 import { SensorData } from '@/types/sensor';
 import {
@@ -17,6 +17,8 @@ import {
 } from 'recharts';
 import { useChartData } from '@/features/analytics-charts/hooks/useChartData';
 import type { TimeRange } from '@/features/analytics-charts/types/chartTypes';
+import { getTimeRangeLabel, getTimeRangeId } from '@/features/analytics-charts/types/chartTypes';
+import { TIME_RANGES, getTimeRangeByIdOrDefault } from '@/features/analytics-charts/constants/timeRanges';
 import {
   getZonesForParameter,
   getParameterLabel,
@@ -24,19 +26,6 @@ import {
 } from '../utils/parameterThresholds';
 
 const { Text, Title } = Typography;
-
-// Simple time range label helper
-const getTimeRangeLabel = (range: TimeRange): string => {
-  const labels: Record<TimeRange, string> = {
-    '1h': 'Last Hour',
-    '8h': 'Last 8 Hours',
-    '24h': 'Last 24 Hours',
-    '48h': 'Last 48 Hours',
-    '7d': 'Last 7 Days',
-    '30d': 'Last 30 Days',
-  };
-  return labels[range] || range;
-};
 
 type ParameterHistoryModalProps = {
   sensor: SensorData;
@@ -53,7 +42,8 @@ export const ParameterHistoryModal = ({
   visible,
   onClose,
 }: ParameterHistoryModalProps) => {
-  const [timeRange, setTimeRange] = useState<TimeRange>('48h');
+  // Use the default time range config (24h with 15min intervals)
+  const [timeRange, setTimeRange] = useState<TimeRange>(getTimeRangeByIdOrDefault('24h'));
 
   // Normalize parameter name to SensorData key
   const normalizeParameter = (param: string): keyof Pick<SensorData, 'temperature' | 'humidity' | 'co2' | 'pm1' | 'pm25' | 'pm10' | 'tvoc'> => {
@@ -175,20 +165,20 @@ export const ParameterHistoryModal = ({
           {/* Time Range Selector */}
           <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text strong style={{ fontSize: 15 }}>
-              Time Range: {getTimeRangeLabel(timeRange)} (5 min intervals)
+              Time Range: {getTimeRangeLabel(timeRange)}
             </Text>
-            <Space>
-              {(['8h', '24h', '48h', '7d'] as TimeRange[]).map((range) => (
-                <Button
-                  key={range}
-                  type={timeRange === range ? 'primary' : 'default'}
-                  onClick={() => setTimeRange(range)}
-                  size="middle"
-                >
-                  {range.toUpperCase()}
-                </Button>
+            <Select
+              value={getTimeRangeId(timeRange)}
+              onChange={(id) => setTimeRange(getTimeRangeByIdOrDefault(id))}
+              style={{ width: 250 }}
+              size="middle"
+            >
+              {TIME_RANGES.map((range) => (
+                <Select.Option key={range.id} value={range.id}>
+                  {range.label}
+                </Select.Option>
               ))}
-            </Space>
+            </Select>
           </div>
 
           {/* Loading State */}

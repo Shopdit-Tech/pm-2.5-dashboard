@@ -1,8 +1,14 @@
-export type TimeRange = '1h' | '8h' | '24h' | '48h' | '7d' | '30d';
+import type { TimeRangeConfig } from '../constants/timeRanges';
+
+// Legacy time range type for backward compatibility
+export type LegacyTimeRange = '1h' | '8h' | '24h' | '48h' | '7d' | '30d';
+
+// TimeRange can now be either a config object or legacy string
+export type TimeRange = TimeRangeConfig | LegacyTimeRange | string;
 
 export type TimeSeriesDataPoint = {
   timestamp: string;
-  value: number;
+  value: number | null;  // Allow null to show gaps in charts
   formattedTime?: string;
   formattedDate?: string;
 };
@@ -27,7 +33,14 @@ export type ChartConfig = {
 };
 
 export function getTimeRangeHours(range: TimeRange): number {
-  switch (range) {
+  // Handle new TimeRangeConfig object
+  if (typeof range === 'object' && range !== null && 'since_hours' in range) {
+    return range.since_hours;
+  }
+  
+  // Handle legacy string format
+  const rangeStr = range as string;
+  switch (rangeStr) {
     case '1h':
       return 1;
     case '8h':
@@ -40,11 +53,20 @@ export function getTimeRangeHours(range: TimeRange): number {
       return 168; // 7 * 24
     case '30d':
       return 720; // 30 * 24
+    default:
+      return 24; // Default fallback
   }
 }
 
 export function getTimeRangeLabel(range: TimeRange): string {
-  switch (range) {
+  // Handle new TimeRangeConfig object
+  if (typeof range === 'object' && range !== null && 'label' in range) {
+    return range.label;
+  }
+  
+  // Handle legacy string format
+  const rangeStr = range as string;
+  switch (rangeStr) {
     case '1h':
       return 'Last 1 Hour';
     case '8h':
@@ -57,11 +79,26 @@ export function getTimeRangeLabel(range: TimeRange): string {
       return 'Last 7 Days';
     case '30d':
       return 'Last 30 Days';
+    default:
+      return rangeStr; // Return the string itself as fallback
   }
 }
 
 export function getAggregationInterval(range: TimeRange): AggregationInterval {
-  switch (range) {
+  // Handle new TimeRangeConfig object - return based on agg_minutes
+  if (typeof range === 'object' && range !== null && 'agg_minutes' in range) {
+    const minutes = range.agg_minutes;
+    if (minutes <= 5) return '5min';
+    if (minutes <= 15) return '15min';
+    if (minutes <= 60) return '1hour';
+    if (minutes <= 120) return '2hour';
+    if (minutes <= 360) return '6hour';
+    return '1day';
+  }
+  
+  // Handle legacy string format
+  const rangeStr = range as string;
+  switch (rangeStr) {
     case '1h':
       return '5min';
     case '8h':
@@ -73,6 +110,8 @@ export function getAggregationInterval(range: TimeRange): AggregationInterval {
       return '6hour';
     case '30d':
       return '1day';
+    default:
+      return '1hour'; // Default fallback
   }
 }
 
@@ -91,4 +130,29 @@ export function getIntervalMinutes(interval: AggregationInterval): number {
     case '1day':
       return 1440;
   }
+}
+
+/**
+ * Get aggregation minutes directly from TimeRange
+ * This is the preferred way for new code
+ */
+export function getAggregationMinutes(range: TimeRange): number {
+  // Handle new TimeRangeConfig object
+  if (typeof range === 'object' && range !== null && 'agg_minutes' in range) {
+    return range.agg_minutes;
+  }
+  
+  // Handle legacy string format - convert through interval
+  const interval = getAggregationInterval(range);
+  return getIntervalMinutes(interval);
+}
+
+/**
+ * Get time range ID for use as key in UI components
+ */
+export function getTimeRangeId(range: TimeRange): string {
+  if (typeof range === 'object' && range !== null && 'id' in range) {
+    return range.id;
+  }
+  return range as string;
 }

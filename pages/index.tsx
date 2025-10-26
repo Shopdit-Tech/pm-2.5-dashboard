@@ -7,6 +7,7 @@ import { SensorDataTable } from '@/features/sensor-table/components/SensorDataTa
 import { MobileSensorDataTable } from '@/features/mobile-sensor-table/components/MobileSensorDataTable';
 import { AnalyticsView } from '@/features/analytics-charts/components/AnalyticsView';
 import { AdminSettings } from '@/features/admin/components/AdminSettings';
+import { DataExportPage } from '@/features/data-export/components';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useSensorTableData } from '@/features/sensor-table/hooks/useSensorTableData';
 import { useMobileSensorTableData } from '@/features/mobile-sensor-table/hooks/useMobileSensorTableData';
@@ -47,6 +48,13 @@ export default function Home() {
             }
             if (activeView === 'analytics') {
               return <AnalyticsView sensors={allSensors} />;
+            }
+            if (activeView === 'data-export') {
+              return (
+                <ProtectedRoute requireAdmin>
+                  <DataExportPage sensors={allSensors} />
+                </ProtectedRoute>
+              );
             }
             if (activeView === 'admin-settings') {
               return (

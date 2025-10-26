@@ -14,7 +14,8 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { SensorData } from '@/types/sensor';
-import { TimeRange, getTimeRangeLabel } from '../types/chartTypes';
+import { TimeRange, getTimeRangeLabel, getTimeRangeId } from '../types/chartTypes';
+import { TIME_RANGES, getTimeRangeByIdOrDefault } from '../constants/timeRanges';
 import { fetchRealChartData, getLocationColor } from '../services/chartDataService';
 import { getParameterLabel, getParameterUnit } from '@/features/sensor-table/utils/parameterThresholds';
 import { ParameterTabs } from './ParameterTabs';
@@ -29,7 +30,7 @@ type MultiLocationLineChartProps = {
 
 export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps) => {
   const [parameter, setParameter] = useState('pm25');
-  const [timeRange, setTimeRange] = useState<TimeRange>('48h');
+  const [timeRange, setTimeRange] = useState<TimeRange>(getTimeRangeByIdOrDefault('24h'));
   const [selectedSensorIds, setSelectedSensorIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -252,17 +253,16 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
                 Time Range:
               </Text>
               <Select
-                value={timeRange}
-                onChange={setTimeRange}
+                value={getTimeRangeId(timeRange)}
+                onChange={(id) => setTimeRange(getTimeRangeByIdOrDefault(id))}
                 style={{ width: '100%' }}
                 size="large"
               >
-                <Option value="1h">Last 1 Hour</Option>
-                <Option value="8h">Last 8 Hours</Option>
-                <Option value="24h">Last 24 Hours</Option>
-                <Option value="48h">Last 48 Hours</Option>
-                <Option value="7d">Last 7 Days</Option>
-                <Option value="30d">Last 30 Days</Option>
+                {TIME_RANGES.map((range) => (
+                  <Option key={range.id} value={range.id}>
+                    {range.label}
+                  </Option>
+                ))}
               </Select>
             </Col>
 

@@ -4,6 +4,7 @@ import {
   TimeSeriesDataPoint,
   ChartData,
   getTimeRangeHours,
+  getAggregationMinutes,
   getAggregationInterval,
   getIntervalMinutes,
 } from '../types/chartTypes';
@@ -28,7 +29,7 @@ export async function fetchRealChartData(
     console.log(`📈 Fetching real history for ${sensor.name} - ${parameter}`);
 
     const hours = getTimeRangeHours(timeRange);
-    const intervalMinutes = getIntervalMinutes(getAggregationInterval(timeRange));
+    const intervalMinutes = getAggregationMinutes(timeRange);
     
     // Map app parameter to API metric name
     const apiMetric = mapParameterToApiMetric(parameter as ParameterType);
@@ -49,31 +50,29 @@ export async function fetchRealChartData(
       return generateChartData(sensor, parameter, timeRange);
     }
 
-    // Transform API data to chart format
-    const data: TimeSeriesDataPoint[] = metricData.points
-      .filter((point) => point.value !== null)
-      .map((point) => {
-        const timestamp = new Date(point.ts);
-        return {
-          timestamp: point.ts,
-          value: point.value!,
-          formattedTime: timestamp.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-          }),
-          formattedDate: timestamp.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-          }),
-        };
-      });
+    // Transform API data to chart format - Keep null values to show gaps
+    const data: TimeSeriesDataPoint[] = metricData.points.map((point) => {
+      const timestamp = new Date(point.ts);
+      return {
+        timestamp: point.ts,
+        value: point.value !== null ? point.value : null,  // Keep null values
+        formattedTime: timestamp.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        }),
+        formattedDate: timestamp.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+        }),
+      };
+    });
 
-    // Calculate statistics
-    const values = data.map((d) => d.value);
+    // Calculate statistics - Filter out null values for calculations
+    const values = data.map((d) => d.value).filter((v) => v !== null) as number[];
     const average = metricData.average;
-    const min = Math.min(...values);
-    const max = Math.max(...values);
+    const min = values.length > 0 ? Math.min(...values) : 0;
+    const max = values.length > 0 ? Math.max(...values) : 0;
 
     console.log(`✅ Fetched ${data.length} points for ${sensor.name} - ${parameter}`);
 
@@ -211,11 +210,11 @@ export function generateChartData(
     });
   }
   
-  // Calculate statistics
-  const values = data.map((d) => d.value);
-  const average = values.reduce((sum, val) => sum + val, 0) / values.length;
-  const min = Math.min(...values);
-  const max = Math.max(...values);
+  // Calculate statistics - Filter out null values
+  const values = data.map((d) => d.value).filter((v) => v !== null) as number[];
+  const average = values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : 0;
+  const min = values.length > 0 ? Math.min(...values) : 0;
+  const max = values.length > 0 ? Math.max(...values) : 0;
   
   return {
     sensorId: sensor.id,
@@ -244,14 +243,19 @@ export function aggregateDataPoints(
   
   for (let i = 0; i < data.length; i += bucketSize) {
     const bucket = data.slice(i, i + bucketSize);
-    const avgValue = bucket.reduce((sum, point) => sum + point.value, 0) / bucket.length;
+    
+    // Filter out null values for averaging
+    const validValues = bucket.map((p) => p.value).filter((v) => v !== null) as number[];
+    const avgValue = validValues.length > 0
+      ? validValues.reduce((sum, val) => sum + val, 0) / validValues.length
+      : null;
     
     // Use the timestamp from the middle of the bucket
     const midPoint = bucket[Math.floor(bucket.length / 2)];
     
     aggregated.push({
       timestamp: midPoint.timestamp,
-      value: Math.round(avgValue * 10) / 10,
+      value: avgValue !== null ? Math.round(avgValue * 10) / 10 : null,
       formattedTime: midPoint.formattedTime,
       formattedDate: midPoint.formattedDate,
     });

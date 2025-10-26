@@ -117,7 +117,7 @@ export const mobileRouteService = {
       
       apiData.metrics.forEach((metricData: any) => {
         metricData.points.forEach((point: any) => {
-          const timestamp = point.timestamp || point.time;
+          const timestamp = point.ts || point.timestamp || point.time;
           const pointDate = new Date(timestamp);
           
           // Only include points from selected date
@@ -126,8 +126,8 @@ export const mobileRouteService = {
               metricsByTimestamp[timestamp] = {
                 timestamp,
                 // GPS coordinates - IMPORTANT: Your API must return these
-                latitude: point.latitude || point.lat || 0,
-                longitude: point.longitude || point.lng || point.lon || 0,
+                latitude: point.latitude || point.lat || null,
+                longitude: point.longitude || point.lng || point.lon || null,
               };
             }
             
@@ -165,7 +165,15 @@ export const mobileRouteService = {
       });
 
       if (routePoints.length === 0) {
-        console.log('❌ No valid route points with GPS coordinates found');
+        const totalPoints = timestamps.length;
+        if (totalPoints > 0) {
+          console.error('❌ API returned data but NO GPS coordinates (latitude/longitude)');
+          throw new Error(
+            `API returned ${totalPoints} data points but none have GPS coordinates. ` +
+            `Your Supabase function must include 'latitude' and 'longitude' fields in the response.`
+          );
+        }
+        console.log('❌ No data points found for this date');
         return null;
       }
 
