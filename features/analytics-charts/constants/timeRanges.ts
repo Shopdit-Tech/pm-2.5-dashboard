@@ -40,6 +40,12 @@ export const TIME_RANGES: TimeRangeConfig[] = [
     agg_minutes: 15,
   },
   {
+    id: '1w',
+    label: 'Last 1 week (30 min)',
+    since_hours: 168, // 7 * 24
+    agg_minutes: 30,
+  },
+  {
     id: '7d',
     label: 'Last Week (1 hour)',
     since_hours: 168, // 7 * 24
@@ -86,6 +92,12 @@ export const TIME_RANGES: TimeRangeConfig[] = [
     label: 'Last 1080 days (1 week)',
     since_hours: 25920, // 1080 * 24
     agg_minutes: 10080, // 7 * 24 * 60
+  },
+  {
+    id: '4y',
+    label: 'Last 4 years (1 week)',
+    since_hours: 35040, // 1460 * 24 (4 years)
+    agg_minutes: 10080, // 7 * 24 * 60 (1 week)
   },
 ];
 
