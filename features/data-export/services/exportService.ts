@@ -75,8 +75,9 @@ function buildCSVRows(
           pm10: null,
           particle_0p3: null,
           co2_ppm: null,
-          temperature: null,
-          humidity: null,
+          temperature_c: null,
+          humidity_rh: null,
+          tvoc_ppb: null,
           tvoc_raw_logr: null,
           tvoc_index: null,
           nox_index: null,
@@ -91,10 +92,12 @@ function buildCSVRows(
         dataByTimestamp[timestamp].particle_0p3 = point.value;
       } else if (metricName === 'co2_ppm') {
         dataByTimestamp[timestamp].co2_ppm = point.value;
-      } else if (metricName === 'temperature') {
-        dataByTimestamp[timestamp].temperature = point.value;
-      } else if (metricName === 'humidity') {
-        dataByTimestamp[timestamp].humidity = point.value;
+      } else if (metricName === 'temperature_c') {
+        dataByTimestamp[timestamp].temperature_c = point.value;
+      } else if (metricName === 'humidity_rh') {
+        dataByTimestamp[timestamp].humidity_rh = point.value;
+      } else if (metricName === 'tvoc_ppb') {
+        dataByTimestamp[timestamp].tvoc_ppb = point.value;
       } else if (metricName === 'tvoc_raw_logr') {
         dataByTimestamp[timestamp].tvoc_raw_logr = point.value;
       } else if (metricName === 'tvoc_index') {
@@ -111,8 +114,8 @@ function buildCSVRows(
     const data = dataByTimestamp[timestamp];
     const date = new Date(timestamp);
 
-    // Calculate heat index
-    const heatIndex = calculateHeatIndex(data.temperature, data.humidity);
+    // Calculate heat index using correct field names
+    const heatIndex = calculateHeatIndex(data.temperature_c, data.humidity_rh);
 
     // Format datetime in local timezone (+07:00 for Thailand)
     const localDateTime = formatLocalDateTime(date);
@@ -130,17 +133,17 @@ function buildCSVRows(
       aggregatedRecords: '1', // Could be enhanced if API provides this
       pm25Raw: formatValue(data.pm25),
       pm25Corrected: formatValue(data.pm25), // No correction available
-      particleCount: formatValue(data.particle_0p3), // NOW AVAILABLE from API
-      co2Raw: formatValue(data.co2_ppm), // Fixed metric name
+      particleCount: formatValue(data.particle_0p3),
+      co2Raw: formatValue(data.co2_ppm),
       co2Corrected: formatValue(data.co2_ppm), // No correction available
-      temperatureRaw: formatValue(data.temperature),
-      temperatureCorrected: formatValue(data.temperature), // No correction available
+      temperatureRaw: formatValue(data.temperature_c), // Fixed: use temperature_c
+      temperatureCorrected: formatValue(data.temperature_c), // Fixed: use temperature_c
       heatIndex: formatHeatIndex(heatIndex),
-      humidityRaw: formatValue(data.humidity),
-      humidityCorrected: formatValue(data.humidity), // No correction available
-      tvoc: formatValue(data.tvoc_raw_logr), // Using raw log value (best available)
-      tvocIndex: formatValue(data.tvoc_index), // NOW AVAILABLE from API
-      noxIndex: formatValue(data.nox_index), // NOW AVAILABLE from API
+      humidityRaw: formatValue(data.humidity_rh), // Fixed: use humidity_rh
+      humidityCorrected: formatValue(data.humidity_rh), // Fixed: use humidity_rh
+      tvoc: formatValue(data.tvoc_ppb), // Fixed: use tvoc_ppb (actual ppb value)
+      tvocIndex: formatValue(data.tvoc_index),
+      noxIndex: formatValue(data.nox_index),
       pm1: formatValue(data.pm1),
       pm10: formatValue(data.pm10),
     };

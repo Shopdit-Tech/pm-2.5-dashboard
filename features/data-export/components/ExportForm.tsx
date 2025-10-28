@@ -51,11 +51,24 @@ export const ExportForm = ({ sensors }: ExportFormProps) => {
 
       message.loading({ content: 'Generating CSV...', key: 'export', duration: 0 });
 
+      // Set start date to beginning of day (00:00:00) in UTC+7
+      const startDateBeginning = new Date(startDate.format('YYYY-MM-DD') + 'T00:00:00+07:00');
+      
+      // Set end date to end of day (23:59:59) in UTC+7
+      const endDateEnd = new Date(endDate.format('YYYY-MM-DD') + 'T23:59:59+07:00');
+
+      console.log('📅 Export date range:', {
+        startLocal: startDate.format('YYYY-MM-DD') + ' 00:00:00 +07:00',
+        endLocal: endDate.format('YYYY-MM-DD') + ' 23:59:59 +07:00',
+        startUTC: startDateBeginning.toISOString(),
+        endUTC: endDateEnd.toISOString(),
+      });
+
       // Generate CSV
       const csvContent = await generateCSV({
         sensor,
-        startDate: startDate.toDate(),
-        endDate: endDate.toDate(),
+        startDate: startDateBeginning,
+        endDate: endDateEnd,
         bucketSize,
       });
 
