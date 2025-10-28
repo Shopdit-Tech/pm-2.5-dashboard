@@ -43,6 +43,8 @@ export const getSensorHistory = async (
           metric: params.metric,
           since_hours: params.since_hours,
           agg_minutes: params.agg_minutes,
+          from: params.from,
+          to: params.to,
         },
       }
     );

@@ -55,6 +55,8 @@ export const MobileSensorsDashboard = () => {
       return;
     }
 
+    // Clear current route first to force RouteMap unmount (like manual clear/select)
+    setSelectedRoute(null);
     setLoadingRoute(true);
     setRouteError(null);
     
@@ -348,7 +350,7 @@ export const MobileSensorsDashboard = () => {
               />
             </div>
           ) : selectedRoute ? (
-            <RouteMap route={selectedRoute} />
+            <RouteMap key={selectedRoute.id} route={selectedRoute} />
           ) : selectedSensorId && selectedDate ? (
             <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Empty

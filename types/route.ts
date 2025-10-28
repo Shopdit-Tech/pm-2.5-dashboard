@@ -2,12 +2,18 @@ export type RoutePoint = {
   id: string;
   latitude: number;
   longitude: number;
+  pm1: number;
   pm25: number;
   pm10: number;
+  particle_0p3?: number;
   temperature: number;
   humidity: number;
   co2: number;
   tvoc: number;
+  tvoc_index?: number;
+  nox_index?: number;
+  tvoc_raw_logr?: number;
+  nox_raw_logr?: number;
   timestamp: string;
   speed?: number; // km/h
 };

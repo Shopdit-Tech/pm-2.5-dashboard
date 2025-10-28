@@ -15,16 +15,13 @@ export async function generateCSV(params: ExportParams): Promise<string> {
     bucketSize: bucketSize.label,
   });
 
-  // Calculate since_hours from date range
-  const now = new Date();
-  const hoursSinceStart = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60));
-
   try {
-    // Fetch historical data from API
+    // Fetch historical data from API using date range
     const response = await getSensorHistory({
       sensor_code: sensor.code!,
       metric: 'All',
-      since_hours: hoursSinceStart,
+      from: startDate.toISOString(),
+      to: endDate.toISOString(),
       agg_minutes: bucketSize.agg_minutes,
     });
 

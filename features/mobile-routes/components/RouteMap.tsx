@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import GoogleMapReact from 'google-map-react';
 import { MobileRoute, RoutePoint } from '@/types/route';
 import { getRouteCenter, calculateZoom, getRouteSegments } from '../utils/routeUtils';
+import { RoutePointInfoWindow } from './RoutePointInfoWindow';
 
 type RouteMapProps = {
   route: MobileRoute;
@@ -14,14 +15,17 @@ type RouteMapProps = {
 type StartMarkerProps = {
   lat: number;
   lng: number;
+  onClick?: () => void;
 };
 
-const StartMarker = (_props: StartMarkerProps) => (
+const StartMarker = ({ onClick }: StartMarkerProps) => (
   <div
     style={{
       position: 'absolute',
       transform: 'translate(-50%, -100%)',
+      cursor: onClick ? 'pointer' : 'default',
     }}
+    onClick={onClick}
   >
     <div
       style={{
@@ -37,6 +41,13 @@ const StartMarker = (_props: StartMarkerProps) => (
         fontSize: '16px',
         fontWeight: 'bold',
         boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+        transition: 'transform 0.2s',
+      }}
+      onMouseEnter={(e) => {
+        if (onClick) e.currentTarget.style.transform = 'scale(1.1)';
+      }}
+      onMouseLeave={(e) => {
+        if (onClick) e.currentTarget.style.transform = 'scale(1)';
       }}
     >
       S
@@ -47,14 +58,17 @@ const StartMarker = (_props: StartMarkerProps) => (
 type EndMarkerProps = {
   lat: number;
   lng: number;
+  onClick?: () => void;
 };
 
-const EndMarker = (_props: EndMarkerProps) => (
+const EndMarker = ({ onClick }: EndMarkerProps) => (
   <div
     style={{
       position: 'absolute',
       transform: 'translate(-50%, -100%)',
+      cursor: onClick ? 'pointer' : 'default',
     }}
+    onClick={onClick}
   >
     <div
       style={{
@@ -70,6 +84,13 @@ const EndMarker = (_props: EndMarkerProps) => (
         fontSize: '16px',
         fontWeight: 'bold',
         boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+        transition: 'transform 0.2s',
+      }}
+      onMouseEnter={(e) => {
+        if (onClick) e.currentTarget.style.transform = 'scale(1.1)';
+      }}
+      onMouseLeave={(e) => {
+        if (onClick) e.currentTarget.style.transform = 'scale(1)';
       }}
     >
       E
@@ -81,14 +102,17 @@ type CurrentMarkerProps = {
   lat: number;
   lng: number;
   pm25: number;
+  onClick?: () => void;
 };
 
-const CurrentMarker = ({ pm25 }: CurrentMarkerProps) => (
+const CurrentMarker = ({ pm25, onClick }: CurrentMarkerProps) => (
   <div
     style={{
       position: 'absolute',
       transform: 'translate(-50%, -50%)',
+      cursor: onClick ? 'pointer' : 'default',
     }}
+    onClick={onClick}
   >
     <div
       style={{
@@ -118,6 +142,14 @@ export const RouteMap = ({ route, currentPointIndex, onPointClick }: RouteMapPro
   const mapRef = useRef<any>(null);
   const mapsRef = useRef<any>(null);
   const polylinesRef = useRef<any[]>([]);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [selectedPoint, setSelectedPoint] = useState<RoutePoint | null>(null);
+
+  const handlePointClick = (point: RoutePoint) => {
+    console.log('✨ Point clicked:', point);
+    setSelectedPoint(point);
+    if (onPointClick) onPointClick(point);
+  };
 
   // Safety check: ensure route has points
   if (!route || !route.points || route.points.length === 0) {
@@ -128,25 +160,37 @@ export const RouteMap = ({ route, currentPointIndex, onPointClick }: RouteMapPro
     );
   }
 
+  // Calculate display points based on playback
   const displayPoints = currentPointIndex !== undefined
     ? route.points.slice(0, currentPointIndex + 1)
     : route.points;
 
-  const center = getRouteCenter(displayPoints);
-  const zoom = calculateZoom(route.points);
+  // Memoize center and zoom to prevent constant recalculation
+  const center = useMemo(() => getRouteCenter(displayPoints), [displayPoints.length]);
+  const zoom = useMemo(() => calculateZoom(route.points), [route.points.length]);
 
-  // Draw polylines when map loads or points change
+  // Draw polylines when map loads or route/points change
   useEffect(() => {
-    if (!mapRef.current || !mapsRef.current || displayPoints.length < 2) return;
+    if (!mapLoaded || !mapRef.current || !mapsRef.current) {
+      console.log('🗺️ Waiting for map to load...');
+      return;
+    }
 
-    // Clear previous polylines
+    if (displayPoints.length < 2) {
+      console.log('🗺️ Not enough points to draw polylines');
+      return;
+    }
+
+    console.log('🗺️ Drawing polylines for route:', route.id, '- Points:', displayPoints.length);
+
+    // Clear old polylines
     polylinesRef.current.forEach((polyline) => polyline.setMap(null));
     polylinesRef.current = [];
 
     // Get colored segments
     const segments = getRouteSegments(displayPoints);
 
-    // Draw each segment with its color
+    // Draw each segment
     segments.forEach((segment) => {
       const polyline = new mapsRef.current.Polyline({
         path: [
@@ -160,27 +204,28 @@ export const RouteMap = ({ route, currentPointIndex, onPointClick }: RouteMapPro
         clickable: true,
       });
 
-      // Add click listener to polyline
-      if (onPointClick) {
-        polyline.addListener('click', () => {
-          // When clicked, show details of the start point of this segment
-          onPointClick(segment.start);
-        });
-      }
+      polyline.addListener('click', () => {
+        handlePointClick(segment.start);
+      });
 
       polyline.setMap(mapRef.current);
       polylinesRef.current.push(polyline);
     });
 
-    // Cleanup on unmount
+    console.log('✅ Drew', polylinesRef.current.length, 'polylines');
+
+    // Cleanup
     return () => {
       polylinesRef.current.forEach((polyline) => polyline.setMap(null));
+      polylinesRef.current = [];
     };
-  }, [displayPoints, onPointClick]);
+  }, [mapLoaded, route.id, currentPointIndex]);
 
   const handleApiLoaded = ({ map, maps }: { map: any; maps: any }) => {
+    console.log('✅ Google Map loaded!');
     mapRef.current = map;
     mapsRef.current = maps;
+    setMapLoaded(true);
   };
 
   const startPoint = route.points[0];
@@ -209,6 +254,10 @@ export const RouteMap = ({ route, currentPointIndex, onPointClick }: RouteMapPro
           <StartMarker 
             lat={startPoint.latitude} 
             lng={startPoint.longitude}
+            onClick={() => {
+              console.log('🟢 Start marker clicked:', startPoint);
+              handlePointClick(startPoint);
+            }}
           />
         )}
 
@@ -217,6 +266,10 @@ export const RouteMap = ({ route, currentPointIndex, onPointClick }: RouteMapPro
           <EndMarker 
             lat={endPoint.latitude} 
             lng={endPoint.longitude}
+            onClick={() => {
+              console.log('🔴 End marker clicked:', endPoint);
+              handlePointClick(endPoint);
+            }}
           />
         )}
 
@@ -226,9 +279,40 @@ export const RouteMap = ({ route, currentPointIndex, onPointClick }: RouteMapPro
             lat={currentPoint.latitude}
             lng={currentPoint.longitude}
             pm25={currentPoint.pm25}
+            onClick={() => {
+              console.log('🔵 Current marker clicked:', currentPoint);
+              handlePointClick(currentPoint);
+            }}
           />
         )}
       </GoogleMapReact>
+
+      {/* Info Window Overlay */}
+      {selectedPoint && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '20px',
+          }}
+          onClick={() => setSelectedPoint(null)}
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <RoutePointInfoWindow
+              point={selectedPoint}
+              onClose={() => setSelectedPoint(null)}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Add pulse animation */}
       <style jsx global>{`

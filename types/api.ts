@@ -53,6 +53,8 @@ export type ApiSensorHistoryResponse = {
 export type SensorHistoryParams = {
   sensor_code: string;
   metric: 'All' | 'pm1' | 'pm25' | 'pm10' | 'co2_ppm' | 'temperature_c' | 'humidity_rh' | 'tvoc_ppb';
-  since_hours: number;
+  since_hours?: number;
   agg_minutes: number;
+  from?: string; // ISO 8601 date string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss)
+  to?: string;   // ISO 8601 date string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss)
 };

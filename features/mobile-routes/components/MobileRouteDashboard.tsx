@@ -1,21 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Select, DatePicker, Space, Typography, Row, Col, Modal } from 'antd';
+import { Card, Select, DatePicker, Space, Typography, Row, Col } from 'antd';
 import { CarOutlined, EnvironmentOutlined, DashboardOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { MOCK_ROUTES } from '../services/mockRouteData';
 import { RouteMap } from './RouteMap';
 import { RouteTimeline, useRoutePlayback } from './RouteTimeline';
 import { formatDuration } from '../utils/routeUtils';
-import { RoutePoint } from '@/types/route';
-import { getParameterColor } from '@/utils/airQualityUtils';
 
 const { Text } = Typography;
 
 export const MobileRouteDashboard = () => {
   const [selectedRouteId, setSelectedRouteId] = useState<string>(MOCK_ROUTES[0]?.id || '');
-  const [selectedPoint, setSelectedPoint] = useState<RoutePoint | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const selectedRoute = MOCK_ROUTES.find((r) => r.id === selectedRouteId);
   
@@ -26,17 +22,6 @@ export const MobileRouteDashboard = () => {
     isPlaying,
     togglePlayPause,
   } = useRoutePlayback(selectedRoute || MOCK_ROUTES[0], 1, 300);
-  
-  // Handle point click from map
-  const handlePointClick = (point: RoutePoint) => {
-    setSelectedPoint(point);
-    setIsModalOpen(true);
-  };
-  
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedPoint(null);
-  };
 
   return (
     <div className="p-6" style={{ background: '#f5f7fa', minHeight: '100%' }}>
@@ -199,7 +184,6 @@ export const MobileRouteDashboard = () => {
             <RouteMap 
               route={selectedRoute} 
               currentPointIndex={currentIndex}
-              onPointClick={handlePointClick}
             />
           </div>
         </Card>
@@ -224,202 +208,6 @@ export const MobileRouteDashboard = () => {
           />
         </Card>
       )}
-
-      {/* Point Details Modal */}
-      <Modal
-        open={isModalOpen}
-        onCancel={handleCloseModal}
-        footer={null}
-        width={680}
-        centered
-        style={{
-          borderRadius: '16px',
-        }}
-      >
-        {selectedPoint && (
-          <div>
-            {/* Header with gradient */}
-            <div 
-              style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                padding: '32px',
-                margin: '-24px -24px 24px -24px',
-                borderRadius: '16px 16px 0 0',
-              }}
-            >
-              <Typography.Title level={4} style={{ margin: 0, color: 'white' }}>
-                <ClockCircleOutlined style={{ marginRight: 8 }} />
-                Route Point Details
-              </Typography.Title>
-              <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>
-                {new Date(selectedPoint.timestamp).toLocaleString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </Text>
-            </div>
-
-            <Space direction="vertical" size="large" style={{ width: '100%', padding: '0 24px 24px' }}>
-              {/* PM2.5 - Featured */}
-              <div
-                style={{
-                  padding: '24px',
-                  borderRadius: '12px',
-                  background: `linear-gradient(135deg, ${getParameterColor('pm25', selectedPoint.pm25)}20, ${getParameterColor('pm25', selectedPoint.pm25)}10)`,
-                  border: `2px solid ${getParameterColor('pm25', selectedPoint.pm25)}`,
-                  textAlign: 'center',
-                }}
-              >
-                <div style={{ fontSize: 13, color: '#595959', marginBottom: 8, fontWeight: 500 }}>
-                  <DashboardOutlined style={{ marginRight: 6 }} />
-                  PM2.5 Level
-                </div>
-                <div
-                  style={{ 
-                    fontSize: 48, 
-                    fontWeight: 700, 
-                    color: getParameterColor('pm25', selectedPoint.pm25),
-                    lineHeight: 1,
-                  }}
-                >
-                  {selectedPoint.pm25.toFixed(1)}
-                  <span style={{ fontSize: 20, fontWeight: 500, marginLeft: 8 }}>µg/m³</span>
-                </div>
-              </div>
-
-              {/* Other Parameters */}
-              <Row gutter={[16, 16]}>
-                <Col span={12}>
-                  <Card
-                    style={{
-                      borderRadius: '12px',
-                      border: '1px solid #f0f0f0',
-                      textAlign: 'center',
-                    }}
-                    bodyStyle={{ padding: '16px' }}
-                  >
-                    <div style={{ fontSize: 12, color: '#8c8c8c', marginBottom: 6 }}>PM10</div>
-                    <div
-                      style={{ 
-                        fontSize: 24, 
-                        fontWeight: 700, 
-                        color: getParameterColor('pm10', selectedPoint.pm10),
-                      }}
-                    >
-                      {selectedPoint.pm10.toFixed(1)}
-                      <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4 }}>µg/m³</span>
-                    </div>
-                  </Card>
-                </Col>
-                <Col span={12}>
-                  <Card
-                    style={{
-                      borderRadius: '12px',
-                      border: '1px solid #f0f0f0',
-                      textAlign: 'center',
-                    }}
-                    bodyStyle={{ padding: '16px' }}
-                  >
-                    <div style={{ fontSize: 12, color: '#8c8c8c', marginBottom: 6 }}>Temperature</div>
-                    <div style={{ fontSize: 24, fontWeight: 700, color: '#ff7a45' }}>
-                      {selectedPoint.temperature.toFixed(1)}
-                      <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4 }}>°C</span>
-                    </div>
-                  </Card>
-                </Col>
-                <Col span={12}>
-                  <Card
-                    style={{
-                      borderRadius: '12px',
-                      border: '1px solid #f0f0f0',
-                      textAlign: 'center',
-                    }}
-                    bodyStyle={{ padding: '16px' }}
-                  >
-                    <div style={{ fontSize: 12, color: '#8c8c8c', marginBottom: 6 }}>Humidity</div>
-                    <div style={{ fontSize: 24, fontWeight: 700, color: '#1890ff' }}>
-                      {selectedPoint.humidity.toFixed(1)}
-                      <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4 }}>%</span>
-                    </div>
-                  </Card>
-                </Col>
-                <Col span={12}>
-                  <Card
-                    style={{
-                      borderRadius: '12px',
-                      border: '1px solid #f0f0f0',
-                      textAlign: 'center',
-                    }}
-                    bodyStyle={{ padding: '16px' }}
-                  >
-                    <div style={{ fontSize: 12, color: '#8c8c8c', marginBottom: 6 }}>CO2</div>
-                    <div style={{ fontSize: 24, fontWeight: 700, color: '#52c41a' }}>
-                      {selectedPoint.co2}
-                      <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4 }}>ppm</span>
-                    </div>
-                  </Card>
-                </Col>
-                <Col span={12}>
-                  <Card
-                    style={{
-                      borderRadius: '12px',
-                      border: '1px solid #f0f0f0',
-                      textAlign: 'center',
-                    }}
-                    bodyStyle={{ padding: '16px' }}
-                  >
-                    <div style={{ fontSize: 12, color: '#8c8c8c', marginBottom: 6 }}>TVOC</div>
-                    <div style={{ fontSize: 24, fontWeight: 700, color: '#722ed1' }}>
-                      {selectedPoint.tvoc}
-                      <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4 }}>ppb</span>
-                    </div>
-                  </Card>
-                </Col>
-                {selectedPoint.speed && (
-                  <Col span={12}>
-                    <Card
-                      style={{
-                        borderRadius: '12px',
-                        border: '1px solid #f0f0f0',
-                        textAlign: 'center',
-                      }}
-                      bodyStyle={{ padding: '16px' }}
-                    >
-                      <div style={{ fontSize: 12, color: '#8c8c8c', marginBottom: 6 }}>Speed</div>
-                      <div style={{ fontSize: 24, fontWeight: 700, color: '#13c2c2' }}>
-                        {selectedPoint.speed.toFixed(1)}
-                        <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4 }}>km/h</span>
-                      </div>
-                    </Card>
-                  </Col>
-                )}
-              </Row>
-
-              {/* Location */}
-              <Card
-                style={{
-                  borderRadius: '12px',
-                  background: '#fafafa',
-                  border: '1px solid #f0f0f0',
-                }}
-                bodyStyle={{ padding: '16px' }}
-              >
-                <div style={{ fontSize: 12, color: '#8c8c8c', marginBottom: 6 }}>
-                  <EnvironmentOutlined style={{ marginRight: 4 }} />
-                  Location Coordinates
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 500, color: '#595959', fontFamily: 'monospace' }}>
-                  {selectedPoint.latitude.toFixed(6)}, {selectedPoint.longitude.toFixed(6)}
-                </div>
-              </Card>
-            </Space>
-          </div>
-        )}
-      </Modal>
     </div>
   );
 };

@@ -68,25 +68,42 @@ export const mobileRouteService = {
 
       console.log(`🗺️ Fetching route for ${sensor.name} on ${date}...`);
 
-      // Calculate since_hours for the date
-      // Get data for 24 hours from start of selected date
-      const selectedDate = new Date(date);
-      selectedDate.setHours(0, 0, 0, 0);
-      const now = new Date();
-      const hoursSince = Math.ceil((now.getTime() - selectedDate.getTime()) / (1000 * 60 * 60));
+      // Convert selected date (UTC+7) to UTC time range for API
+      // User selects Oct 28 → means Oct 28 00:00 to 23:59 in UTC+7
+      // API needs: Oct 27 17:00 to Oct 28 16:59 in UTC
+      const selectedDate = new Date(date + 'T00:00:00+07:00'); // Start of day in UTC+7
+      const fromDate = selectedDate.toISOString(); // Converts to UTC
+      
+      const endDate = new Date(date + 'T23:59:59+07:00'); // End of day in UTC+7
+      const toDate = endDate.toISOString(); // Converts to UTC
+      
+      console.log('🕐 Timezone conversion:', {
+        selectedDate: date,
+        fromUTC7: date + ' 00:00:00 +07:00',
+        toUTC7: date + ' 23:59:59 +07:00',
+        fromUTC: fromDate,
+        toUTC: toDate,
+      });
 
       // Call history API with All metrics and 1-minute aggregation for GPS accuracy
       const response = await axios.get(`${API_CONFIG.baseURL}${API_ENDPOINTS.sensorHistory}`, {
         params: {
           sensor_code: sensor.code,
           metric: 'All', // Get all parameters
-          since_hours: Math.min(hoursSince + 24, 8760), // Max 1 year
-          agg_minutes: 1, // 1-minute intervals for route accuracy
+          from: fromDate, // Start of selected date
+          to: toDate,     // End of selected date
+          agg_minutes: 5, // 5-minute intervals for route accuracy
         },
         timeout: API_CONFIG.timeout,
       });
 
       const apiData = response.data;
+
+      console.log('📊 API Response:', {
+        metricsCount: apiData.metrics?.length,
+        firstMetric: apiData.metrics?.[0]?.metric,
+        firstPointSample: apiData.metrics?.[0]?.points?.[0],
+      });
 
       // Validate response
       if (!apiData.metrics || apiData.metrics.length === 0) {
@@ -106,29 +123,46 @@ export const mobileRouteService = {
         return null;
       }
 
-      // Filter points to only include those from the selected date
-      const startOfDay = new Date(date);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(date);
-      endOfDay.setHours(23, 59, 59, 999);
+      // Filter points to only include those from the selected date (UTC+7)
+      // Use the same timezone boundaries as the API request
+      const startOfDay = new Date(date + 'T00:00:00+07:00'); // Start of day in UTC+7
+      const endOfDay = new Date(date + 'T23:59:59+07:00'); // End of day in UTC+7
 
       // Create a map of timestamp -> values for each metric
       const metricsByTimestamp: Record<string, any> = {};
       
+      // Debug: Log all metric names
+      console.log('📊 Available metrics:', apiData.metrics.map((m: any) => m.metric));
+      
       apiData.metrics.forEach((metricData: any) => {
         metricData.points.forEach((point: any) => {
           const timestamp = point.ts || point.timestamp || point.time;
-          const pointDate = new Date(timestamp);
+          const pointDate = new Date(timestamp); // Timestamp from API is in UTC
           
-          // Only include points from selected date
+          // Only include points from selected date in UTC+7 timezone
           if (pointDate >= startOfDay && pointDate <= endOfDay) {
             if (!metricsByTimestamp[timestamp]) {
               metricsByTimestamp[timestamp] = {
                 timestamp,
-                // GPS coordinates - IMPORTANT: Your API must return these
-                latitude: point.latitude || point.lat || null,
-                longitude: point.longitude || point.lng || point.lon || null,
+                // GPS coordinates - extract from API response (now returns lat/lng on each point)
+                latitude: null,
+                longitude: null,
               };
+            }
+            
+            // Update GPS coordinates if available (API now sends lat/lng on each point)
+            if (point.lat !== undefined && point.lat !== null) {
+              metricsByTimestamp[timestamp].latitude = point.lat;
+            }
+            if (point.lng !== undefined && point.lng !== null) {
+              metricsByTimestamp[timestamp].longitude = point.lng;
+            }
+            // Also check for full names as fallback
+            if (point.latitude !== undefined && point.latitude !== null && metricsByTimestamp[timestamp].latitude === null) {
+              metricsByTimestamp[timestamp].latitude = point.latitude;
+            }
+            if (point.longitude !== undefined && point.longitude !== null && metricsByTimestamp[timestamp].longitude === null) {
+              metricsByTimestamp[timestamp].longitude = point.longitude;
             }
             
             // Add metric value
@@ -141,28 +175,67 @@ export const mobileRouteService = {
       // Convert to array and sort by timestamp
       const timestamps = Object.keys(metricsByTimestamp).sort();
       
+      // Debug: Log sample data point
+      if (timestamps.length > 0) {
+        console.log('🔍 Sample data point:', metricsByTimestamp[timestamps[0]]);
+      }
+      
+      console.log('📍 Processing GPS data:', {
+        totalTimestamps: timestamps.length,
+        sampleData: timestamps.slice(0, 3).map(ts => ({
+          ts,
+          lat: metricsByTimestamp[ts].latitude,
+          lng: metricsByTimestamp[ts].longitude,
+        })),
+      });
+
+      let skippedCount = 0;
       timestamps.forEach((timestamp, index) => {
         const data = metricsByTimestamp[timestamp];
         
         // Skip points without valid GPS coordinates
         if (!data.latitude || !data.longitude) {
+          skippedCount++;
           return;
+        }
+
+        // Debug: Log first point's data mapping
+        if (index === 0) {
+          console.log('🔍 First point data mapping:', {
+            humidity: data.humidity,
+            humidity_rh: data.humidity_rh,
+            co2: data.co2,
+            co2_ppm: data.co2_ppm,
+            tvoc: data.tvoc,
+            tvoc_ppb: data.tvoc_ppb,
+            allKeys: Object.keys(data)
+          });
         }
 
         routePoints.push({
           id: `point-${index}`,
           latitude: data.latitude,
           longitude: data.longitude,
+          pm1: data.pm1 || 0,
           pm25: data.pm25 || data.pm2_5 || 0,
           pm10: data.pm10 || 0,
+          particle_0p3: data.particle_0p3 !== undefined ? data.particle_0p3 : undefined,
           temperature: data.temperature || data.temperature_c || 0,
-          humidity: data.humidity || 0,
-          co2: data.co2 || 0,
-          tvoc: data.tvoc || 0,
+          humidity: data.humidity || data.humidity_rh || 0,
+          co2: data.co2 || data.co2_ppm || 0,
+          tvoc: data.tvoc || data.tvoc_ppb || 0,
+          tvoc_index: data.tvoc_index !== undefined ? data.tvoc_index : undefined,
+          nox_index: data.nox_index !== undefined ? data.nox_index : undefined,
+          tvoc_raw_logr: data.tvoc_raw_logr !== undefined ? data.tvoc_raw_logr : undefined,
+          nox_raw_logr: data.nox_raw_logr !== undefined ? data.nox_raw_logr : undefined,
           timestamp: timestamp,
           speed: data.speed || undefined,
         });
       });
+
+      if (skippedCount > 0) {
+        console.warn(`⚠️ Skipped ${skippedCount} points without GPS coordinates`);
+      }
 
       if (routePoints.length === 0) {
         const totalPoints = timestamps.length;
