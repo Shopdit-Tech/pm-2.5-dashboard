@@ -1,17 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Select, Space, Popconfirm, message, Tag } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
-import { getAllUsers, addUser, deleteUser, updateUser } from '@/data/users';
-import type { AuthUser } from '@/types/auth';
+import { Table, Button, Modal, Form, Input, Select, Space, message, Tag } from 'antd';
+import { PlusOutlined, DeleteOutlined, UserOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { userService } from '@/features/admin-users/services/userService';
+import type { AdminUser } from '@/features/admin-users/types/user';
+import { useAuth } from '@/contexts/AuthContext';
+import dayjs from 'dayjs';
 
 const { Option } = Select;
+const { confirm } = Modal;
 
 export const UserManagement = () => {
-  const [users, setUsers] = useState<AuthUser[]>([]);
+  const { user: currentUser } = useAuth();
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingUser, setEditingUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
   // Load users
@@ -19,139 +23,149 @@ export const UserManagement = () => {
     loadUsers();
   }, []);
 
-  const loadUsers = () => {
-    const allUsers = getAllUsers();
-    setUsers(allUsers);
+  const loadUsers = async () => {
+    try {
+      setLoading(true);
+      const data = await userService.getUsers();
+      setUsers(data);
+    } catch (error: any) {
+      message.error(error.message || 'Failed to load users');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAdd = () => {
-    setEditingUser(null);
     form.resetFields();
     setIsModalVisible(true);
   };
 
-  const handleEdit = (user: AuthUser) => {
-    setEditingUser(user);
-    form.setFieldsValue({
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      // Don't set password for security
-    });
-    setIsModalVisible(true);
-  };
-
-  const handleDelete = async (userId: string) => {
-    const success = deleteUser(userId);
-    if (success) {
-      message.success('User deleted successfully');
-      loadUsers();
-    } else {
-      message.error('Failed to delete user');
+  const handleDelete = (user: AdminUser) => {
+    // Prevent deleting yourself
+    if (user.id === currentUser?.id) {
+      message.warning('You cannot delete your own account');
+      return;
     }
+
+    confirm({
+      title: 'Delete User',
+      icon: <ExclamationCircleOutlined />,
+      content: (
+        <div>
+          <p>Are you sure you want to delete this user?</p>
+          <p>
+            <strong>Email:</strong> {user.email}
+          </p>
+          <p>
+            <strong>Role:</strong> {user.app_metadata.role}
+          </p>
+          <p style={{ color: '#ff4d4f', marginTop: 12 }}>This action cannot be undone.</p>
+        </div>
+      ),
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          await userService.deleteUser(user.id);
+          message.success('User deleted successfully');
+          loadUsers();
+        } catch (error: any) {
+          message.error(error.message || 'Failed to delete user');
+        }
+      },
+    });
   };
 
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
       
-      if (editingUser) {
-        // Update existing user
-        const updates: Partial<AuthUser> = {
-          username: values.username,
-          email: values.email,
-          role: values.role,
-        };
-        
-        // Only update password if provided
-        if (values.password) {
-          updates.password = values.password;
-        }
-        
-        const updated = updateUser(editingUser.id, updates);
-        if (updated) {
-          message.success('User updated successfully');
-        } else {
-          message.error('Failed to update user');
-        }
-      } else {
-        // Add new user
-        addUser({
-          username: values.username,
-          password: values.password,
-          email: values.email,
-          role: values.role,
-        });
-        message.success('User added successfully');
-      }
+      await userService.createUser({
+        email: values.email,
+        password: values.password,
+        role: values.role,
+      });
       
+      message.success(`User ${values.email} created successfully!`);
       setIsModalVisible(false);
       form.resetFields();
       loadUsers();
-    } catch (error) {
-      console.error('Validation failed:', error);
+    } catch (error: any) {
+      message.error(error.message || 'Failed to create user');
     }
   };
 
   const columns = [
     {
-      title: 'Username',
-      dataIndex: 'username',
-      key: 'username',
-      render: (text: string, record: AuthUser) => (
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      render: (email: string, record: AdminUser) => (
         <Space>
           <UserOutlined />
-          <span style={{ fontWeight: 500 }}>{text}</span>
-          {record.role === 'admin' && <Tag color="blue">Admin</Tag>}
+          <span>{email}</span>
+          {record.id === currentUser?.id && (
+            <Tag color="blue" style={{ marginLeft: 8 }}>
+              You
+            </Tag>
+          )}
         </Space>
       ),
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
       title: 'Role',
-      dataIndex: 'role',
+      dataIndex: ['app_metadata', 'role'],
       key: 'role',
       render: (role: string) => (
-        <Tag color={role === 'admin' ? 'blue' : 'default'}>
-          {role.charAt(0).toUpperCase() + role.slice(1)}
-        </Tag>
+        <Tag color={role === 'admin' ? 'blue' : 'green'}>{role.toUpperCase()}</Tag>
       ),
+      filters: [
+        { text: 'Admin', value: 'admin' },
+        { text: 'User', value: 'user' },
+      ],
+      onFilter: (value: any, record: AdminUser) => record.app_metadata.role === value,
+    },
+    {
+      title: 'Email Verified',
+      dataIndex: ['user_metadata', 'email_verified'],
+      key: 'email_verified',
+      render: (verified: boolean) => (
+        <Tag color={verified ? 'success' : 'warning'}>{verified ? 'Verified' : 'Not Verified'}</Tag>
+      ),
+    },
+    {
+      title: 'Created At',
+      dataIndex: 'created_at',
+      key: 'created_at',
+      render: (date: string) => dayjs(date).format('MMM DD, YYYY HH:mm'),
+      sorter: (a: AdminUser, b: AdminUser) => dayjs(a.created_at).unix() - dayjs(b.created_at).unix(),
+    },
+    {
+      title: 'Last Sign In',
+      dataIndex: 'last_sign_in_at',
+      key: 'last_sign_in_at',
+      render: (date: string | undefined) => (date ? dayjs(date).format('MMM DD, YYYY HH:mm') : '-'),
+      sorter: (a: AdminUser, b: AdminUser) => {
+        if (!a.last_sign_in_at) return 1;
+        if (!b.last_sign_in_at) return -1;
+        return dayjs(a.last_sign_in_at).unix() - dayjs(b.last_sign_in_at).unix();
+      },
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 150,
-      render: (_: any, record: AuthUser) => (
-        <Space>
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-            size="small"
-          >
-            Edit
-          </Button>
-          <Popconfirm
-            title="Delete User"
-            description="Are you sure you want to delete this user?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button
-              type="text"
-              danger
-              icon={<DeleteOutlined />}
-              size="small"
-            >
-              Delete
-            </Button>
-          </Popconfirm>
-        </Space>
+      width: 100,
+      render: (_: any, record: AdminUser) => (
+        <Button
+          type="text"
+          danger
+          icon={<DeleteOutlined />}
+          onClick={() => handleDelete(record)}
+          disabled={record.id === currentUser?.id}
+        >
+          Delete
+        </Button>
       ),
     },
   ];
@@ -176,18 +190,20 @@ export const UserManagement = () => {
         columns={columns}
         dataSource={users}
         rowKey="id"
-        pagination={{ pageSize: 10 }}
+        loading={loading}
+        pagination={false}
       />
 
       <Modal
-        title={editingUser ? 'Edit User' : 'Add New User'}
+        title="Add New User"
         open={isModalVisible}
         onOk={handleSubmit}
         onCancel={() => {
           setIsModalVisible(false);
           form.resetFields();
         }}
-        okText={editingUser ? 'Update' : 'Add'}
+        okText="Add User"
+        width={500}
       >
         <Form
           form={form}
@@ -195,29 +211,30 @@ export const UserManagement = () => {
           autoComplete="off"
         >
           <Form.Item
-            name="username"
-            label="Username"
-            rules={[{ required: true, message: 'Please enter username' }]}
-          >
-            <Input placeholder="Enter username" />
-          </Form.Item>
-
-          <Form.Item
             name="email"
             label="Email"
             rules={[
-              { type: 'email', message: 'Please enter valid email' },
+              { required: true, message: 'Please enter email' },
+              { type: 'email', message: 'Please enter a valid email' },
             ]}
           >
-            <Input placeholder="Enter email (optional)" />
+            <Input placeholder="user@example.com" size="large" autoComplete="off" />
           </Form.Item>
 
           <Form.Item
             name="password"
-            label={editingUser ? 'Password (leave empty to keep current)' : 'Password'}
-            rules={editingUser ? [] : [{ required: true, message: 'Please enter password' }]}
+            label="Password"
+            rules={[
+              { required: true, message: 'Please enter password' },
+              { min: 8, message: 'Password must be at least 8 characters' },
+              {
+                pattern: /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/,
+                message: 'Password must contain uppercase, number, and special character',
+              },
+            ]}
+            extra="Min 8 characters with uppercase, number, and special character (!@#$%^&*)"
           >
-            <Input.Password placeholder="Enter password" />
+            <Input.Password placeholder="Password12345!" size="large" autoComplete="new-password" />
           </Form.Item>
 
           <Form.Item
@@ -226,7 +243,7 @@ export const UserManagement = () => {
             rules={[{ required: true, message: 'Please select role' }]}
             initialValue="user"
           >
-            <Select>
+            <Select size="large">
               <Option value="user">User</Option>
               <Option value="admin">Administrator</Option>
             </Select>

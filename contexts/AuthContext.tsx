@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, UserCredentials } from '@/types/auth';
-import { authenticateUser } from '@/data/users';
+import { authService } from '@/services/authService';
 
 type AuthContextType = {
   user: User | null;
@@ -23,13 +23,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Load user from localStorage on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem(AUTH_STORAGE_KEY);
-    if (storedUser) {
+    const storedData = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (storedData) {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
+        const parsedData = JSON.parse(storedData);
+        // Verify token is still valid by checking if it exists
+        if (parsedData.access_token && parsedData.user) {
+          setUser(parsedData.user);
+        } else {
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+        }
       } catch (error) {
-        console.error('Failed to parse stored user:', error);
+        console.error('Failed to parse stored auth data:', error);
         localStorage.removeItem(AUTH_STORAGE_KEY);
       }
     }
@@ -38,30 +43,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (credentials: UserCredentials): Promise<{ success: boolean; error?: string }> => {
     try {
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const authUser = authenticateUser(credentials.username, credentials.password);
+      // Call real API - username field is used for email
+      const response = await authService.login({
+        email: credentials.username, // Use username field as email
+        password: credentials.password,
+      });
       
-      if (authUser) {
-        // Remove password before storing
-        const { password, ...userWithoutPassword } = authUser;
-        
-        setUser(userWithoutPassword);
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userWithoutPassword));
-        
-        return { success: true };
-      } else {
-        return { success: false, error: 'Invalid username or password' };
-      }
-    } catch (error) {
-      return { success: false, error: 'An error occurred during login' };
+      // Map API user to app User type
+      const appUser: User = {
+        id: response.user.id,
+        username: response.user.email, // Use email as username for now
+        email: response.user.email,
+        role: response.user.app_metadata.role,
+      };
+      
+      // Store both user and token
+      const authData = {
+        user: appUser,
+        access_token: response.access_token,
+        refresh_token: response.refresh_token,
+      };
+      
+      setUser(appUser);
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData));
+      
+      console.log('✅ User logged in successfully:', appUser.email);
+      return { success: true };
+    } catch (error: any) {
+      console.error('❌ Login error:', error);
+      return { success: false, error: error.message || 'Login failed' };
     }
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    console.log('👋 User logged out');
   };
 
   const value: AuthContextType = {

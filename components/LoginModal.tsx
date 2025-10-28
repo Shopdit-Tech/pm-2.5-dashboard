@@ -87,14 +87,18 @@ export const LoginModal = ({ visible, onClose, onSuccess }: LoginModalProps) => 
         >
           <Form.Item
             name="username"
-            label="Username"
-            rules={[{ required: true, message: 'Please enter your username' }]}
+            label="Email"
+            rules={[
+              { required: true, message: 'Please enter your email' },
+              { type: 'email', message: 'Please enter a valid email' },
+            ]}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="Username"
+              placeholder="your@email.com"
               size="large"
               autoFocus
+              type="email"
             />
           </Form.Item>
 
@@ -123,19 +127,6 @@ export const LoginModal = ({ visible, onClose, onSuccess }: LoginModalProps) => 
             </Button>
           </Form.Item>
         </Form>
-
-        {/* Demo Credentials */}
-        <div style={{ marginTop: 24, padding: 16, background: '#f5f5f5', borderRadius: 8 }}>
-          <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>
-            <strong>Demo Credentials:</strong>
-          </Text>
-          <Text type="secondary" style={{ fontSize: 12, display: 'block' }}>
-            Admin: admin / admin123
-          </Text>
-          <Text type="secondary" style={{ fontSize: 12, display: 'block' }}>
-            User: user / user123
-          </Text>
-        </div>
       </div>
     </Modal>
   );
