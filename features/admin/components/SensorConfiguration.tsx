@@ -21,6 +21,17 @@ export const SensorConfiguration = () => {
   const [sensors, setSensors] = useState<SensorData[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{ name: string; type: string }>({ name: '', type: '' });
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     loadSensors();
@@ -89,8 +100,8 @@ export const SensorConfiguration = () => {
       title: 'Sensor ID',
       dataIndex: 'id',
       key: 'id',
-      width: 200,
-      render: (text: string) => <span style={{ fontFamily: 'monospace', color: '#8c8c8c' }}>{text}</span>,
+      width: isMobile ? 120 : 200,
+      render: (text: string) => <span style={{ fontFamily: 'monospace', color: '#8c8c8c', fontSize: isMobile ? 11 : 13 }}>{text}</span>,
     },
     {
       title: 'Name',
@@ -146,6 +157,7 @@ export const SensorConfiguration = () => {
       dataIndex: 'status',
       key: 'status',
       width: 100,
+      responsive: isMobile ? ['md' as const] : undefined,
       render: (status: string) => (
         <Tag color={status === 'online' ? 'success' : 'error'}>
           {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -194,18 +206,20 @@ export const SensorConfiguration = () => {
 
   return (
     <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ marginBottom: 16, display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'center', gap: isMobile ? 12 : 0 }}>
         <div>
-          <h3 style={{ margin: 0 }}>Sensor Configuration</h3>
-          <p style={{ margin: 0, color: '#8c8c8c' }}>
-            Configure sensor names and types ({sensors.length} total sensors)
+          <h3 style={{ margin: 0, fontSize: isMobile ? 16 : 18 }}>Sensor Configuration</h3>
+          <p style={{ margin: 0, color: '#8c8c8c', fontSize: isMobile ? 12 : 14 }}>
+            {isMobile ? `${sensors.length} sensors` : `Configure sensor names and types (${sensors.length} total sensors)`}
           </p>
         </div>
         <Button
           onClick={handleReset}
           danger
+          size={isMobile ? 'middle' : 'large'}
+          block={isMobile}
         >
-          Reset to Defaults
+          {isMobile ? 'Reset' : 'Reset to Defaults'}
         </Button>
       </div>
 
@@ -213,11 +227,12 @@ export const SensorConfiguration = () => {
         columns={columns}
         dataSource={sensors}
         rowKey="id"
-        pagination={{ pageSize: 15 }}
-        scroll={{ x: 800 }}
+        pagination={{ pageSize: isMobile ? 10 : 15, size: isMobile ? 'small' : 'default' }}
+        scroll={{ x: isMobile ? 600 : 800 }}
+        size={isMobile ? 'small' : 'middle'}
       />
 
-      <div style={{ marginTop: 16, padding: 12, background: '#f5f5f5', borderRadius: 8 }}>
+      <div style={{ marginTop: 16, padding: isMobile ? 10 : 12, background: '#f5f5f5', borderRadius: 8, fontSize: isMobile ? 12 : 14 }}>
         <strong>Note:</strong> Changes are saved to browser localStorage and will persist across sessions.
         Click "Reset to Defaults" to restore original sensor configurations.
       </div>

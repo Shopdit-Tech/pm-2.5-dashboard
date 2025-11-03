@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Tabs, Card } from 'antd';
 import { UserOutlined, SettingOutlined, BgColorsOutlined } from '@ant-design/icons';
 import { UserManagement } from './UserManagement';
@@ -7,6 +8,18 @@ import { SensorConfiguration } from './SensorConfiguration';
 import { ThresholdConfiguration } from './ThresholdConfiguration';
 
 export const AdminSettings = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const tabItems = [
     {
       key: 'users',
@@ -53,20 +66,20 @@ export const AdminSettings = () => {
   ];
 
   return (
-    <div style={{ padding: '24px', background: '#f5f7fa', minHeight: '100vh' }}>
-      <div style={{ marginBottom: 24 }}>
-        <h2 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>
+    <div style={{ padding: isMobile ? '16px' : '24px', background: '#f5f7fa', minHeight: '100vh' }}>
+      <div style={{ marginBottom: isMobile ? 16 : 24 }}>
+        <h2 style={{ margin: 0, fontSize: isMobile ? 20 : 24, fontWeight: 600 }}>
           Admin Settings
         </h2>
-        <p style={{ margin: 0, color: '#8c8c8c', fontSize: 14 }}>
-          Manage users, sensors, and system configuration
+        <p style={{ margin: 0, color: '#8c8c8c', fontSize: isMobile ? 12 : 14 }}>
+          {isMobile ? 'Manage system configuration' : 'Manage users, sensors, and system configuration'}
         </p>
       </div>
 
       <Tabs
         defaultActiveKey="users"
         items={tabItems}
-        size="large"
+        size={isMobile ? 'middle' : 'large'}
         style={{ background: 'transparent' }}
       />
     </div>

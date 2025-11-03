@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Alert, Button, Space, Tag, Row, Col } from 'antd';
+import { Card, Alert, Button, Tag, Row, Col } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import { GoogleMapComponent } from './GoogleMapComponent';
 import { useSensorData } from '../hooks/useSensorData';
@@ -31,105 +31,104 @@ export const MapDashboard = () => {
       : 0;
 
   return (
-    <div style={{ padding: '32px', background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)', minHeight: '100%' }}>
+    <div style={{ padding: '16px', background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)', minHeight: '100%' }}>
       {/* Header */}
-      <div className="mb-8" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
-            Static Sensor Monitoring
-          </h2>
-          <p style={{ margin: '8px 0 0 0', color: '#666', fontSize: 15 }}>
-            Real-time PM2.5 and air quality parameters
-          </p>
+      <div className="mb-6" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ flex: 1, minWidth: '200px' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
+              Static Sensor Monitoring
+            </h2>
+            <p style={{ margin: '6px 0 0 0', color: '#666', fontSize: 13 }}>
+              Real-time PM2.5 and air quality
+            </p>
+          </div>
+          <Button
+            icon={<ReloadOutlined spin={refreshing} />}
+            onClick={handleRefresh}
+            loading={refreshing}
+            size="middle"
+            style={{
+              borderRadius: 10,
+              height: 40,
+              padding: '0 20px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              borderColor: 'transparent',
+              color: 'white',
+              fontWeight: 600,
+              boxShadow: '0 4px 12px rgba(102,126,234,0.3)',
+              fontSize: '14px',
+            }}
+          >
+            Refresh
+          </Button>
         </div>
-        <Button
-          icon={<ReloadOutlined spin={refreshing} />}
-          onClick={handleRefresh}
-          loading={refreshing}
-          size="large"
-          style={{
-            borderRadius: 12,
-            height: 48,
-            padding: '0 24px',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            borderColor: 'transparent',
-            color: 'white',
-            fontWeight: 600,
-            boxShadow: '0 4px 12px rgba(102,126,234,0.3)',
-          }}
-        >
-          Refresh
-        </Button>
       </div>
 
       {/* Statistics Cards */}
-      <Row gutter={[20, 20]} className="mb-8">
+      <Row gutter={[12, 12]} className="mb-6">
         <Col xs={12} sm={12} md={6}>
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 12,
               border: '1px solid rgba(255,255,255,0.6)',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               background: 'linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%)',
-              backdropFilter: 'blur(10px)',
             }}
-            bodyStyle={{ padding: '24px' }}
+            bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ fontSize: 13, color: '#666', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Sensors</div>
-            <div style={{ fontSize: 36, fontWeight: 700, color: '#667eea', marginBottom: 4 }}>{sensors.length}</div>
-            <div style={{ fontSize: 12, color: '#999' }}>monitoring points</div>
+            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>Total Sensors</div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#667eea', marginBottom: 2 }}>{sensors.length}</div>
+            <div style={{ fontSize: 11, color: '#999' }}>monitoring points</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 12,
               border: '1px solid rgba(255,255,255,0.6)',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               background: 'linear-gradient(135deg, rgba(82,196,26,0.1) 0%, rgba(115,209,61,0.1) 100%)',
-              backdropFilter: 'blur(10px)',
             }}
-            bodyStyle={{ padding: '24px' }}
+            bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ fontSize: 13, color: '#666', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Online Status</div>
-            <div style={{ fontSize: 36, fontWeight: 700, color: '#52c41a', marginBottom: 4 }}>{onlineSensors.length}</div>
-            <div style={{ fontSize: 12, color: '#999' }}>of {sensors.length} active</div>
+            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>Online Status</div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#52c41a', marginBottom: 2 }}>{onlineSensors.length}</div>
+            <div style={{ fontSize: 11, color: '#999' }}>of {sensors.length} active</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 12,
               border: '1px solid rgba(255,255,255,0.6)',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               background: 'linear-gradient(135deg, rgba(24,144,255,0.08) 0%, rgba(24,144,255,0.05) 100%)',
-              backdropFilter: 'blur(10px)',
             }}
-            bodyStyle={{ padding: '24px' }}
+            bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ marginBottom: 8 }}>
-              <Tag color="blue" style={{ borderRadius: 8, padding: '4px 12px', fontWeight: 600, border: 'none' }}>🏠 Indoor</Tag>
+            <div style={{ marginBottom: 6 }}>
+              <Tag color="blue" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>🏠 Indoor</Tag>
             </div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: '#1890ff', marginBottom: 4 }}>{avgPM25Indoor.toFixed(1)}</div>
-            <div style={{ fontSize: 12, color: '#999' }}>µg/m³ avg PM2.5</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: '#1890ff', marginBottom: 2 }}>{avgPM25Indoor.toFixed(1)}</div>
+            <div style={{ fontSize: 11, color: '#999' }}>µg/m³ avg PM2.5</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 12,
               border: '1px solid rgba(255,255,255,0.6)',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               background: 'linear-gradient(135deg, rgba(82,196,26,0.08) 0%, rgba(82,196,26,0.05) 100%)',
-              backdropFilter: 'blur(10px)',
             }}
-            bodyStyle={{ padding: '24px' }}
+            bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ marginBottom: 8 }}>
-              <Tag color="green" style={{ borderRadius: 8, padding: '4px 12px', fontWeight: 600, border: 'none' }}>🌳 Outdoor</Tag>
+            <div style={{ marginBottom: 6 }}>
+              <Tag color="green" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>🌳 Outdoor</Tag>
             </div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: '#52c41a', marginBottom: 4 }}>{avgPM25Outdoor.toFixed(1)}</div>
-            <div style={{ fontSize: 12, color: '#999' }}>µg/m³ avg PM2.5</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: '#52c41a', marginBottom: 2 }}>{avgPM25Outdoor.toFixed(1)}</div>
+            <div style={{ fontSize: 11, color: '#999' }}>µg/m³ avg PM2.5</div>
           </Card>
         </Col>
       </Row>
@@ -160,15 +159,18 @@ export const MapDashboard = () => {
       {/* Map Container */}
       <Card
         style={{
-          borderRadius: 20,
+          borderRadius: 16,
           border: '1px solid rgba(255,255,255,0.6)',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
           overflow: 'hidden',
           background: 'rgba(255,255,255,0.95)',
         }}
         bodyStyle={{ padding: 0 }}
       >
-        <div style={{ height: 'calc(100vh - 380px)', minHeight: '600px' }}>
+        <div style={{ 
+          height: typeof window !== 'undefined' && window.innerWidth < 768 ? '400px' : 'calc(100vh - 380px)', 
+          minHeight: typeof window !== 'undefined' && window.innerWidth < 768 ? '400px' : '500px' 
+        }}>
           <GoogleMapComponent sensors={sensors} />
         </div>
       </Card>
@@ -176,21 +178,26 @@ export const MapDashboard = () => {
       {/* Legend */}
       <div
         style={{
-          marginTop: 20,
+          marginTop: 16,
           textAlign: 'center',
-          padding: '16px 24px',
+          padding: '12px 16px',
           background: 'rgba(255,255,255,0.9)',
-          borderRadius: 16,
+          borderRadius: 12,
           backdropFilter: 'blur(10px)',
           boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
         }}
       >
-        <Space size="large">
-          <span style={{ color: '#52c41a', fontWeight: 600, fontSize: 14 }}>● Good (0-12)</span>
-          <span style={{ color: '#faad14', fontWeight: 600, fontSize: 14 }}>● Moderate (12-35)</span>
-          <span style={{ color: '#fa8c16', fontWeight: 600, fontSize: 14 }}>● Unhealthy (35-55)</span>
-          <span style={{ color: '#f5222d', fontWeight: 600, fontSize: 14 }}>● Hazardous (&gt;55)</span>
-        </Space>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: typeof window !== 'undefined' && window.innerWidth < 768 ? '1fr 1fr' : 'repeat(4, 1fr)',
+          gap: '8px',
+          fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? '12px' : '14px'
+        }}>
+          <span style={{ color: '#52c41a', fontWeight: 600 }}>● Good (0-12)</span>
+          <span style={{ color: '#faad14', fontWeight: 600 }}>● Moderate (12-35)</span>
+          <span style={{ color: '#fa8c16', fontWeight: 600 }}>● Unhealthy (35-55)</span>
+          <span style={{ color: '#f5222d', fontWeight: 600 }}>● Hazardous (&gt;55)</span>
+        </div>
       </div>
     </div>
   );

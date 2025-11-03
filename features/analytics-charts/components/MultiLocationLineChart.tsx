@@ -35,6 +35,17 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [chartsData, setChartsData] = useState<any[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Auto-select first 2 sensors on mount
   useEffect(() => {
@@ -212,7 +223,7 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
   };
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ padding: isMobile ? '16px' : '24px' }}>
       {/* Error Alert */}
       {error && (
         <Alert
@@ -222,41 +233,41 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
           showIcon
           closable
           onClose={() => setError(null)}
-          style={{ marginBottom: 24, borderRadius: 12 }}
+          style={{ marginBottom: isMobile ? 16 : 24, borderRadius: 12 }}
         />
       )}
       {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <Title level={4} style={{ margin: 0 }}>
-          Historical Trends - Multi-Location Comparison
+      <div style={{ marginBottom: isMobile ? 16 : 24 }}>
+        <Title level={4} style={{ margin: 0, fontSize: isMobile ? 18 : 24 }}>
+          {isMobile ? 'Historical Trends' : 'Historical Trends - Multi-Location Comparison'}
         </Title>
-        <Text type="secondary">
-          Compare air quality parameters across multiple locations over time
+        <Text type="secondary" style={{ fontSize: isMobile ? 12 : 14 }}>
+          {isMobile ? 'Compare air quality data' : 'Compare air quality parameters across multiple locations over time'}
         </Text>
       </div>
 
       {/* Controls */}
-      <Card style={{ marginBottom: 16, borderRadius: '12px' }} styles={{ body: { padding: '20px' } }}>
-        <Space direction="vertical" style={{ width: '100%' }} size="large">
+      <Card style={{ marginBottom: 16, borderRadius: '12px' }} styles={{ body: { padding: isMobile ? '16px' : '20px' } }}>
+        <Space direction="vertical" style={{ width: '100%' }} size={isMobile ? 'middle' : 'large'}>
           {/* Parameter Tabs */}
           <div>
-            <Text strong style={{ display: 'block', marginBottom: 12 }}>
+            <Text strong style={{ display: 'block', marginBottom: isMobile ? 8 : 12, fontSize: isMobile ? 13 : 14 }}>
               Select Parameter:
             </Text>
             <ParameterTabs activeParameter={parameter} onChange={setParameter} />
           </div>
 
           {/* Time Range & Location Selection */}
-          <Row gutter={16}>
+          <Row gutter={isMobile ? [12, 12] : [16, 16]}>
             <Col xs={24} md={8}>
-              <Text strong style={{ display: 'block', marginBottom: 8 }}>
+              <Text strong style={{ display: 'block', marginBottom: 8, fontSize: isMobile ? 13 : 14 }}>
                 Time Range:
               </Text>
               <Select
                 value={getTimeRangeId(timeRange)}
                 onChange={(id) => setTimeRange(getTimeRangeByIdOrDefault(id))}
                 style={{ width: '100%' }}
-                size="large"
+                size={isMobile ? 'middle' : 'large'}
               >
                 {TIME_RANGES.map((range) => (
                   <Option key={range.id} value={range.id}>
@@ -267,7 +278,7 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
             </Col>
 
             <Col xs={24} md={16}>
-              <Text strong style={{ display: 'block', marginBottom: 8 }}>
+              <Text strong style={{ display: 'block', marginBottom: 8, fontSize: isMobile ? 13 : 14 }}>
                 Locations:
               </Text>
               <LocationSelector
@@ -282,7 +293,7 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
       </Card>
 
       {/* Chart */}
-      <Card style={{ borderRadius: '12px' }} styles={{ body: { padding: '20px' } }}>
+      <Card style={{ borderRadius: '12px' }} styles={{ body: { padding: isMobile ? '16px' : '20px' } }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: 60 }}>
             <Spin size="large" />
@@ -303,8 +314,8 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
             </Text>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={500}>
-            <LineChart data={mergedChartData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
+          <ResponsiveContainer width="100%" height={isMobile ? 300 : 500}>
+            <LineChart data={mergedChartData} margin={{ top: 10, right: isMobile ? 10 : 30, left: isMobile ? 10 : 20, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
 
               <XAxis

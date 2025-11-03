@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Modal, Typography, Card, Space, Row, Col, Tag, Button } from 'antd';
 import { CopyOutlined, EnvironmentOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { SensorData } from '@/types/sensor';
@@ -14,6 +15,18 @@ type SensorDetailModalProps = {
 };
 
 export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModalProps) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Copy serial number to clipboard
   const handleCopySerial = () => {
     if (sensor.serialNumber) {
@@ -27,10 +40,11 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
       open={visible}
       onCancel={onClose}
       footer={null}
-      width={680}
+      width={isMobile ? '95%' : 680}
       centered
       style={{
         borderRadius: '16px',
+        maxWidth: isMobile ? '100vw' : undefined,
       }}
     >
       <div>
@@ -38,21 +52,21 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
         <div
           style={{
             background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
-            padding: '32px',
+            padding: isMobile ? '20px 16px' : '32px',
             margin: '-24px -24px 24px -24px',
             borderRadius: '16px 16px 0 0',
           }}
         >
-          <Title level={4} style={{ margin: 0, color: 'white' }}>
+          <Title level={4} style={{ margin: 0, color: 'white', fontSize: isMobile ? 16 : 20 }}>
             <InfoCircleOutlined style={{ marginRight: 8 }} />
             Monitor Information
           </Title>
-          <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>
-            Detailed sensor specifications and calibration data
+          <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: isMobile ? 12 : 14 }}>
+            {isMobile ? 'Sensor details' : 'Detailed sensor specifications and calibration data'}
           </Text>
         </div>
 
-        <Space direction="vertical" size="large" style={{ width: '100%', padding: '0 24px 24px' }}>
+        <Space direction="vertical" size={isMobile ? 'middle' : 'large'} style={{ width: '100%', padding: isMobile ? '0 16px 16px' : '0 24px 24px' }}>
           {/* General Information Section */}
           <Card
             style={{
@@ -60,9 +74,9 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
               border: '1px solid #f0f0f0',
               background: '#fafafa',
             }}
-            bodyStyle={{ padding: '20px' }}
+            bodyStyle={{ padding: isMobile ? '16px' : '20px' }}
           >
-            <Title level={5} style={{ marginTop: 0, marginBottom: 16, fontSize: 16 }}>
+            <Title level={5} style={{ marginTop: 0, marginBottom: isMobile ? 12 : 16, fontSize: 16 }}>
               General Information
             </Title>
             
@@ -100,7 +114,7 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
 
               {/* Monitor Maker */}
               <Row gutter={16}>
-                <Col span={12}>
+                <Col xs={24} sm={12}>
                   <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                     Monitor Maker
                   </Text>
@@ -110,7 +124,7 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
                 </Col>
 
                 {/* Model */}
-                <Col span={12}>
+                <Col xs={24} sm={12}>
                   <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                     Model
                   </Text>
@@ -133,7 +147,7 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
 
               {/* Commissioning Date */}
               <Row gutter={16}>
-                <Col span={12}>
+                <Col xs={24} sm={12}>
                   <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                     Monitor Commissioning Date
                   </Text>
@@ -149,7 +163,7 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
                 </Col>
 
                 {/* Status */}
-                <Col span={12}>
+                <Col xs={24} sm={12}>
                   <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                     Status
                   </Text>
@@ -169,9 +183,9 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
                 border: '1px solid #f0f0f0',
                 background: '#fafafa',
               }}
-              bodyStyle={{ padding: '20px' }}
+              bodyStyle={{ padding: isMobile ? '16px' : '20px' }}
             >
-              <Title level={5} style={{ marginTop: 0, marginBottom: 16, fontSize: 16 }}>
+              <Title level={5} style={{ marginTop: 0, marginBottom: isMobile ? 12 : 16, fontSize: 16 }}>
                 Calibration
               </Title>
 
@@ -233,77 +247,131 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
                 borderRadius: '12px',
                 border: '1px solid #f0f0f0',
               }}
-              bodyStyle={{ padding: '20px' }}
+              bodyStyle={{ padding: isMobile ? '16px' : '20px' }}
             >
-              <Title level={5} style={{ marginTop: 0, marginBottom: 16, fontSize: 16 }}>
+              <Title level={5} style={{ marginTop: 0, marginBottom: isMobile ? 12 : 16, fontSize: 16 }}>
                 Current Readings
               </Title>
 
-              <Row gutter={[16, 16]}>
-                <Col span={8}>
-                  <div style={{ textAlign: 'center' }}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
+              <Row gutter={[12, 12]} justify="center">
+                <Col xs={8} sm={8}>
+                  <div style={{ 
+                    textAlign: 'center', 
+                    padding: isMobile ? '10px 6px' : '12px', 
+                    background: '#fafafa', 
+                    borderRadius: '8px',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
+                  }}>
+                    <Text type="secondary" style={{ fontSize: 11, display: 'block', marginBottom: 4 }}>
                       PM₂.₅
                     </Text>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: '#1890ff' }}>
+                    <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: '#1890ff' }}>
                       {sensor.pm25.toFixed(1)}
-                      <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4 }}>μg/m³</span>
                     </div>
+                    <Text type="secondary" style={{ fontSize: 10 }}>μg/m³</Text>
                   </div>
                 </Col>
-                <Col span={8}>
-                  <div style={{ textAlign: 'center' }}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
+                <Col xs={8} sm={8}>
+                  <div style={{ 
+                    textAlign: 'center', 
+                    padding: isMobile ? '10px 6px' : '12px', 
+                    background: '#fafafa', 
+                    borderRadius: '8px',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
+                  }}>
+                    <Text type="secondary" style={{ fontSize: 11, display: 'block', marginBottom: 4 }}>
                       PM₁₀
                     </Text>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: '#52c41a' }}>
+                    <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: '#52c41a' }}>
                       {sensor.pm10.toFixed(1)}
-                      <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4 }}>μg/m³</span>
                     </div>
+                    <Text type="secondary" style={{ fontSize: 10 }}>μg/m³</Text>
                   </div>
                 </Col>
-                <Col span={8}>
-                  <div style={{ textAlign: 'center' }}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
+                <Col xs={8} sm={8}>
+                  <div style={{ 
+                    textAlign: 'center', 
+                    padding: isMobile ? '10px 6px' : '12px', 
+                    background: '#fafafa', 
+                    borderRadius: '8px',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
+                  }}>
+                    <Text type="secondary" style={{ fontSize: 11, display: 'block', marginBottom: 4 }}>
                       CO₂
                     </Text>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: '#722ed1' }}>
-                      {sensor.co2}
-                      <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4 }}>ppm</span>
+                    <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: '#722ed1' }}>
+                      {sensor.co2.toFixed(0)}
                     </div>
+                    <Text type="secondary" style={{ fontSize: 10 }}>ppm</Text>
                   </div>
                 </Col>
-                <Col span={8}>
-                  <div style={{ textAlign: 'center' }}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      Temperature
+                <Col xs={8} sm={8}>
+                  <div style={{ 
+                    textAlign: 'center', 
+                    padding: isMobile ? '10px 6px' : '12px', 
+                    background: '#fafafa', 
+                    borderRadius: '8px',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
+                  }}>
+                    <Text type="secondary" style={{ fontSize: 11, display: 'block', marginBottom: 4 }}>
+                      Temp
                     </Text>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: '#ff7a45' }}>
+                    <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: '#ff7a45' }}>
                       {sensor.temperature.toFixed(1)}
-                      <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4 }}>°C</span>
                     </div>
+                    <Text type="secondary" style={{ fontSize: 10 }}>°C</Text>
                   </div>
                 </Col>
-                <Col span={8}>
-                  <div style={{ textAlign: 'center' }}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
+                <Col xs={8} sm={8}>
+                  <div style={{ 
+                    textAlign: 'center', 
+                    padding: isMobile ? '10px 6px' : '12px', 
+                    background: '#fafafa', 
+                    borderRadius: '8px',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
+                  }}>
+                    <Text type="secondary" style={{ fontSize: 11, display: 'block', marginBottom: 4 }}>
                       Humidity
                     </Text>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: '#13c2c2' }}>
+                    <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: '#13c2c2' }}>
                       {sensor.humidity.toFixed(1)}
-                      <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4 }}>%</span>
                     </div>
+                    <Text type="secondary" style={{ fontSize: 10 }}>%</Text>
                   </div>
                 </Col>
-                <Col span={8}>
-                  <div style={{ textAlign: 'center' }}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
+                <Col xs={8} sm={8}>
+                  <div style={{ 
+                    textAlign: 'center', 
+                    padding: isMobile ? '10px 6px' : '12px', 
+                    background: '#fafafa', 
+                    borderRadius: '8px',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
+                  }}>
+                    <Text type="secondary" style={{ fontSize: 11, display: 'block', marginBottom: 4 }}>
                       TVOC
                     </Text>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: '#fa8c16' }}>
-                      {sensor.tvoc}
-                      <span style={{ fontSize: 12, fontWeight: 500, marginLeft: 4 }}>index</span>
+                    <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: '#fa8c16' }}>
+                      {sensor.tvoc.toFixed(0)}
                     </div>
+                    <Text type="secondary" style={{ fontSize: 10 }}>index</Text>
                   </div>
                 </Col>
               </Row>

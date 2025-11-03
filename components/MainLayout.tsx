@@ -186,7 +186,13 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           <Menu
             mode="inline"
             selectedKeys={[activeView]}
-            onClick={({ key }) => setActiveView(key)}
+            onClick={({ key }) => {
+              setActiveView(key);
+              // Auto-close sidebar on mobile after selecting a menu item
+              if (isMobile) {
+                setCollapsed(true);
+              }
+            }}
             items={menuItems}
             style={{
               background: 'transparent',
@@ -230,7 +236,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         <div
           style={{
             height: '80px',
-            padding: '0 40px',
+            padding: isMobile ? '0 16px' : '0 40px',
             background: 'white',
             boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
             display: 'flex',
@@ -242,23 +248,23 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             borderBottom: '1px solid #f3f4f6',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 20 }}>
             <button
               onClick={() => setCollapsed(!collapsed)}
               style={{
-                fontSize: '20px',
+                fontSize: isMobile ? '18px' : '20px',
                 border: '1px solid #e5e7eb',
                 background: 'white',
                 cursor: 'pointer',
                 color: '#6b7280',
-                padding: '12px',
+                padding: isMobile ? '10px' : '12px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: '12px',
                 transition: 'all 0.2s',
-                width: '48px',
-                height: '48px',
+                width: isMobile ? '40px' : '48px',
+                height: isMobile ? '40px' : '48px',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = '#f9fafb';
@@ -274,10 +280,12 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
               {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             </button>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <Text style={{ color: '#9ca3af', fontSize: 13, display: 'block', fontWeight: 600 }}>
-                {menuItems.find((item) => item.key === activeView)?.title}
-              </Text>
-              <Title level={3} style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
+              {!isMobile && (
+                <Text style={{ color: '#9ca3af', fontSize: 13, display: 'block', fontWeight: 600 }}>
+                  {menuItems.find((item) => item.key === activeView)?.title}
+                </Text>
+              )}
+              <Title level={3} style={{ margin: 0, fontSize: isMobile ? 18 : 24, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
                 {menuItems.find((item) => item.key === activeView)?.label}
               </Title>
             </div>
@@ -285,15 +293,17 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           
           {/* Auth Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Badge 
-              status="success" 
-              text="System Online" 
-              style={{ 
-                fontSize: 14, 
-                fontWeight: 500,
-                marginRight: 12,
-              }} 
-            />
+            {!isMobile && (
+              <Badge 
+                status="success" 
+                text="System Online" 
+                style={{ 
+                  fontSize: 14, 
+                  fontWeight: 500,
+                  marginRight: 12,
+                }} 
+              />
+            )}
             
             {user ? (
               <Dropdown
@@ -305,7 +315,13 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                             key: 'admin',
                             label: 'Admin Settings',
                             icon: <SettingOutlined />,
-                            onClick: () => setActiveView('admin-settings'),
+                            onClick: () => {
+                              setActiveView('admin-settings');
+                              // Auto-close sidebar on mobile
+                              if (isMobile) {
+                                setCollapsed(true);
+                              }
+                            },
                           },
                           { type: 'divider' as const },
                         ]
@@ -322,12 +338,14 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
               >
                 <Space style={{ cursor: 'pointer' }}>
                   <Avatar icon={<UserOutlined />} style={{ background: '#1890ff' }} />
-                  <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                    <Text strong style={{ fontSize: 14 }}>{user.username}</Text>
-                    <Text type="secondary" style={{ fontSize: 11 }}>
-                      {user.role === 'admin' ? 'Administrator' : 'User'}
-                    </Text>
-                  </div>
+                  {!isMobile && (
+                    <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                      <Text strong style={{ fontSize: 14 }}>{user.username}</Text>
+                      <Text type="secondary" style={{ fontSize: 11 }}>
+                        {user.role === 'admin' ? 'Administrator' : 'User'}
+                      </Text>
+                    </div>
+                  )}
                 </Space>
               </Dropdown>
             ) : (
@@ -335,8 +353,9 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                 type="primary"
                 icon={<LoginOutlined />}
                 onClick={() => setShowLoginModal(true)}
+                size={isMobile ? 'middle' : 'large'}
               >
-                Login
+                {isMobile ? '' : 'Login'}
               </Button>
             )}
           </div>

@@ -107,106 +107,105 @@ export const MobileSensorsDashboard = () => {
       : 0;
 
   return (
-    <div style={{ padding: '32px', background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)', minHeight: '100%' }}>
+    <div style={{ padding: '16px', background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)', minHeight: '100%' }}>
       {/* Header */}
-      <div className="mb-8" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
-            <CarOutlined style={{ marginRight: 12, color: '#f5576c' }} />
-            Mobile Sensor Monitoring
-          </h2>
-          <p style={{ margin: '8px 0 0 0', color: '#666', fontSize: 15 }}>
-            Real-time tracking of mobile air quality sensors
-          </p>
+      <div className="mb-6" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ flex: 1, minWidth: '200px' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
+              <CarOutlined style={{ marginRight: 8, color: '#f5576c' }} />
+              Mobile Sensor Monitoring
+            </h2>
+            <p style={{ margin: '6px 0 0 0', color: '#666', fontSize: 13 }}>
+              Real-time tracking of mobile sensors
+            </p>
+          </div>
+          <Button
+            icon={<ReloadOutlined spin={refreshing} />}
+            onClick={handleRefresh}
+            loading={refreshing}
+            size="middle"
+            style={{
+              borderRadius: 10,
+              height: 40,
+              padding: '0 20px',
+              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+              borderColor: 'transparent',
+              color: 'white',
+              fontWeight: 600,
+              boxShadow: '0 4px 12px rgba(245,87,108,0.3)',
+              fontSize: '14px',
+            }}
+          >
+            Refresh
+          </Button>
         </div>
-        <Button
-          icon={<ReloadOutlined spin={refreshing} />}
-          onClick={handleRefresh}
-          loading={refreshing}
-          size="large"
-          style={{
-            borderRadius: 12,
-            height: 48,
-            padding: '0 24px',
-            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-            borderColor: 'transparent',
-            color: 'white',
-            fontWeight: 600,
-            boxShadow: '0 4px 12px rgba(245,87,108,0.3)',
-          }}
-        >
-          Refresh
-        </Button>
       </div>
 
       {/* Statistics Cards */}
-      <Row gutter={[20, 20]} className="mb-8">
+      <Row gutter={[12, 12]} className="mb-6">
         <Col xs={12} sm={12} md={6}>
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 12,
               border: '1px solid rgba(255,255,255,0.6)',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               background: 'linear-gradient(135deg, rgba(240,147,251,0.1) 0%, rgba(245,87,108,0.1) 100%)',
-              backdropFilter: 'blur(10px)',
             }}
-            bodyStyle={{ padding: '24px' }}
+            bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ fontSize: 13, color: '#666', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Mobile</div>
-            <div style={{ fontSize: 36, fontWeight: 700, color: '#f5576c', marginBottom: 4 }}>{sensors.length}</div>
-            <div style={{ fontSize: 12, color: '#999' }}>🚗 tracking devices</div>
+            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>Total Mobile</div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#f5576c', marginBottom: 2 }}>{sensors.length}</div>
+            <div style={{ fontSize: 11, color: '#999' }}>🚗 tracking devices</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 12,
               border: '1px solid rgba(255,255,255,0.6)',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               background: 'linear-gradient(135deg, rgba(82,196,26,0.1) 0%, rgba(115,209,61,0.1) 100%)',
-              backdropFilter: 'blur(10px)',
             }}
-            bodyStyle={{ padding: '24px' }}
+            bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ fontSize: 13, color: '#666', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Active Now</div>
-            <div style={{ fontSize: 36, fontWeight: 700, color: '#52c41a', marginBottom: 4 }}>{onlineSensors.length}</div>
-            <div style={{ fontSize: 12, color: '#999' }}>of {sensors.length} online</div>
+            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>Active Now</div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#52c41a', marginBottom: 2 }}>{onlineSensors.length}</div>
+            <div style={{ fontSize: 11, color: '#999' }}>of {sensors.length} online</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 12,
               border: '1px solid rgba(255,255,255,0.6)',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               background: 'linear-gradient(135deg, rgba(24,144,255,0.08) 0%, rgba(24,144,255,0.05) 100%)',
-              backdropFilter: 'blur(10px)',
             }}
-            bodyStyle={{ padding: '24px' }}
+            bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ marginBottom: 8 }}>
-              <Tag color="blue" style={{ borderRadius: 8, padding: '4px 12px', fontWeight: 600, border: 'none' }}>📊 Average</Tag>
+            <div style={{ marginBottom: 6 }}>
+              <Tag color="blue" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>📊 Average</Tag>
             </div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: '#1890ff', marginBottom: 4 }}>{avgPM25.toFixed(1)}</div>
-            <div style={{ fontSize: 12, color: '#999' }}>µg/m³ PM2.5</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: '#1890ff', marginBottom: 2 }}>{avgPM25.toFixed(1)}</div>
+            <div style={{ fontSize: 11, color: '#999' }}>µg/m³ PM2.5</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 12,
               border: '1px solid rgba(255,255,255,0.6)',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               background: 'linear-gradient(135deg, rgba(255,77,79,0.08) 0%, rgba(255,77,79,0.05) 100%)',
-              backdropFilter: 'blur(10px)',
             }}
-            bodyStyle={{ padding: '24px' }}
+            bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ marginBottom: 8 }}>
-              <Tag color="red" style={{ borderRadius: 8, padding: '4px 12px', fontWeight: 600, border: 'none' }}>⚠️ Maximum</Tag>
+            <div style={{ marginBottom: 6 }}>
+              <Tag color="red" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>⚠️ Maximum</Tag>
             </div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: '#ff4d4f', marginBottom: 4 }}>{maxPM25.toFixed(1)}</div>
-            <div style={{ fontSize: 12, color: '#999' }}>µg/m³ PM2.5</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: '#ff4d4f', marginBottom: 2 }}>{maxPM25.toFixed(1)}</div>
+            <div style={{ fontSize: 11, color: '#999' }}>µg/m³ PM2.5</div>
           </Card>
         </Col>
       </Row>
@@ -321,7 +320,10 @@ export const MobileSensorsDashboard = () => {
         }}
         bodyStyle={{ padding: 0 }}
       >
-        <div style={{ height: 'calc(100vh - 500px)', minHeight: '600px' }}>
+        <div style={{ 
+          height: typeof window !== 'undefined' && window.innerWidth < 768 ? '400px' : 'calc(100vh - 500px)', 
+          minHeight: typeof window !== 'undefined' && window.innerWidth < 768 ? '400px' : '500px' 
+        }}>
           {loadingRoute ? (
             <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
               <ReloadOutlined spin style={{ fontSize: 48, color: '#1890ff' }} />
@@ -374,62 +376,76 @@ export const MobileSensorsDashboard = () => {
             background: 'linear-gradient(135deg, #1890ff15 0%, #096dd915 100%)',
           }}
         >
-          <Row gutter={[16, 16]}>
-            <Col xs={24} md={6}>
+          <Row gutter={[12, 12]}>
+            <Col xs={12} sm={12} md={6}>
               <Statistic
                 title="Start Time"
                 value={new Date(selectedRoute.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                valueStyle={{ fontSize: 20, color: '#52c41a' }}
+                valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#52c41a' }}
               />
             </Col>
-            <Col xs={24} md={6}>
+            <Col xs={12} sm={12} md={6}>
               <Statistic
                 title="End Time"
                 value={new Date(selectedRoute.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                valueStyle={{ fontSize: 20, color: '#ff4d4f' }}
+                valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#ff4d4f' }}
               />
             </Col>
-            <Col xs={24} md={4}>
+            <Col xs={8} sm={8} md={4}>
               <Statistic
                 title="Distance"
                 value={selectedRoute.totalDistance}
                 suffix="km"
-                valueStyle={{ fontSize: 20, color: '#1890ff' }}
+                valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#1890ff' }}
               />
             </Col>
-            <Col xs={24} md={4}>
+            <Col xs={8} sm={8} md={4}>
               <Statistic
                 title="Avg PM2.5"
                 value={selectedRoute.averagePm25}
                 suffix="µg/m³"
-                valueStyle={{ fontSize: 20, color: '#faad14' }}
+                valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#faad14' }}
               />
             </Col>
-            <Col xs={24} md={4}>
+            <Col xs={8} sm={8} md={4}>
               <Statistic
                 title="Max PM2.5"
                 value={selectedRoute.maxPm25}
                 suffix="µg/m³"
-                valueStyle={{ fontSize: 20, color: '#ff4d4f' }}
+                valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#ff4d4f' }}
               />
             </Col>
           </Row>
-          <div style={{ marginTop: 16, fontSize: 13, color: '#595959' }}>
+          <div style={{ marginTop: 12, fontSize: 12, color: '#595959' }}>
             <EnvironmentOutlined style={{ marginRight: 8 }} />
-            Showing complete route for {selectedRoute.deviceName} with {selectedRoute.points.length} data points
+            Showing route for {selectedRoute.deviceName} with {selectedRoute.points.length} points
           </div>
         </Card>
       )}
 
       {/* Legend */}
-      <div style={{ marginTop: 16, textAlign: 'center', color: '#8c8c8c', fontSize: 13 }}>
-        <Space size="large">
+      <div style={{ 
+        marginTop: 16, 
+        textAlign: 'center', 
+        padding: '12px 16px',
+        background: 'rgba(255,255,255,0.9)',
+        borderRadius: 12,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+      }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: typeof window !== 'undefined' && window.innerWidth < 768 ? '1fr 1fr' : 'repeat(5, 1fr)',
+          gap: '8px',
+          fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? '12px' : '13px',
+          color: '#595959',
+          fontWeight: 600
+        }}>
           <span><CarOutlined /> Mobile Sensors</span>
           <span>🟢 Good (0-12)</span>
           <span>🟡 Moderate (12-35)</span>
           <span>🟠 Unhealthy (35-55)</span>
           <span>🔴 Hazardous (&gt;55)</span>
-        </Space>
+        </div>
       </div>
 
       {/* Info Banner */}

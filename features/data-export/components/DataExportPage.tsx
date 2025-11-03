@@ -15,14 +15,20 @@ type DataExportPageProps = {
 
 export const DataExportPage = ({ sensors, loading, error }: DataExportPageProps) => {
   return (
-    <div style={{ padding: '24px', maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ padding: '16px', maxWidth: 1200, margin: '0 auto' }}>
       {/* Header */}
-      <div style={{ marginBottom: 32 }}>
-        <Title level={2} style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ marginBottom: 24 }}>
+        <Title level={2} style={{ 
+          margin: 0, 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 12,
+          fontSize: '24px'
+        }}>
           <DownloadOutlined />
-          BMA | Data Export
+          <span style={{ fontSize: 'inherit' }}>BMA | Data Export</span>
         </Title>
-        <Text type="secondary" style={{ fontSize: 15 }}>
+        <Text type="secondary" style={{ fontSize: 14 }}>
           Export historical sensor data as CSV format
         </Text>
       </div>
@@ -33,9 +39,9 @@ export const DataExportPage = ({ sensors, loading, error }: DataExportPageProps)
           borderRadius: 12,
           boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
         }}
-        styles={{ body: { padding: 32 } }}
+        styles={{ body: { padding: '24px 16px' } }}
       >
-        <Title level={3} style={{ marginTop: 0 }}>
+        <Title level={3} style={{ marginTop: 0, fontSize: '20px' }}>
           Export Data as CSV
         </Title>
 
@@ -83,13 +89,17 @@ export const DataExportPage = ({ sensors, loading, error }: DataExportPageProps)
           borderRadius: 12,
           boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
         }}
-        styles={{ body: { padding: 24 } }}
+        styles={{ body: { padding: '20px 16px' } }}
       >
-        <Title level={4}>CSV Format Information</Title>
+        <Title level={4} style={{ fontSize: '18px' }}>CSV Format Information</Title>
         <Paragraph>
           The exported CSV file will contain the following columns:
         </Paragraph>
-        <ul style={{ columns: 2, columnGap: 40 }}>
+        <ul style={{ 
+          columns: typeof window !== 'undefined' && window.innerWidth > 768 ? 2 : 1, 
+          columnGap: 40,
+          paddingLeft: 20
+        }}>
           <li>Location ID & Name</li>
           <li>Sensor ID & Type</li>
           <li>Local & UTC Date/Time</li>

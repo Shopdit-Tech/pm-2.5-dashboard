@@ -119,7 +119,10 @@ export const GoogleMapComponent = ({
         footer={null}
         closable={false}
         width="auto"
-        style={{ top: 20 }}
+        style={{ 
+          maxWidth: '95vw',
+          top: typeof window !== 'undefined' && window.innerWidth < 768 ? undefined : 20 
+        }}
         bodyStyle={{ padding: 0, display: 'flex', justifyContent: 'center' }}
         destroyOnClose
         centered

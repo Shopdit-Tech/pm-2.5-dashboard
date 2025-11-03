@@ -102,7 +102,7 @@ export const ExportForm = ({ sensors }: ExportFormProps) => {
         bucketSize: DEFAULT_BUCKET_SIZE,
         dateRange: [dayjs().subtract(7, 'days'), dayjs()],
       }}
-      style={{ maxWidth: 600 }}
+      style={{ maxWidth: 600, width: '100%' }}
     >
       {/* Sensor Selection */}
       <Form.Item

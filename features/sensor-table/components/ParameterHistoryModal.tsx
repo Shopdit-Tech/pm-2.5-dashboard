@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Modal, Typography, Card, Row, Col, Spin, Alert, Select } from 'antd';
 import { LineChartOutlined, RiseOutlined, FallOutlined, DashboardOutlined } from '@ant-design/icons';
 import { SensorData } from '@/types/sensor';
@@ -44,6 +44,17 @@ export const ParameterHistoryModal = ({
 }: ParameterHistoryModalProps) => {
   // Use the default time range config (24h with 15min intervals)
   const [timeRange, setTimeRange] = useState<TimeRange>(getTimeRangeByIdOrDefault('24h'));
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Normalize parameter name to SensorData key
   const normalizeParameter = (param: string): keyof Pick<SensorData, 'temperature' | 'humidity' | 'co2' | 'pm1' | 'pm25' | 'pm10' | 'tvoc'> => {
@@ -138,40 +149,42 @@ export const ParameterHistoryModal = ({
       open={visible}
       onCancel={onClose}
       footer={null}
-      width="90%"
-      style={{ maxWidth: 1200, top: 20 }}
-      centered={false}
+      width="95%"
+      style={{ maxWidth: isMobile ? '100vw' : 1200, top: isMobile ? 0 : 20 }}
+      centered={isMobile}
     >
       <div>
         {/* Header with gradient */}
         <div
           style={{
             background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
-            padding: '32px',
+            padding: isMobile ? '20px 16px' : '32px',
             margin: '-24px -24px 24px -24px',
             borderRadius: '16px 16px 0 0',
           }}
         >
-          <Title level={4} style={{ margin: 0, color: 'white' }}>
+          <Title level={4} style={{ margin: 0, color: 'white', fontSize: isMobile ? 16 : 20 }}>
             <LineChartOutlined style={{ marginRight: 8 }} />
             {getParameterLabel(parameter)} ({getParameterUnit(parameter)})
           </Title>
-          <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>
-            {sensor.name} - Historical Data Analysis
+          <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: isMobile ? 12 : 14, wordBreak: 'break-word' }}>
+            {sensor.name} - {isMobile ? 'Historical Data' : 'Historical Data Analysis'}
           </Text>
         </div>
 
-        <div style={{ padding: '0 24px 24px' }}>
+        <div style={{ padding: isMobile ? '0 16px 16px' : '0 24px 24px' }}>
           {/* Time Range Selector */}
-          <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text strong style={{ fontSize: 15 }}>
-              Time Range: {getTimeRangeLabel(timeRange)}
-            </Text>
+          <div style={{ marginBottom: isMobile ? 16 : 24, display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'center', gap: isMobile ? 12 : 0 }}>
+            {!isMobile && (
+              <Text strong style={{ fontSize: 15 }}>
+                Time Range: {getTimeRangeLabel(timeRange)}
+              </Text>
+            )}
             <Select
               value={getTimeRangeId(timeRange)}
               onChange={(id) => setTimeRange(getTimeRangeByIdOrDefault(id))}
-              style={{ width: 250 }}
-              size="middle"
+              style={{ width: isMobile ? '100%' : 250 }}
+              size={isMobile ? 'middle' : 'large'}
             >
               {TIME_RANGES.map((range) => (
                 <Select.Option key={range.id} value={range.id}>
@@ -208,11 +221,11 @@ export const ParameterHistoryModal = ({
               style={{
                 borderRadius: '12px',
                 border: '1px solid #f0f0f0',
-                marginBottom: 24,
+                marginBottom: isMobile ? 16 : 24,
               }}
-              bodyStyle={{ padding: '24px 16px' }}
+              bodyStyle={{ padding: isMobile ? '16px 8px' : '24px 16px' }}
             >
-              <ResponsiveContainer width="100%" height={400}>
+              <ResponsiveContainer width="100%" height={isMobile ? 280 : 400}>
               <LineChart data={formattedChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
 
@@ -308,7 +321,7 @@ export const ParameterHistoryModal = ({
           )}
 
           {/* Statistics Cards */}
-          <Row gutter={[16, 16]}>
+          <Row gutter={isMobile ? [12, 12] : [16, 16]}>
             <Col xs={12} sm={6}>
               <Card
                 style={{
@@ -316,16 +329,16 @@ export const ParameterHistoryModal = ({
                   background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
                   border: 'none',
                 }}
-                bodyStyle={{ padding: '20px', textAlign: 'center' }}
+                bodyStyle={{ padding: isMobile ? '16px 12px' : '20px', textAlign: 'center' }}
               >
-                <DashboardOutlined style={{ fontSize: 24, color: 'white', marginBottom: 8 }} />
-                <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
+                <DashboardOutlined style={{ fontSize: isMobile ? 20 : 24, color: 'white', marginBottom: isMobile ? 6 : 8 }} />
+                <Text style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
                   Current
                 </Text>
-                <Text style={{ fontSize: 24, fontWeight: 700, color: 'white', display: 'block' }}>
+                <Text style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: 'white', display: 'block' }}>
                   {stats.current.toFixed(1)}
                 </Text>
-                <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>
+                <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.8)' }}>
                   {getParameterUnit(parameter)}
                 </Text>
               </Card>
@@ -338,16 +351,16 @@ export const ParameterHistoryModal = ({
                   background: 'linear-gradient(135deg, #faad14 0%, #fa8c16 100%)',
                   border: 'none',
                 }}
-                bodyStyle={{ padding: '20px', textAlign: 'center' }}
+                bodyStyle={{ padding: isMobile ? '16px 12px' : '20px', textAlign: 'center' }}
               >
-                <LineChartOutlined style={{ fontSize: 24, color: 'white', marginBottom: 8 }} />
-                <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
+                <LineChartOutlined style={{ fontSize: isMobile ? 20 : 24, color: 'white', marginBottom: isMobile ? 6 : 8 }} />
+                <Text style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
                   Average
                 </Text>
-                <Text style={{ fontSize: 24, fontWeight: 700, color: 'white', display: 'block' }}>
+                <Text style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: 'white', display: 'block' }}>
                   {stats.average.toFixed(1)}
                 </Text>
-                <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>
+                <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.8)' }}>
                   {getParameterUnit(parameter)}
                 </Text>
               </Card>
@@ -360,16 +373,16 @@ export const ParameterHistoryModal = ({
                   background: 'linear-gradient(135deg, #52c41a 0%, #389e0d 100%)',
                   border: 'none',
                 }}
-                bodyStyle={{ padding: '20px', textAlign: 'center' }}
+                bodyStyle={{ padding: isMobile ? '16px 12px' : '20px', textAlign: 'center' }}
               >
-                <FallOutlined style={{ fontSize: 24, color: 'white', marginBottom: 8 }} />
-                <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
+                <FallOutlined style={{ fontSize: isMobile ? 20 : 24, color: 'white', marginBottom: isMobile ? 6 : 8 }} />
+                <Text style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
                   Minimum
                 </Text>
-                <Text style={{ fontSize: 24, fontWeight: 700, color: 'white', display: 'block' }}>
+                <Text style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: 'white', display: 'block' }}>
                   {stats.min.toFixed(1)}
                 </Text>
-                <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>
+                <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.8)' }}>
                   {getParameterUnit(parameter)}
                 </Text>
               </Card>
@@ -382,16 +395,16 @@ export const ParameterHistoryModal = ({
                   background: 'linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%)',
                   border: 'none',
                 }}
-                bodyStyle={{ padding: '20px', textAlign: 'center' }}
+                bodyStyle={{ padding: isMobile ? '16px 12px' : '20px', textAlign: 'center' }}
               >
-                <RiseOutlined style={{ fontSize: 24, color: 'white', marginBottom: 8 }} />
-                <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
+                <RiseOutlined style={{ fontSize: isMobile ? 20 : 24, color: 'white', marginBottom: isMobile ? 6 : 8 }} />
+                <Text style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
                   Maximum
                 </Text>
-                <Text style={{ fontSize: 24, fontWeight: 700, color: 'white', display: 'block' }}>
+                <Text style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: 'white', display: 'block' }}>
                   {stats.max.toFixed(1)}
                 </Text>
-                <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>
+                <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.8)' }}>
                   {getParameterUnit(parameter)}
                 </Text>
               </Card>

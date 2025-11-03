@@ -24,6 +24,7 @@ const CircularProgress = ({ value, max, size = 145, strokeWidth = 18, color = '#
   const circumference = radius * 2 * Math.PI;
   const percentage = Math.min((value / max) * 100, 100);
   const offset = circumference - (percentage / 100) * circumference;
+  const isMobile = size < 110;
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
@@ -55,11 +56,11 @@ const CircularProgress = ({ value, max, size = 145, strokeWidth = 18, color = '#
         className="absolute inset-0 flex flex-col items-center justify-center"
         style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
       >
-        <div className="text-xs text-gray-400 font-bold uppercase tracking-wide mb-1">PM 2.5</div>
-        <div className="text-4xl font-bold" style={{ color, lineHeight: '1.2' }}>
+        <div className="text-xs text-gray-400 font-bold uppercase tracking-wide mb-1" style={{ fontSize: isMobile ? '10px' : undefined }}>PM 2.5</div>
+        <div className="font-bold" style={{ color, lineHeight: '1.2', fontSize: isMobile ? '28px' : '36px' }}>
           {value.toFixed(1)}
         </div>
-        <div className="text-xs text-gray-400 font-medium mt-1">μg/m³</div>
+        <div className="text-xs text-gray-400 font-medium mt-1" style={{ fontSize: isMobile ? '10px' : undefined }}>μg/m³</div>
       </div>
     </div>
   );
@@ -120,16 +121,16 @@ const MetricCardWithBar = ({ label, value, unit, parameter }: {
       style={{
         background: '#fafafa',
         borderRadius: '10px',
-        padding: '14px',
+        padding: '12px',
         border: '1px solid #f0f0f0',
       }}
     >
-      <div className="text-gray-400 text-xs font-bold mb-1.5 uppercase tracking-wide">{label}</div>
+      <div className="text-gray-400 text-xs font-bold mb-1 uppercase tracking-wide" style={{ fontSize: '10px' }}>{label}</div>
       <div className="flex items-baseline gap-1 mb-2">
-        <span className="text-xl font-bold" style={{ color }}>
+        <span className="text-lg md:text-xl font-bold" style={{ color }}>
           {value.toFixed(1)}
         </span>
-        <span className="text-xs text-gray-400 font-medium">{unit}</span>
+        <span className="text-xs text-gray-400 font-medium" style={{ fontSize: '10px' }}>{unit}</span>
       </div>
       {/* Progress bar */}
       <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
@@ -170,7 +171,7 @@ export const RoutePointInfoWindow = ({ point, onClose }: RoutePointInfoWindowPro
       style={{
         background: 'white',
         border: '1px solid rgba(0,0,0,0.08)',
-        padding: '32px',
+        padding: '16px',
         maxWidth: '920px',
         width: '100%',
         boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
@@ -186,21 +187,21 @@ export const RoutePointInfoWindow = ({ point, onClose }: RoutePointInfoWindowPro
       </button>
 
       {/* Top Section: Circle, Temp/Humidity, and Info */}
-      <div className="flex items-start gap-6 mb-6">
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 mb-6">
         {/* Left: Circular Progress */}
         <div className="flex-shrink-0">
           <CircularProgress
             value={point.pm25}
             max={250}
-            size={130}
-            strokeWidth={16}
+            size={window.innerWidth < 768 ? 100 : 130}
+            strokeWidth={window.innerWidth < 768 ? 12 : 16}
             color={pm25Color}
           />
         </div>
         
         {/* Middle: Temperature & Humidity */}
-        <div className="flex-1">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="flex-1 w-full md:w-auto">
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
             {/* Temperature */}
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -220,7 +221,7 @@ export const RoutePointInfoWindow = ({ point, onClose }: RoutePointInfoWindowPro
                 </div>
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">อุณหภูมิ</span>
               </div>
-              <div className="text-2xl font-bold text-gray-900">{point.temperature.toFixed(0)}°C</div>
+              <div className="text-xl md:text-2xl font-bold text-gray-900">{point.temperature.toFixed(0)}°C</div>
             </div>
             
             {/* Humidity */}
@@ -242,12 +243,12 @@ export const RoutePointInfoWindow = ({ point, onClose }: RoutePointInfoWindowPro
                 </div>
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">ความชื้น</span>
               </div>
-              <div className="text-2xl font-bold text-gray-900">{point.humidity.toFixed(0)}%</div>
+              <div className="text-xl md:text-2xl font-bold text-gray-900">{point.humidity.toFixed(0)}%</div>
             </div>
           </div>
           
           {/* Timestamp & Speed */}
-          <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-gray-200">
             <div className="flex items-center gap-2 text-gray-700">
               <ClockCircleOutlined style={{ fontSize: 13, color: '#667eea' }} />
               <span className="text-sm font-bold">{timeString}</span>
@@ -262,14 +263,14 @@ export const RoutePointInfoWindow = ({ point, onClose }: RoutePointInfoWindowPro
         </div>
 
         {/* Right: Quality Indicator */}
-        <div className="flex-1">
-          <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">คุณภาพอากาศ</div>
+        <div className="flex-1 w-full md:w-auto">
+          <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 md:mb-3">คุณภาพอากาศ</div>
           <QualityIndicatorTabs currentLevel={Number(pm25Level)} />
         </div>
       </div>
 
-      {/* Metrics Grid - 3 columns */}
-      <div className="grid grid-cols-3 gap-3 mb-4">
+      {/* Metrics Grid - Responsive columns */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-4">
         <MetricCardWithBar
           label="PM 1.0"
           value={point.pm1}

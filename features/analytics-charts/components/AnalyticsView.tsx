@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Tabs } from 'antd';
 import { BarChartOutlined, LineChartOutlined } from '@ant-design/icons';
 import { SensorData } from '@/types/sensor';
@@ -12,6 +13,18 @@ type AnalyticsViewProps = {
 };
 
 export const AnalyticsView = ({ sensors }: AnalyticsViewProps) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const tabItems = [
     {
       key: 'bar-charts',
@@ -44,9 +57,9 @@ export const AnalyticsView = ({ sensors }: AnalyticsViewProps) => {
       <Tabs
         defaultActiveKey="bar-charts"
         items={tabItems}
-        size="large"
+        size={isMobile ? 'middle' : 'large'}
         style={{
-          padding: '0 24px',
+          padding: isMobile ? '0 16px' : '0 24px',
           background: 'white',
           marginBottom: 0,
         }}

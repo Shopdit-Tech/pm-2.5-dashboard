@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, Select, Space, message, Tag } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, DeleteOutlined, UserOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { userService } from '@/features/admin-users/services/userService';
 import type { AdminUser } from '@/features/admin-users/types/user';
@@ -96,15 +97,16 @@ export const UserManagement = () => {
     }
   };
 
-  const columns = [
+  const columns: ColumnsType<AdminUser> = [
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
+      width: 200,
       render: (email: string, record: AdminUser) => (
         <Space>
           <UserOutlined />
-          <span>{email}</span>
+          <span style={{ wordBreak: 'break-word', maxWidth: 150 }}>{email}</span>
           {record.id === currentUser?.id && (
             <Tag color="blue" style={{ marginLeft: 8 }}>
               You
@@ -130,6 +132,7 @@ export const UserManagement = () => {
       title: 'Email Verified',
       dataIndex: ['user_metadata', 'email_verified'],
       key: 'email_verified',
+      responsive: ['md'],
       render: (verified: boolean) => (
         <Tag color={verified ? 'success' : 'warning'}>{verified ? 'Verified' : 'Not Verified'}</Tag>
       ),
@@ -138,6 +141,7 @@ export const UserManagement = () => {
       title: 'Created At',
       dataIndex: 'created_at',
       key: 'created_at',
+      responsive: ['lg'],
       render: (date: string) => dayjs(date).format('MMM DD, YYYY HH:mm'),
       sorter: (a: AdminUser, b: AdminUser) => dayjs(a.created_at).unix() - dayjs(b.created_at).unix(),
     },
@@ -145,6 +149,7 @@ export const UserManagement = () => {
       title: 'Last Sign In',
       dataIndex: 'last_sign_in_at',
       key: 'last_sign_in_at',
+      responsive: ['lg'],
       render: (date: string | undefined) => (date ? dayjs(date).format('MMM DD, YYYY HH:mm') : '-'),
       sorter: (a: AdminUser, b: AdminUser) => {
         if (!a.last_sign_in_at) return 1;
@@ -171,28 +176,45 @@ export const UserManagement = () => {
   ];
 
   return (
-    <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h3 style={{ margin: 0 }}>User Management</h3>
-          <p style={{ margin: 0, color: '#8c8c8c' }}>Manage system users and their roles</p>
+    <div style={{ padding: '16px' }}>
+      <div style={{ 
+        marginBottom: 16, 
+        display: 'flex', 
+        flexDirection: 'column',
+        gap: '12px'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <h3 style={{ margin: 0, fontSize: '18px' }}>User Management</h3>
+            <p style={{ margin: 0, color: '#8c8c8c', fontSize: '14px' }}>Manage system users and their roles</p>
+          </div>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAdd}
+            style={{ whiteSpace: 'nowrap' }}
+          >
+            Add User
+          </Button>
         </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleAdd}
-        >
-          Add User
-        </Button>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={users}
-        rowKey="id"
-        loading={loading}
-        pagination={false}
-      />
+      <div style={{ overflowX: 'auto' }}>
+        <Table
+          columns={columns}
+          dataSource={users}
+          rowKey="id"
+          loading={loading}
+          pagination={false}
+          scroll={{ x: 800 }}
+        />
+      </div>
 
       <Modal
         title="Add New User"
@@ -203,7 +225,9 @@ export const UserManagement = () => {
           form.resetFields();
         }}
         okText="Add User"
-        width={500}
+        width="90%"
+        style={{ maxWidth: 500 }}
+        centered
       >
         <Form
           form={form}

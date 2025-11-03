@@ -91,7 +91,7 @@ export const RouteTimeline = ({
           <Button
             icon={<FastBackwardOutlined />}
             onClick={handleSkipBack}
-            size="large"
+            size={typeof window !== 'undefined' && window.innerWidth < 768 ? 'middle' : 'large'}
             disabled={currentIndex === 0}
           />
           
@@ -99,20 +99,25 @@ export const RouteTimeline = ({
             type="primary"
             icon={isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
             onClick={onPlayPause}
-            size="large"
-            style={{ width: 60, height: 60, fontSize: 24 }}
+            size={typeof window !== 'undefined' && window.innerWidth < 768 ? 'middle' : 'large'}
+            style={{ 
+              width: typeof window !== 'undefined' && window.innerWidth < 768 ? 48 : 60, 
+              height: typeof window !== 'undefined' && window.innerWidth < 768 ? 48 : 60, 
+              fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 20 : 24 
+            }}
           />
           
           <Button
             icon={<FastForwardOutlined />}
             onClick={handleSkipForward}
-            size="large"
+            size={typeof window !== 'undefined' && window.innerWidth < 768 ? 'middle' : 'large'}
             disabled={currentIndex === maxIndex}
           />
           
           <Select
             value={playbackSpeed}
             onChange={setPlaybackSpeed}
+            size={typeof window !== 'undefined' && window.innerWidth < 768 ? 'middle' : undefined}
             style={{ width: 90 }}
             options={[
               { label: '0.5x', value: 0.5 },
@@ -125,19 +130,22 @@ export const RouteTimeline = ({
         </Space>
 
         {/* Current Info */}
-        <Space direction="vertical" size="small" className="text-right">
-          <Text strong>
+        <Space direction="vertical" size="small" style={{ 
+          textAlign: typeof window !== 'undefined' && window.innerWidth < 768 ? 'center' : 'right',
+          width: typeof window !== 'undefined' && window.innerWidth < 768 ? '100%' : 'auto'
+        }}>
+          <Text strong style={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 13 : 14 }}>
             Point {currentIndex + 1} / {route.points.length}
           </Text>
-          <Text type="secondary" style={{ fontSize: 12 }}>
+          <Text type="secondary" style={{ fontSize: 11 }}>
             {formatTime(currentPoint.timestamp)}
           </Text>
-          <Text style={{ fontSize: 12 }}>
+          <Text style={{ fontSize: 11 }}>
             PM2.5: <span style={{ fontWeight: 'bold', color: '#1890ff' }}>
               {currentPoint.pm25.toFixed(1)} µg/m³
             </span>
           </Text>
-          <Text type="secondary" style={{ fontSize: 12 }}>
+          <Text type="secondary" style={{ fontSize: 11 }}>
             Progress: {progress.toFixed(0)}%
           </Text>
         </Space>

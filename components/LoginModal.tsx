@@ -53,9 +53,10 @@ export const LoginModal = ({ visible, onClose, onSuccess }: LoginModalProps) => 
       onCancel={handleCancel}
       footer={null}
       centered
-      width={400}
+      width="90%"
+      style={{ maxWidth: 400 }}
     >
-      <div style={{ padding: '20px 0' }}>
+      <div style={{ padding: '16px 0' }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <Title level={3} style={{ margin: 0, marginBottom: 8 }}>
