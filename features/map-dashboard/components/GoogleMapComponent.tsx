@@ -121,11 +121,29 @@ export const GoogleMapComponent = ({
         width="auto"
         style={{ 
           maxWidth: '95vw',
-          top: typeof window !== 'undefined' && window.innerWidth < 768 ? undefined : 20 
+          top: typeof window !== 'undefined' && window.innerWidth < 768 ? undefined : 20,
         }}
-        bodyStyle={{ padding: 0, display: 'flex', justifyContent: 'center' }}
+        styles={{
+          wrapper: {
+            zIndex: 2000,
+          },
+          content: {
+            background: 'transparent',
+            boxShadow: 'none',
+            padding: 0,
+          }
+        }}
+        bodyStyle={{ padding: 0, display: 'flex', justifyContent: 'center', background: 'transparent' }}
         destroyOnClose
         centered
+        zIndex={2000}
+        getContainer={() => {
+          // Render modal inside fullscreen element if map is fullscreen
+          if (typeof document !== 'undefined' && document.fullscreenElement) {
+            return document.fullscreenElement as HTMLElement;
+          }
+          return typeof document !== 'undefined' ? document.body : undefined as any;
+        }}
       >
         {selectedSensor && (
           <SensorInfoWindow sensor={selectedSensor} onClose={handleModalClose} />

@@ -1,8 +1,28 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import GoogleMapReact from 'google-map-react';
 import { MobileRoute, RoutePoint } from '@/types/route';
 import { getRouteCenter, calculateZoom, getRouteSegments } from '../utils/routeUtils';
-import { RoutePointInfoWindow } from './RoutePointInfoWindow';
+import { SensorInfoWindow } from '@/features/map-dashboard/components/SensorInfoWindow';
+import type { SensorData } from '@/types/sensor';
+
+// Convert RoutePoint to SensorData format
+const convertRoutePointToSensor = (point: RoutePoint, routeName: string): SensorData => ({
+  id: point.id,
+  name: `${routeName} - Point`,
+  type: 'mobile' as const,
+  status: 'online' as const,
+  latitude: point.latitude,
+  longitude: point.longitude,
+  temperature: point.temperature,
+  humidity: point.humidity,
+  co2: point.co2,
+  pm1: point.pm1,
+  pm25: point.pm25,
+  pm10: point.pm10,
+  tvoc: point.tvoc,
+  timestamp: point.timestamp,
+});
 
 type RouteMapProps = {
   route: MobileRoute;
@@ -287,8 +307,8 @@ export const RouteMap = ({ route, currentPointIndex, onPointClick }: RouteMapPro
         )}
       </GoogleMapReact>
 
-      {/* Info Window Overlay */}
-      {selectedPoint && (
+      {/* Info Window Overlay - Use Portal to render in fullscreen element */}
+      {selectedPoint && typeof document !== 'undefined' && createPortal(
         <div
           style={{
             position: 'fixed',
@@ -300,18 +320,19 @@ export const RouteMap = ({ route, currentPointIndex, onPointClick }: RouteMapPro
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 9999,
+            zIndex: 10000,
             padding: '20px',
           }}
           onClick={() => setSelectedPoint(null)}
         >
           <div onClick={(e) => e.stopPropagation()}>
-            <RoutePointInfoWindow
-              point={selectedPoint}
+            <SensorInfoWindow
+              sensor={convertRoutePointToSensor(selectedPoint, route.deviceName)}
               onClose={() => setSelectedPoint(null)}
             />
           </div>
-        </div>
+        </div>,
+        document.fullscreenElement || document.body
       )}
 
       {/* Add pulse animation */}
