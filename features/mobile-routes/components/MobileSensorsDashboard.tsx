@@ -114,10 +114,10 @@ export const MobileSensorsDashboard = () => {
           <div style={{ flex: 1, minWidth: '200px' }}>
             <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
               <CarOutlined style={{ marginRight: 8, color: '#f5576c' }} />
-              Mobile Sensor Monitoring
+              ติดตามเซ็นเซอร์เคลื่อนที่
             </h2>
             <p style={{ margin: '6px 0 0 0', color: '#666', fontSize: 13 }}>
-              Real-time tracking of mobile sensors
+              ติดตามเซ็นเซอร์เคลื่อนที่แบบเรียลไทม์
             </p>
           </div>
           <Button
@@ -137,7 +137,7 @@ export const MobileSensorsDashboard = () => {
               fontSize: '14px',
             }}
           >
-            Refresh
+            รีเฟรช
           </Button>
         </div>
       </div>
@@ -154,9 +154,9 @@ export const MobileSensorsDashboard = () => {
             }}
             bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>Total Mobile</div>
+            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>อุปกรณ์เคลื่อนที่ทั้งหมด</div>
             <div style={{ fontSize: 28, fontWeight: 700, color: '#f5576c', marginBottom: 2 }}>{sensors.length}</div>
-            <div style={{ fontSize: 11, color: '#999' }}>🚗 tracking devices</div>
+            <div style={{ fontSize: 11, color: '#999' }}>🚗 อุปกรณ์ติดตาม</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
@@ -169,9 +169,9 @@ export const MobileSensorsDashboard = () => {
             }}
             bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>Active Now</div>
+            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>ใช้งานอยู่</div>
             <div style={{ fontSize: 28, fontWeight: 700, color: '#52c41a', marginBottom: 2 }}>{onlineSensors.length}</div>
-            <div style={{ fontSize: 11, color: '#999' }}>of {sensors.length} online</div>
+            <div style={{ fontSize: 11, color: '#999' }}>จาก {sensors.length} ออนไลน์</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
@@ -185,7 +185,7 @@ export const MobileSensorsDashboard = () => {
             bodyStyle={{ padding: '16px' }}
           >
             <div style={{ marginBottom: 6 }}>
-              <Tag color="blue" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>📊 Average</Tag>
+              <Tag color="blue" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>📊 เฉลี่ย</Tag>
             </div>
             <div style={{ fontSize: 26, fontWeight: 700, color: '#1890ff', marginBottom: 2 }}>{avgPM25.toFixed(1)}</div>
             <div style={{ fontSize: 11, color: '#999' }}>µg/m³ PM2.5</div>
@@ -202,7 +202,7 @@ export const MobileSensorsDashboard = () => {
             bodyStyle={{ padding: '16px' }}
           >
             <div style={{ marginBottom: 6 }}>
-              <Tag color="red" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>⚠️ Maximum</Tag>
+              <Tag color="red" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>🔺 สูงสุด</Tag>
             </div>
             <div style={{ fontSize: 26, fontWeight: 700, color: '#ff4d4f', marginBottom: 2 }}>{maxPM25.toFixed(1)}</div>
             <div style={{ fontSize: 11, color: '#999' }}>µg/m³ PM2.5</div>
@@ -213,8 +213,8 @@ export const MobileSensorsDashboard = () => {
       {/* Alerts */}
       {error && (
         <Alert
-          message="Error Loading Data"
-          description="Unable to load mobile sensor data. Please try again."
+          message="ข้อผิดพลาดในการโหลดข้อมูล"
+          description="ไม่สามารถโหลดข้อมูลเซ็นเซอร์เคลื่อนที่ กรุณาลองใหม่อีกครั้ง"
           type="error"
           closable
           className="mb-4"
@@ -224,8 +224,8 @@ export const MobileSensorsDashboard = () => {
 
       {loading && sensors.length === 0 && (
         <Alert
-          message="Loading Mobile Sensors"
-          description="Fetching real-time mobile sensor data..."
+          message="กำลังโหลดเซ็นเซอร์เคลื่อนที่"
+          description="กำลังดึงข้อมูลเซ็นเซอร์เคลื่อนที่แบบเรียลไทม์..."
           type="info"
           className="mb-4"
           style={{ borderRadius: 8 }}
@@ -234,8 +234,8 @@ export const MobileSensorsDashboard = () => {
 
       {!loading && sensors.length === 0 && !error && (
         <Alert
-          message="No Mobile Sensors Available"
-          description="There are no mobile sensors currently active."
+          message="ไม่มีเซ็นเซอร์เคลื่อนที่"
+          description="ไม่มีเซ็นเซอร์เคลื่อนที่ที่ใช้งานในขณะนี้"
           type="warning"
           className="mb-4"
           style={{ borderRadius: 8 }}
@@ -244,7 +244,7 @@ export const MobileSensorsDashboard = () => {
 
       {offlineSensors.length > 0 && (
         <Alert
-          message={`${offlineSensors.length} Mobile Sensors Offline`}
+          message={`${offlineSensors.length} เซ็นเซอร์เคลื่อนที่ออฟไลน์`}
           description={offlineSensors.map((s) => s.name).join(', ')}
           type="warning"
           closable
@@ -264,13 +264,13 @@ export const MobileSensorsDashboard = () => {
       >
         <div style={{ marginBottom: 12, fontWeight: 600, fontSize: 15 }}>
           <CalendarOutlined style={{ marginRight: 8, color: '#1890ff' }} />
-          View Historical Route
+          ดูเส้นทางเชิงประวัติศาสตร์
         </div>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={8}>
-            <div style={{ marginBottom: 4, fontSize: 13, color: '#595959' }}>Select Mobile Sensor</div>
+            <div style={{ marginBottom: 4, fontSize: 13, color: '#595959' }}>เลือกเซ็นเซอร์เคลื่อนที่</div>
             <Select
-              placeholder="Choose a sensor"
+              placeholder="เลือกเซ็นเซอร์"
               value={selectedSensorId}
               onChange={handleSensorSelect}
               style={{ width: '100%' }}
@@ -287,9 +287,9 @@ export const MobileSensorsDashboard = () => {
             </Select>
           </Col>
           <Col xs={24} sm={12} md={8}>
-            <div style={{ marginBottom: 4, fontSize: 13, color: '#595959' }}>Select Date</div>
+            <div style={{ marginBottom: 4, fontSize: 13, color: '#595959' }}>เลือกวันที่</div>
             <DatePicker
-              placeholder="Choose date"
+              placeholder="เลือกวันที่"
               value={selectedDate}
               onChange={handleDateSelect}
               style={{ width: '100%' }}
@@ -299,11 +299,11 @@ export const MobileSensorsDashboard = () => {
           </Col>
           {selectedRoute && (
             <Col xs={24} sm={24} md={8}>
-              <div style={{ marginBottom: 4, fontSize: 13, color: '#595959' }}>Route Information</div>
+              <div style={{ marginBottom: 4, fontSize: 13, color: '#595959' }}>ข้อมูลเส้นทาง</div>
               <Space>
-                <Tag color="blue">{selectedRoute.points.length} points</Tag>
+                <Tag color="blue">{selectedRoute.points.length} จุด</Tag>
                 <Tag color="green">{selectedRoute.totalDistance} km</Tag>
-                <Tag color="orange">Avg PM2.5: {selectedRoute.averagePm25}</Tag>
+                <Tag color="orange">PM2.5 เฉลี่ย: {selectedRoute.averagePm25}</Tag>
               </Space>
             </Col>
           )}
@@ -327,13 +327,13 @@ export const MobileSensorsDashboard = () => {
           {loadingRoute ? (
             <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
               <ReloadOutlined spin style={{ fontSize: 48, color: '#1890ff' }} />
-              <div style={{ fontSize: 16, color: '#595959' }}>Loading route data...</div>
+              <div style={{ fontSize: 16, color: '#595959' }}>กำลังโหลดข้อมูลเส้นทาง...</div>
             </div>
           ) : routeError ? (
             <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
               <Alert
                 type="error"
-                message="Failed to Load Route"
+                message="ไม่สามารถโหลดเส้นทาง"
                 description={
                   <div>
                     <p style={{ marginBottom: 12 }}>{routeError}</p>
@@ -356,7 +356,7 @@ export const MobileSensorsDashboard = () => {
           ) : selectedSensorId && selectedDate ? (
             <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Empty
-                description="No route data available for selected sensor and date"
+                description="ไม่มีข้อมูลเส้นทางสำหรับเซ็นเซอร์และวันที่ที่เลือก"
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
               />
             </div>
@@ -379,21 +379,21 @@ export const MobileSensorsDashboard = () => {
           <Row gutter={[12, 12]}>
             <Col xs={12} sm={12} md={6}>
               <Statistic
-                title="Start Time"
+                title="เวลาเริ่มต้น"
                 value={new Date(selectedRoute.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                 valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#52c41a' }}
               />
             </Col>
             <Col xs={12} sm={12} md={6}>
               <Statistic
-                title="End Time"
+                title="เวลาสิ้นสุด"
                 value={new Date(selectedRoute.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                 valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#ff4d4f' }}
               />
             </Col>
             <Col xs={8} sm={8} md={4}>
               <Statistic
-                title="Distance"
+                title="ระยะทาง"
                 value={selectedRoute.totalDistance}
                 suffix="km"
                 valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#1890ff' }}
@@ -401,7 +401,7 @@ export const MobileSensorsDashboard = () => {
             </Col>
             <Col xs={8} sm={8} md={4}>
               <Statistic
-                title="Avg PM2.5"
+                title="PM2.5 เฉลี่ย"
                 value={selectedRoute.averagePm25}
                 suffix="µg/m³"
                 valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#faad14' }}
@@ -409,7 +409,7 @@ export const MobileSensorsDashboard = () => {
             </Col>
             <Col xs={8} sm={8} md={4}>
               <Statistic
-                title="Max PM2.5"
+                title="PM2.5 สูงสุด"
                 value={selectedRoute.maxPm25}
                 suffix="µg/m³"
                 valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#ff4d4f' }}
@@ -418,7 +418,7 @@ export const MobileSensorsDashboard = () => {
           </Row>
           <div style={{ marginTop: 12, fontSize: 12, color: '#595959' }}>
             <EnvironmentOutlined style={{ marginRight: 8 }} />
-            Showing route for {selectedRoute.deviceName} with {selectedRoute.points.length} points
+            แสดงเส้นทางสำหรับ {selectedRoute.deviceName} ด้วย {selectedRoute.points.length} จุด
           </div>
         </Card>
       )}
@@ -461,10 +461,10 @@ export const MobileSensorsDashboard = () => {
           <Space direction="vertical" size={8}>
             <div style={{ fontWeight: 600, color: '#262626' }}>
               <EnvironmentOutlined style={{ marginRight: 8, color: '#667eea' }} />
-              Real-time Mobile Sensor Tracking
+              ติดตามเซ็นเซอร์เคลื่อนที่แบบเรียลไทม์
             </div>
             <div style={{ fontSize: 13, color: '#595959' }}>
-              Showing current positions of mobile air quality sensors. Select a sensor and date above to view historical route.
+              แสดงตำแหน่งปัจจุบันของเซ็นเซอร์คุณภาพอากาศเคลื่อนที่ เลือกเซ็นเซอร์และวันที่ด้านบนเพื่อดูเส้นทางเชิงประวัติศาสตร์
             </div>
           </Space>
         </Card>

@@ -37,10 +37,10 @@ export const MapDashboard = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: '200px' }}>
             <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
-              Static Sensor Monitoring
+              การติดตามเซ็นเซอร์ติดตั้ง
             </h2>
             <p style={{ margin: '6px 0 0 0', color: '#666', fontSize: 13 }}>
-              Real-time PM2.5 and air quality
+              ติดตาม PM2.5 และคุณภาพอากาศแบบเรียลไทม์
             </p>
           </div>
           <Button
@@ -60,7 +60,7 @@ export const MapDashboard = () => {
               fontSize: '14px',
             }}
           >
-            Refresh
+            รีเฟรช
           </Button>
         </div>
       </div>
@@ -77,9 +77,9 @@ export const MapDashboard = () => {
             }}
             bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>Total Sensors</div>
+            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>เซ็นเซอร์ทั้งหมด</div>
             <div style={{ fontSize: 28, fontWeight: 700, color: '#667eea', marginBottom: 2 }}>{sensors.length}</div>
-            <div style={{ fontSize: 11, color: '#999' }}>monitoring points</div>
+            <div style={{ fontSize: 11, color: '#999' }}>จุดติดตาม</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
@@ -92,9 +92,9 @@ export const MapDashboard = () => {
             }}
             bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>Online Status</div>
+            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>สถานะออนไลน์</div>
             <div style={{ fontSize: 28, fontWeight: 700, color: '#52c41a', marginBottom: 2 }}>{onlineSensors.length}</div>
-            <div style={{ fontSize: 11, color: '#999' }}>of {sensors.length} active</div>
+            <div style={{ fontSize: 11, color: '#999' }}>จาก {sensors.length} ที่ใช้งาน</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
@@ -108,10 +108,10 @@ export const MapDashboard = () => {
             bodyStyle={{ padding: '16px' }}
           >
             <div style={{ marginBottom: 6 }}>
-              <Tag color="blue" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>🏠 Indoor</Tag>
+              <Tag color="blue" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>🏠 ภายใน</Tag>
             </div>
             <div style={{ fontSize: 26, fontWeight: 700, color: '#1890ff', marginBottom: 2 }}>{avgPM25Indoor.toFixed(1)}</div>
-            <div style={{ fontSize: 11, color: '#999' }}>µg/m³ avg PM2.5</div>
+            <div style={{ fontSize: 11, color: '#999' }}>µg/m³ PM2.5 เฉลี่ย</div>
           </Card>
         </Col>
         <Col xs={12} sm={12} md={6}>
@@ -125,10 +125,10 @@ export const MapDashboard = () => {
             bodyStyle={{ padding: '16px' }}
           >
             <div style={{ marginBottom: 6 }}>
-              <Tag color="green" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>🌳 Outdoor</Tag>
+              <Tag color="green" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>🌳 ภายนอก</Tag>
             </div>
             <div style={{ fontSize: 26, fontWeight: 700, color: '#52c41a', marginBottom: 2 }}>{avgPM25Outdoor.toFixed(1)}</div>
-            <div style={{ fontSize: 11, color: '#999' }}>µg/m³ avg PM2.5</div>
+            <div style={{ fontSize: 11, color: '#999' }}>µg/m³ PM2.5 เฉลี่ย</div>
           </Card>
         </Col>
       </Row>
@@ -147,7 +147,7 @@ export const MapDashboard = () => {
 
       {offlineSensors.length > 0 && (
         <Alert
-          message={`${offlineSensors.length} Sensors Offline`}
+          message={`${offlineSensors.length} เซ็นเซอร์ออฟไลน์`}
           description={offlineSensors.map((s) => s.name).join(', ')}
           type="warning"
           closable

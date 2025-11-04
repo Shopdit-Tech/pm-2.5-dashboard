@@ -369,16 +369,16 @@ export const MobileSensorDataTable = () => {
         <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'stretch' : 'center', justifyContent: 'space-between', gap: 16 }}>
           <div>
             <Typography.Title level={5} style={{ margin: 0, fontSize: isMobile ? 16 : 18 }}>
-              Mobile Sensor Data Table
+              ตารางข้อมูลเซ็นเซอร์เคลื่อนที่
             </Typography.Title>
             <Text type="secondary" style={{ fontSize: isMobile ? 12 : 13 }}>
-              Real-time data from {filteredSensors.length} mobile sensors
+              ข้อมูลเรียลไทม์จาก {filteredSensors.length} เซ็นเซอร์เคลื่อนที่
             </Text>
           </div>
 
           <Space direction={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : 'auto' }}>
             <Input
-              placeholder="Search sensors..."
+              placeholder="ค้นหาเซ็นเซอร์..."
               prefix={<SearchOutlined />}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -390,7 +390,7 @@ export const MobileSensorDataTable = () => {
             <Space style={{ width: isMobile ? '100%' : 'auto' }}>
               <Dropdown overlay={columnFilterMenu} trigger={['click']} placement="bottomRight">
                 <Button icon={<SettingOutlined />} size={isMobile ? 'middle' : 'large'} style={{ flex: isMobile ? 1 : 'none' }}>
-                  {!isMobile && 'Columns'}
+                  {!isMobile && 'คอลัมน์'}
                 </Button>
               </Dropdown>
 
@@ -401,7 +401,7 @@ export const MobileSensorDataTable = () => {
                 size={isMobile ? 'middle' : 'large'}
                 style={{ flex: isMobile ? 1 : 'none' }}
               >
-                {!isMobile && 'Refresh'}
+                {!isMobile && 'รีเฟรช'}
               </Button>
             </Space>
           </Space>

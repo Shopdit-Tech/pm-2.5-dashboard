@@ -23,12 +23,12 @@ export const CreateUserModal = ({ open, onClose, onSuccess }: CreateUserModalPro
       
       await userService.createUser(values);
       
-      message.success(`User ${values.email} created successfully!`);
+      message.success(`สร้างผู้ใช้ ${values.email} สำเร็จ!`);
       form.resetFields();
       onSuccess();
       onClose();
     } catch (error: any) {
-      message.error(error.message || 'Failed to create user');
+      message.error(error.message || 'ไม่สามารถสร้างผู้ใช้');
     } finally {
       setLoading(false);
     }
@@ -41,12 +41,12 @@ export const CreateUserModal = ({ open, onClose, onSuccess }: CreateUserModalPro
 
   return (
     <Modal
-      title="Create New User"
+      title="สร้างผู้ใช้ใหม่"
       open={open}
       onOk={() => form.submit()}
       onCancel={handleCancel}
       confirmLoading={loading}
-      okText="Create User"
+      okText="สร้างผู้ใช้"
       width={500}
     >
       <Form
@@ -56,11 +56,11 @@ export const CreateUserModal = ({ open, onClose, onSuccess }: CreateUserModalPro
         autoComplete="off"
       >
         <Form.Item
-          label="Email"
+          label="อีเมล"
           name="email"
           rules={[
-            { required: true, message: 'Please enter email' },
-            { type: 'email', message: 'Please enter a valid email' },
+            { required: true, message: 'กรุณากรอกอีเมล' },
+            { type: 'email', message: 'กรุณากรอกอีเมลที่ถูกต้อง' },
           ]}
         >
           <Input
@@ -71,17 +71,17 @@ export const CreateUserModal = ({ open, onClose, onSuccess }: CreateUserModalPro
         </Form.Item>
 
         <Form.Item
-          label="Password"
+          label="รหัสผ่าน"
           name="password"
           rules={[
-            { required: true, message: 'Please enter password' },
-            { min: 8, message: 'Password must be at least 8 characters' },
+            { required: true, message: 'กรุณากรอกรหัสผ่าน' },
+            { min: 8, message: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร' },
             {
               pattern: /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/,
-              message: 'Password must contain uppercase, number, and special character',
+              message: 'รหัสผ่านต้องมีตัวพิมพ์ใหญ่ ตัวเลข และอักขระพิเศษ',
             },
           ]}
-          extra="Min 8 characters with uppercase, number, and special character (!@#$%^&*)"
+          extra="อย่างน้อย 8 ตัวอักษร ต้องมีตัวพิมพ์ใหญ่ ตัวเลข และอักขระพิเศษ (!@#$%^&*)"
         >
           <Input.Password
             placeholder="Password12345!"
@@ -91,14 +91,14 @@ export const CreateUserModal = ({ open, onClose, onSuccess }: CreateUserModalPro
         </Form.Item>
 
         <Form.Item
-          label="Role"
+          label="บทบาท"
           name="role"
           initialValue="user"
-          rules={[{ required: true, message: 'Please select a role' }]}
+          rules={[{ required: true, message: 'กรุณาเลือกบทบาท' }]}
         >
           <Select size="large">
-            <Option value="user">User</Option>
-            <Option value="admin">Admin</Option>
+            <Option value="user">ผู้ใช้</Option>
+            <Option value="admin">ผู้ดูแล</Option>
           </Select>
         </Form.Item>
       </Form>

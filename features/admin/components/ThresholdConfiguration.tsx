@@ -81,7 +81,7 @@ export const ThresholdConfiguration = () => {
     configs[selectedParameter] = updatedRanges;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(configs));
 
-    message.success('Threshold updated successfully');
+    message.success('อัปเดตค่าเกณฑ์แล้ว');
     setEditingIndex(null);
   };
 
@@ -102,18 +102,18 @@ export const ThresholdConfiguration = () => {
       }
     }
     loadRanges(selectedParameter);
-    message.success('Thresholds reset to defaults');
+    message.success('รีเซ็ตค่าเกณฑ์เป็นค่าเริ่มต้นแล้ว');
   };
 
   const handleResetAll = () => {
     localStorage.removeItem(STORAGE_KEY);
     loadRanges(selectedParameter);
-    message.success('All thresholds reset to defaults');
+    message.success('รีเซ็ตค่าเกณฑ์ทั้งหมดแล้ว');
   };
 
   const columns = [
     {
-      title: 'Level',
+      title: 'ระดับ',
       dataIndex: 'level',
       key: 'level',
       width: isMobile ? 80 : undefined,
@@ -124,7 +124,7 @@ export const ThresholdConfiguration = () => {
       ),
     },
     {
-      title: 'Color',
+      title: 'สี',
       dataIndex: 'color',
       key: 'color',
       width: isMobile ? 60 : 150,
@@ -157,7 +157,7 @@ export const ThresholdConfiguration = () => {
       ),
     },
     {
-      title: isMobile ? 'Min' : 'Min Value',
+      title: isMobile ? 'ต่ำสุด' : 'ค่าต่ำสุด',
       dataIndex: 'min',
       key: 'min',
       width: isMobile ? 80 : 150,
@@ -177,7 +177,7 @@ export const ThresholdConfiguration = () => {
       },
     },
     {
-      title: isMobile ? 'Max' : 'Max Value',
+      title: isMobile ? 'สูงสุด' : 'ค่าสูงสุด',
       dataIndex: 'max',
       key: 'max',
       width: isMobile ? 80 : 150,
@@ -197,7 +197,7 @@ export const ThresholdConfiguration = () => {
       },
     },
     {
-      title: isMobile ? '' : 'Actions',
+      title: isMobile ? '' : 'ดำเนินการ',
       key: 'actions',
       width: isMobile ? 90 : 150,
       align: 'center' as const,
@@ -211,14 +211,14 @@ export const ThresholdConfiguration = () => {
                 icon={<SaveOutlined />}
                 onClick={() => handleSave(index)}
               >
-                {!isMobile && 'Save'}
+                {!isMobile && 'บันทึก'}
               </Button>
               <Button
                 size="small"
                 icon={<CloseOutlined />}
                 onClick={handleCancel}
               >
-                {!isMobile && 'Cancel'}
+                {!isMobile && 'ยกเลิก'}
               </Button>
             </Space>
           );
@@ -230,7 +230,7 @@ export const ThresholdConfiguration = () => {
             icon={<EditOutlined />}
             onClick={() => handleEdit(index, record)}
           >
-            {!isMobile && 'Edit'}
+            {!isMobile && 'แก้ไข'}
           </Button>
         );
       },
@@ -241,9 +241,9 @@ export const ThresholdConfiguration = () => {
     <div>
       <div style={{ marginBottom: 16 }}>
         <div style={{ flex: 1 }}>
-          <h3 style={{ margin: 0, fontSize: isMobile ? 16 : 18 }}>Threshold Configuration</h3>
+          <h3 style={{ margin: 0, fontSize: isMobile ? 16 : 18 }}>การตั้งค่าค่าเกณฑ์</h3>
           <p style={{ margin: 0, color: '#8c8c8c', fontSize: isMobile ? 12 : 14 }}>
-            {isMobile ? 'Configure color thresholds' : 'Configure air quality color thresholds for each parameter'}
+            {isMobile ? 'ตั้งค่าเกณฑ์สี' : 'ตั้งค่าเกณฑ์สีคุณภาพอากาศสำหรับแต่ละพารามิเตอร์'}
           </p>
         </div>
       </div>
@@ -252,7 +252,7 @@ export const ThresholdConfiguration = () => {
         {isMobile ? (
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <div>
-              <div style={{ marginBottom: 8, fontWeight: 600, fontSize: 13 }}>Select Parameter:</div>
+              <div style={{ marginBottom: 8, fontWeight: 600, fontSize: 13 }}>เลือกพารามิเตอร์:</div>
               <Select
                 value={selectedParameter}
                 onChange={setSelectedParameter}
@@ -268,17 +268,17 @@ export const ThresholdConfiguration = () => {
             </div>
             <Space style={{ width: '100%' }} size="small">
               <Button onClick={handleReset} block style={{ flex: 1 }}>
-                Reset Parameter
+                รีเซ็ตพารามิเตอร์
               </Button>
               <Button onClick={handleResetAll} danger block style={{ flex: 1 }}>
-                Reset All
+                รีเซ็ตทั้งหมด
               </Button>
             </Space>
           </Space>
         ) : (
           <Space size="middle" style={{ width: '100%' }}>
             <div>
-              <strong>Select Parameter:</strong>
+              <strong>เลือกพารามิเตอร์:</strong>
             </div>
             <Select
               value={selectedParameter}
@@ -293,10 +293,10 @@ export const ThresholdConfiguration = () => {
               ))}
             </Select>
             <Button onClick={handleReset}>
-              Reset This Parameter
+              รีเซ็ตพารามิเตอร์นี้
             </Button>
             <Button onClick={handleResetAll} danger>
-              Reset All Parameters
+              รีเซ็ตทั้งหมด
             </Button>
           </Space>
         )}
@@ -312,8 +312,8 @@ export const ThresholdConfiguration = () => {
       />
 
       <div style={{ marginTop: 16, padding: isMobile ? 10 : 12, background: '#f5f5f5', borderRadius: 8, fontSize: isMobile ? 12 : 14 }}>
-        <strong>Note:</strong> These thresholds control the color coding throughout the dashboard.
-        Changes are saved to browser localStorage and will apply to all charts and visualizations.
+        <strong>หมายเหตุ:</strong> ค่าเกณฑ์เหล่านี้ควบคุมการแสดงสีทั่วทั้งแดชบอร์ด
+        การเปลี่ยนแปลงจะถูกบันทึกใน localStorage และจะใช้กับกราฟและการแสดงผลทั้งหมด
       </div>
     </div>
   );

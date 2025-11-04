@@ -135,7 +135,7 @@ export const SensorDataTable = () => {
   // Table columns
   const columns: ColumnsType<SensorData> = [
     {
-      title: 'Name',
+      title: 'ชื่อ',
       dataIndex: 'name',
       key: 'name',
       fixed: isMobile ? false : 'left',
@@ -154,7 +154,7 @@ export const SensorDataTable = () => {
       ),
     },
     {
-      title: 'Outdoor',
+      title: 'ประเภท',
       dataIndex: 'type',
       key: 'type',
       width: 90,
@@ -246,14 +246,14 @@ export const SensorDataTable = () => {
         ]
       : []),
     {
-      title: 'Last Update',
+      title: 'อัปเดตล่าสุด',
       dataIndex: 'timestamp',
       key: 'timestamp',
       width: 180,
       responsive: ['md'] as Breakpoint[],
       render: (timestamp: string, record: SensorData) => {
         if (record.status === 'offline') {
-          return <Text type="secondary">Offline</Text>;
+          return <Text type="secondary">ออฟไลน์</Text>;
         }
         
         const date = new Date(timestamp);
@@ -278,7 +278,7 @@ export const SensorDataTable = () => {
       },
     },
     {
-      title: 'Action',
+      title: 'ดำเนินการ',
       key: 'action',
       fixed: isMobile ? false : 'right',
       width: isMobile ? 60 : 80,
@@ -312,7 +312,7 @@ export const SensorDataTable = () => {
     <Card style={{ width: 200 }} bodyStyle={{ padding: 12 }}>
       <Space direction="vertical" style={{ width: '100%' }}>
         <Text strong style={{ fontSize: 13 }}>
-          Show Columns
+          แสดงคอลัมน์
         </Text>
         <Checkbox.Group
           value={visibleColumns}
@@ -371,16 +371,16 @@ export const SensorDataTable = () => {
         <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'stretch' : 'center', justifyContent: 'space-between', gap: 16 }}>
           <div>
             <Typography.Title level={5} style={{ margin: 0, fontSize: isMobile ? 16 : 18 }}>
-              Sensor Data Table
+              ตารางข้อมูลเซ็นเซอร์
             </Typography.Title>
             <Text type="secondary" style={{ fontSize: isMobile ? 12 : 13 }}>
-              Real-time data from {filteredSensors.length} sensors
+              ข้อมูลเรียลไทม์จาก {filteredSensors.length} เซ็นเซอร์
             </Text>
           </div>
 
           <Space direction={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : 'auto' }}>
             <Input
-              placeholder="Search sensors..."
+              placeholder="ค้นหาเซ็นเซอร์..."
               prefix={<SearchOutlined />}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -392,7 +392,7 @@ export const SensorDataTable = () => {
             <Space style={{ width: isMobile ? '100%' : 'auto' }}>
               <Dropdown overlay={columnFilterMenu} trigger={['click']} placement="bottomRight">
                 <Button icon={<SettingOutlined />} size={isMobile ? 'middle' : 'large'} style={{ flex: isMobile ? 1 : 'none' }}>
-                  {!isMobile && 'Columns'}
+                  {!isMobile && 'คอลัมน์'}
                 </Button>
               </Dropdown>
 
@@ -403,7 +403,7 @@ export const SensorDataTable = () => {
                 size={isMobile ? 'middle' : 'large'}
                 style={{ flex: isMobile ? 1 : 'none' }}
               >
-                {!isMobile && 'Refresh'}
+                {!isMobile && 'รีเฟรช'}
               </Button>
             </Space>
           </Space>
@@ -415,13 +415,13 @@ export const SensorDataTable = () => {
             <div>
               <Badge status="success" />
               <Text type="secondary" style={{ fontSize: 13 }}>
-                Online: {sensors.filter((s) => s.status === 'online').length}
+                ออนไลน์: {sensors.filter((s) => s.status === 'online').length}
               </Text>
             </div>
             <div>
               <Badge status="error" />
               <Text type="secondary" style={{ fontSize: 13 }}>
-                Offline: {sensors.filter((s) => s.status === 'offline').length}
+                ออฟไลน์: {sensors.filter((s) => s.status === 'offline').length}
               </Text>
             </div>
           </div>

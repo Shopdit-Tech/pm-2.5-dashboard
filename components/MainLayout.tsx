@@ -63,31 +63,31 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     {
       key: 'static-sensors',
       icon: <EnvironmentOutlined />,
-      label: 'Static Sensors',
+      label: 'เซ็นเซอร์ติดตั้ง',
       title: 'แผนที่เซ็นเซอร์ติดตั้ง',
     },
     {
       key: 'mobile-routes',
       icon: <LineChartOutlined />,
-      label: 'Mobile Routes',
+      label: 'เส้นทางเคลื่อนที่',
       title: 'เส้นทางอุปกรณ์เคลื่อนที่',
     },
     {
       key: 'sensor-data-table',
       icon: <TableOutlined />,
-      label: 'Data Table',
+      label: 'ตารางข้อมูล',
       title: 'ตารางข้อมูลเซ็นเซอร์',
     },
     {
       key: 'mobile-data-table',
       icon: <MobileOutlined />,
-      label: 'Mobile Data',
+      label: 'ข้อมูลเคลื่อนที่',
       title: 'ตารางข้อมูลอุปกรณ์เคลื่อนที่',
     },
     {
       key: 'analytics',
       icon: <BarChartOutlined />,
-      label: 'Analytics',
+      label: 'การวิเคราะห์',
       title: 'กราฟวิเคราะห์',
     },
   ];
@@ -99,13 +99,13 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         {
           key: 'data-export',
           icon: <DownloadOutlined />,
-          label: 'Data Export',
+          label: 'ส่งออกข้อมูล',
           title: 'ส่งออกข้อมูล',
         },
         {
           key: 'admin-settings',
           icon: <SettingOutlined />,
-          label: 'Admin Settings',
+          label: 'การตั้งค่าผู้ดูแล',
           title: 'การตั้งค่าระบบ',
         },
       ]
@@ -313,7 +313,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                       ? [
                           {
                             key: 'admin',
-                            label: 'Admin Settings',
+                            label: 'การตั้งค่าผู้ดูแล',
                             icon: <SettingOutlined />,
                             onClick: () => {
                               setActiveView('admin-settings');
@@ -328,7 +328,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                       : []),
                     {
                       key: 'logout',
-                      label: 'Logout',
+                      label: 'ออกจากระบบ',
                       icon: <LogoutOutlined />,
                       onClick: () => logout(),
                     },
@@ -342,7 +342,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                     <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                       <Text strong style={{ fontSize: 14 }}>{user.username}</Text>
                       <Text type="secondary" style={{ fontSize: 11 }}>
-                        {user.role === 'admin' ? 'Administrator' : 'User'}
+                        {user.role === 'admin' ? 'ผู้ดูแลระบบ' : 'ผู้ใช้'}
                       </Text>
                     </div>
                   )}
@@ -355,7 +355,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                 onClick={() => setShowLoginModal(true)}
                 size={isMobile ? 'middle' : 'large'}
               >
-                {isMobile ? '' : 'Login'}
+                {isMobile ? '' : 'เข้าสู่ระบบ'}
               </Button>
             )}
           </div>

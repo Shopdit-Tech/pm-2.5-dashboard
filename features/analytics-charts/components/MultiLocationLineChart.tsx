@@ -93,11 +93,11 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
         setChartsData(validResults);
         
         if (validResults.length === 0) {
-          setError('No data available for selected sensors');
+          setError('ไม่มีข้อมูลสำหรับเซ็นเซอร์ที่เลือก');
         }
       } catch (err) {
         console.error('❌ Error fetching charts data:', err);
-        setError('Failed to load chart data');
+        setError('ไม่สามารถโหลดข้อมูลกราฟ');
       } finally {
         setLoading(false);
       }
@@ -227,7 +227,7 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
       {/* Error Alert */}
       {error && (
         <Alert
-          message="Error Loading Chart Data"
+          message="ข้อผิดพลาดในการโหลดข้อมูลกราฟ"
           description={error}
           type="warning"
           showIcon
@@ -239,10 +239,10 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
       {/* Header */}
       <div style={{ marginBottom: isMobile ? 16 : 24 }}>
         <Title level={4} style={{ margin: 0, fontSize: isMobile ? 18 : 24 }}>
-          {isMobile ? 'Historical Trends' : 'Historical Trends - Multi-Location Comparison'}
+          {isMobile ? 'แนวโน้มเชิงประวัติศาสตร์' : 'แนวโน้วเชิงประวัติศาสตร์ - เปรียบเทียบหลายสถานที่'}
         </Title>
         <Text type="secondary" style={{ fontSize: isMobile ? 12 : 14 }}>
-          {isMobile ? 'Compare air quality data' : 'Compare air quality parameters across multiple locations over time'}
+          {isMobile ? 'เปรียบเทียบข้อมูลคุณภาพอากาศ' : 'เปรียบเทียบพารามิเตอร์คุณภาพอากาศระหว่างหลายสถานที่ตามเวลา'}
         </Text>
       </div>
 
@@ -252,7 +252,7 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
           {/* Parameter Tabs */}
           <div>
             <Text strong style={{ display: 'block', marginBottom: isMobile ? 8 : 12, fontSize: isMobile ? 13 : 14 }}>
-              Select Parameter:
+              เลือกพารามิเตอร์:
             </Text>
             <ParameterTabs activeParameter={parameter} onChange={setParameter} />
           </div>
@@ -298,19 +298,19 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
           <div style={{ textAlign: 'center', padding: 60 }}>
             <Spin size="large" />
             <div style={{ marginTop: 16, color: '#8c8c8c' }}>
-              Loading chart data for {selectedSensorIds.length} sensor{selectedSensorIds.length > 1 ? 's' : ''}...
+              กำลังโหลดข้อมูลกราฟสำหรับ {selectedSensorIds.length} เซ็นเซอร์...
             </div>
           </div>
         ) : selectedSensorIds.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <Text type="secondary" style={{ fontSize: 15 }}>
-              Select one or more locations to view comparison chart
+              เลือกหนึ่งสถานที่หรือมากกว่าเพื่อดูกราฟเปรียบเทียบ
             </Text>
           </div>
         ) : mergedChartData.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <Text type="secondary" style={{ fontSize: 15 }}>
-              No valid data available for selected sensors
+              ไม่มีข้อมูลสำหรับช่วงเวลาที่เลือก
             </Text>
           </div>
         ) : (

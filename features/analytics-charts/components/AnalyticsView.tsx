@@ -31,7 +31,7 @@ export const AnalyticsView = ({ sensors }: AnalyticsViewProps) => {
       label: (
         <span>
           <BarChartOutlined />
-          Bar Charts
+          กราฟแท่ง
         </span>
       ),
       children: <BarChartDashboard sensors={sensors} />,
@@ -41,7 +41,7 @@ export const AnalyticsView = ({ sensors }: AnalyticsViewProps) => {
       label: (
         <span>
           <LineChartOutlined />
-          Historical Trends
+          กราฟเปรียบเทียบ
         </span>
       ),
       children: (

@@ -26,10 +26,10 @@ export const DataExportPage = ({ sensors, loading, error }: DataExportPageProps)
           fontSize: '24px'
         }}>
           <DownloadOutlined />
-          <span style={{ fontSize: 'inherit' }}>BMA | Data Export</span>
+          <span style={{ fontSize: 'inherit' }}>BMA | ส่งออกข้อมูล</span>
         </Title>
         <Text type="secondary" style={{ fontSize: 14 }}>
-          Export historical sensor data as CSV format
+          ส่งออกข้อมูลเซ็นเซอร์เชิงประวัติศาสตร์เป็นไฟล์ CSV
         </Text>
       </div>
 
@@ -42,7 +42,7 @@ export const DataExportPage = ({ sensors, loading, error }: DataExportPageProps)
         styles={{ body: { padding: '24px 16px' } }}
       >
         <Title level={3} style={{ marginTop: 0, fontSize: '20px' }}>
-          Export Data as CSV
+          ส่งออกข้อมูลเป็น CSV
         </Title>
 
         {/* Loading State */}
@@ -50,7 +50,7 @@ export const DataExportPage = ({ sensors, loading, error }: DataExportPageProps)
           <div style={{ textAlign: 'center', padding: 60 }}>
             <Spin size="large" />
             <div style={{ marginTop: 16, color: '#8c8c8c' }}>
-              Loading sensors...
+              กำลังโหลดเซ็นเซอร์...
             </div>
           </div>
         )}
@@ -59,7 +59,7 @@ export const DataExportPage = ({ sensors, loading, error }: DataExportPageProps)
         {error && (
           <Alert
             type="error"
-            message="Error Loading Sensors"
+            message="ข้อผิดพลาดในการโหลดเซ็นเซอร์"
             description={error}
             showIcon
             style={{ marginBottom: 24 }}
@@ -75,8 +75,8 @@ export const DataExportPage = ({ sensors, loading, error }: DataExportPageProps)
         {!loading && !error && sensors.length === 0 && (
           <Alert
             type="warning"
-            message="No Sensors Available"
-            description="There are no sensors available for export. Please check your sensor configuration."
+            message="ไม่มีเซ็นเซอร์"
+            description="ไม่มีเซ็นเซอร์สำหรับการส่งออก กรุณาตรวจสอบการตั้งค่าเซ็นเซอร์ของคุณ"
             showIcon
           />
         )}

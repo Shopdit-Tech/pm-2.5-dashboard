@@ -80,7 +80,7 @@ export const SensorConfiguration = () => {
     }));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(configs));
 
-    message.success('Sensor configuration saved');
+    message.success('บันทึกการตั้งค่าเซ็นเซอร์แล้ว');
     setEditingId(null);
   };
 
@@ -92,19 +92,19 @@ export const SensorConfiguration = () => {
   const handleReset = () => {
     localStorage.removeItem(STORAGE_KEY);
     loadSensors();
-    message.success('Sensor configurations reset to defaults');
+    message.success('รีเซ็ตการตั้งค่าเซ็นเซอร์แล้ว');
   };
 
   const columns = [
     {
-      title: 'Sensor ID',
+      title: 'รหัสเซ็นเซอร์',
       dataIndex: 'id',
       key: 'id',
       width: isMobile ? 120 : 200,
       render: (text: string) => <span style={{ fontFamily: 'monospace', color: '#8c8c8c', fontSize: isMobile ? 11 : 13 }}>{text}</span>,
     },
     {
-      title: 'Name',
+      title: 'ชื่อ',
       dataIndex: 'name',
       key: 'name',
       render: (text: string, record: SensorData) => {
@@ -113,7 +113,7 @@ export const SensorConfiguration = () => {
             <Input
               value={editForm.name}
               onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-              placeholder="Sensor name"
+              placeholder="ชื่อเซ็นเซอร์"
               autoFocus
             />
           );
@@ -127,7 +127,7 @@ export const SensorConfiguration = () => {
       },
     },
     {
-      title: 'Type',
+      title: 'ประเภท',
       dataIndex: 'type',
       key: 'type',
       width: 180,
@@ -139,9 +139,9 @@ export const SensorConfiguration = () => {
               onChange={(value) => setEditForm({ ...editForm, type: value })}
               style={{ width: '100%' }}
             >
-              <Option value="indoor">Indoor</Option>
-              <Option value="outdoor">Outdoor</Option>
-              <Option value="mobile">Mobile</Option>
+              <Option value="indoor">ภายใน</Option>
+              <Option value="outdoor">ภายนอก</Option>
+              <Option value="mobile">เคลื่อนที่</Option>
             </Select>
           );
         }
@@ -153,7 +153,7 @@ export const SensorConfiguration = () => {
       },
     },
     {
-      title: 'Status',
+      title: 'สถานะ',
       dataIndex: 'status',
       key: 'status',
       width: 100,
@@ -165,7 +165,7 @@ export const SensorConfiguration = () => {
       ),
     },
     {
-      title: 'Actions',
+      title: 'ดำเนินการ',
       key: 'actions',
       width: 150,
       render: (_: any, record: SensorData) => {
@@ -178,14 +178,14 @@ export const SensorConfiguration = () => {
                 icon={<SaveOutlined />}
                 onClick={() => handleSave(record.id)}
               >
-                Save
+                บันทึก
               </Button>
               <Button
                 size="small"
                 icon={<CloseOutlined />}
                 onClick={handleCancel}
               >
-                Cancel
+                ยกเลิก
               </Button>
             </Space>
           );
@@ -197,7 +197,7 @@ export const SensorConfiguration = () => {
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
           >
-            Edit
+            แก้ไข
           </Button>
         );
       },
@@ -208,9 +208,9 @@ export const SensorConfiguration = () => {
     <div>
       <div style={{ marginBottom: 16, display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'center', gap: isMobile ? 12 : 0 }}>
         <div>
-          <h3 style={{ margin: 0, fontSize: isMobile ? 16 : 18 }}>Sensor Configuration</h3>
+          <h3 style={{ margin: 0, fontSize: isMobile ? 16 : 18 }}>การตั้งค่าเซ็นเซอร์</h3>
           <p style={{ margin: 0, color: '#8c8c8c', fontSize: isMobile ? 12 : 14 }}>
-            {isMobile ? `${sensors.length} sensors` : `Configure sensor names and types (${sensors.length} total sensors)`}
+            {isMobile ? `${sensors.length} เซ็นเซอร์` : `ตั้งค่าชื่อและประเภทของเซ็นเซอร์ (${sensors.length} เซ็นเซอร์ทั้งหมด)`}
           </p>
         </div>
         <Button
@@ -219,7 +219,7 @@ export const SensorConfiguration = () => {
           size={isMobile ? 'middle' : 'large'}
           block={isMobile}
         >
-          {isMobile ? 'Reset' : 'Reset to Defaults'}
+          {isMobile ? 'รีเซ็ต' : 'รีเซ็ตเป็นค่าเริ่มต้น'}
         </Button>
       </div>
 
@@ -233,8 +233,8 @@ export const SensorConfiguration = () => {
       />
 
       <div style={{ marginTop: 16, padding: isMobile ? 10 : 12, background: '#f5f5f5', borderRadius: 8, fontSize: isMobile ? 12 : 14 }}>
-        <strong>Note:</strong> Changes are saved to browser localStorage and will persist across sessions.
-        Click "Reset to Defaults" to restore original sensor configurations.
+        <strong>หมายเหตุ:</strong> การเปลี่ยนแปลงจะถูกบันทึกใน localStorage ของเบราว์เซอร์
+        คลิก "รีเซ็ตเป็นค่าเริ่มต้น" เพื่อคืนค่าเซ็นเซอร์เดิม
       </div>
     </div>
   );

@@ -37,16 +37,16 @@ export const MobileRouteDashboard = () => {
         <div style={{ marginBottom: 16 }}>
           <Typography.Title level={5} style={{ margin: 0, color: '#262626', fontSize: 18 }}>
             <CarOutlined style={{ marginRight: 8, color: '#1890ff' }} />
-            Route Configuration
+            การตั้งค่าเส้นทาง
           </Typography.Title>
-          <Text type="secondary" style={{ fontSize: 13 }}>Select device and date to view route data</Text>
+          <Text type="secondary" style={{ fontSize: 13 }}>เลือกอุปกรณ์และวันที่เพื่อดูข้อมูลเส้นทาง</Text>
         </div>
         <Row gutter={[24, 16]} align="middle">
           <Col xs={24} sm={12} md={12}>
             <Space direction="vertical" style={{ width: '100%' }} size={4}>
               <Text strong style={{ fontSize: 13, color: '#595959' }}>
                 <CarOutlined style={{ marginRight: 6 }} />
-                Device
+                อุปกรณ์
               </Text>
               <Select
                 size="large"
@@ -65,13 +65,13 @@ export const MobileRouteDashboard = () => {
             <Space direction="vertical" style={{ width: '100%' }} size={4}>
               <Text strong style={{ fontSize: 13, color: '#595959' }}>
                 <ClockCircleOutlined style={{ marginRight: 6 }} />
-                Date
+                วันที่
               </Text>
               <DatePicker 
                 size="large"
                 style={{ width: '100%' }} 
                 format="DD/MM/YYYY" 
-                placeholder="Select date" 
+                placeholder="เลือกวันที่" 
               />
             </Space>
           </Col>
@@ -93,7 +93,7 @@ export const MobileRouteDashboard = () => {
             >
               <div style={{ color: 'rgba(255,255,255,0.9)', marginBottom: 8, fontSize: 13, fontWeight: 500 }}>
                 <EnvironmentOutlined style={{ marginRight: 6 }} />
-                Total Distance
+                รวมระยะทาง
               </div>
               <div style={{ color: 'white', fontSize: 28, fontWeight: 700, lineHeight: 1.2 }}>
                 {selectedRoute.totalDistance}
@@ -113,7 +113,7 @@ export const MobileRouteDashboard = () => {
             >
               <div style={{ color: 'rgba(255,255,255,0.9)', marginBottom: 8, fontSize: 13, fontWeight: 500 }}>
                 <ClockCircleOutlined style={{ marginRight: 6 }} />
-                Duration
+                รวมระยะเวลา
               </div>
               <div style={{ color: 'white', fontSize: 28, fontWeight: 700, lineHeight: 1.2 }}>
                 {formatDuration(
@@ -138,7 +138,7 @@ export const MobileRouteDashboard = () => {
             >
               <div style={{ color: 'rgba(255,255,255,0.9)', marginBottom: 8, fontSize: 13, fontWeight: 500 }}>
                 <DashboardOutlined style={{ marginRight: 6 }} />
-                Average PM2.5
+                PM2.5 เฉลี่ย
               </div>
               <div style={{ color: 'white', fontSize: 28, fontWeight: 700, lineHeight: 1.2 }}>
                 {selectedRoute.averagePm25.toFixed(1)}
@@ -157,7 +157,7 @@ export const MobileRouteDashboard = () => {
               bodyStyle={{ padding: '24px' }}
             >
               <div style={{ color: 'rgba(139, 69, 19, 0.8)', marginBottom: 8, fontSize: 13, fontWeight: 500 }}>
-                Max PM2.5
+                PM2.5 สูงสุด
               </div>
               <div style={{ color: '#8b4513', fontSize: 28, fontWeight: 700, lineHeight: 1.2 }}>
                 {selectedRoute.maxPm25.toFixed(1)}

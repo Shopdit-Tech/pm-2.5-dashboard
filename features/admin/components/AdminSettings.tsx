@@ -40,7 +40,7 @@ export const AdminSettings = () => {
       label: (
         <span>
           <SettingOutlined />
-          Sensor Configuration
+          เซ็นเซอร์
         </span>
       ),
       children: (
@@ -54,7 +54,7 @@ export const AdminSettings = () => {
       label: (
         <span>
           <BgColorsOutlined />
-          Threshold Configuration
+          ค่าเกณฑ์
         </span>
       ),
       children: (
@@ -69,10 +69,10 @@ export const AdminSettings = () => {
     <div style={{ padding: isMobile ? '16px' : '24px', background: '#f5f7fa', minHeight: '100vh' }}>
       <div style={{ marginBottom: isMobile ? 16 : 24 }}>
         <h2 style={{ margin: 0, fontSize: isMobile ? 20 : 24, fontWeight: 600 }}>
-          Admin Settings
+          การตั้งค่าผู้ดูแล
         </h2>
         <p style={{ margin: 0, color: '#8c8c8c', fontSize: isMobile ? 12 : 14 }}>
-          {isMobile ? 'Manage system configuration' : 'Manage users, sensors, and system configuration'}
+          {isMobile ? 'จัดการการตั้งค่าระบบ' : 'จัดการผู้ใช้ เซ็นเซอร์ และการตั้งค่าระบบ'}
         </p>
       </div>
 

@@ -34,10 +34,10 @@ export const BarChartDashboard = ({ sensors }: BarChartDashboardProps) => {
       {/* Header */}
       <div style={{ marginBottom: isMobile ? 16 : 24 }}>
         <Title level={4} style={{ margin: 0, fontSize: isMobile ? 18 : 24 }}>
-          Analytics Dashboard
+          แดชบอร์ดวิเคราะห์
         </Title>
         <Text type="secondary" style={{ fontSize: isMobile ? 12 : 14 }}>
-          {isMobile ? 'Real-time monitoring' : 'Real-time parameter monitoring with customizable time ranges'}
+          {isMobile ? 'ติดตามแบบเรียลไทม์' : 'ติดตามพารามิเตอร์แบบเรียลไทม์พร้อมช่วงเวลาที่กำหนดเองได้'}
         </Text>
       </div>
 

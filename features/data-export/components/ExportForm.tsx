@@ -76,11 +76,11 @@ export const ExportForm = ({ sensors }: ExportFormProps) => {
       const filename = generateFilename(sensor.name, startDate.toDate(), endDate.toDate());
       downloadCSV(csvContent, filename);
 
-      message.success({ content: 'CSV exported successfully!', key: 'export' });
+      message.success({ content: 'ส่งออก CSV สำเร็จ!', key: 'export' });
     } catch (error: any) {
       console.error('Export error:', error);
       message.error({ 
-        content: error.message || 'Failed to export CSV', 
+        content: error.message || 'ไม่สามารถส่งออก CSV', 
         key: 'export' 
       });
     } finally {
@@ -106,9 +106,9 @@ export const ExportForm = ({ sensors }: ExportFormProps) => {
     >
       {/* Sensor Selection */}
       <Form.Item
-        label="Select Sensor"
+        label="เลือกเซ็นเซอร์"
         name="sensorId"
-        rules={[{ required: true, message: 'Please select a sensor' }]}
+        rules={[{ required: true, message: 'กรุณาเลือกเซ็นเซอร์' }]}
       >
         <Select
           placeholder="Choose a sensor to export data from"
@@ -142,10 +142,10 @@ export const ExportForm = ({ sensors }: ExportFormProps) => {
 
       {/* Date Range Selection */}
       <Form.Item
-        label="Date Range"
+        label="ช่วงวันที่"
         name="dateRange"
-        rules={[{ required: true, message: 'Please select a date range' }]}
-        extra="Data will be exported for the selected period"
+        rules={[{ required: true, message: 'กรุณาเลือกช่วงวันที่' }]}
+        extra="ข้อมูลจะถูกส่งออกสำหรับช่วงเวลาที่เลือก"
       >
         <RangePicker
           size="large"
@@ -171,8 +171,8 @@ export const ExportForm = ({ sensors }: ExportFormProps) => {
               return (
                 <Alert
                   type="warning"
-                  message="Large Date Range"
-                  description="Exporting more than 1 year of data may take a while and result in a large file."
+                  message="ช่วงวันที่มาก"
+                  description="การส่งออกข้อมูลมากกว่า 1 ปีอาจใช้เวลานานและไฟล์มีขนาดใหญ่"
                   showIcon
                   style={{ marginBottom: 24 }}
                 />
@@ -205,20 +205,20 @@ export const ExportForm = ({ sensors }: ExportFormProps) => {
           loading={loading}
           block
         >
-          {loading ? 'Generating CSV...' : 'Export CSV'}
+          {loading ? 'กำลังสร้าง CSV...' : 'ส่งออก CSV'}
         </Button>
       </Form.Item>
 
       {/* Info */}
       <Alert
         type="info"
-        message="Export Information"
+        message="ข้อมูลการส่งออก"
         description={
           <ul style={{ margin: 0, paddingLeft: 20 }}>
-            <li>The CSV will include all available sensor metrics</li>
-            <li>Missing data fields will be marked with "-"</li>
-            <li>Times are provided in both local (UTC+7) and UTC formats</li>
-            <li>Heat Index is automatically calculated from temperature and humidity</li>
+            <li>ไฟล์ CSV จะรวมข้อมูลเซ็นเซอร์ทั้งหมด</li>
+            <li>ไฟล์ขนาดใหญ่อาจใช้เวลาดาวน์โหลด</li>
+            <li>เวลาเป็นเวลาประเทศไทย (UTC+7)</li>
+            <li>ดัชนีความร้อนจะถูกคำนวณจากอุณหภูมิและความชื้นโดยอัตโนมัติ</li>
           </ul>
         }
         showIcon

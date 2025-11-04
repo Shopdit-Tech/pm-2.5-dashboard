@@ -37,7 +37,7 @@ export const LoginModal = ({ visible, onClose, onSuccess }: LoginModalProps) => 
         onSuccess();
       }
     } else {
-      setError(result.error || 'Login failed');
+      setError(result.error || 'เข้าสู่ระบบไม่สำเร็จ');
     }
   };
 
@@ -60,10 +60,10 @@ export const LoginModal = ({ visible, onClose, onSuccess }: LoginModalProps) => 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <Title level={3} style={{ margin: 0, marginBottom: 8 }}>
-            Login to Dashboard
+            เข้าสู่ระบบแดชบอร์ด
           </Title>
           <Text type="secondary">
-            Enter your credentials to continue
+            กรอกข้อมูลเพื่อดำเนินการต่อ
           </Text>
         </div>
 
@@ -88,10 +88,10 @@ export const LoginModal = ({ visible, onClose, onSuccess }: LoginModalProps) => 
         >
           <Form.Item
             name="username"
-            label="Email"
+            label="อีเมล"
             rules={[
-              { required: true, message: 'Please enter your email' },
-              { type: 'email', message: 'Please enter a valid email' },
+              { required: true, message: 'กรุณากรอกอีเมล' },
+              { type: 'email', message: 'กรุณากรอกอีเมลที่ถูกต้อง' },
             ]}
           >
             <Input
@@ -105,12 +105,12 @@ export const LoginModal = ({ visible, onClose, onSuccess }: LoginModalProps) => 
 
           <Form.Item
             name="password"
-            label="Password"
-            rules={[{ required: true, message: 'Please enter your password' }]}
+            label="รหัสผ่าน"
+            rules={[{ required: true, message: 'กรุณากรอกรหัสผ่าน' }]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Password"
+              placeholder="รหัสผ่าน"
               size="large"
             />
           </Form.Item>
@@ -124,7 +124,7 @@ export const LoginModal = ({ visible, onClose, onSuccess }: LoginModalProps) => 
               block
               style={{ marginTop: 8 }}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
             </Button>
           </Form.Item>
         </Form>

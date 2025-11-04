@@ -177,7 +177,7 @@ export const ParameterHistoryModal = ({
           <div style={{ marginBottom: isMobile ? 16 : 24, display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'center', gap: isMobile ? 12 : 0 }}>
             {!isMobile && (
               <Text strong style={{ fontSize: 15 }}>
-                Time Range: {getTimeRangeLabel(timeRange)}
+                ช่วงเวลา: {getTimeRangeLabel(timeRange)}
               </Text>
             )}
             <Select
@@ -199,7 +199,7 @@ export const ParameterHistoryModal = ({
             <Card style={{ borderRadius: 12, textAlign: 'center', padding: 60, marginBottom: 24 }}>
               <Spin size="large" />
               <div style={{ marginTop: 16, color: '#8c8c8c' }}>
-                Loading historical data...
+                กำลังโหลดข้อมูลเชิงประวัติศาสตร์...
               </div>
             </Card>
           )}
@@ -207,8 +207,8 @@ export const ParameterHistoryModal = ({
           {/* Error State */}
           {error && (
             <Alert
-              message="Error Loading Historical Data"
-              description="Unable to load historical data. Showing current value only."
+              message="ข้อผิดพลาดในการโหลดข้อมูล"
+              description="ไม่สามารถโหลดข้อมูลเชิงประวัติศาสตร์ แสดงเฉพาะค่าปัจจุบันเท่านั้น"
               type="warning"
               showIcon
               style={{ marginBottom: 24, borderRadius: 12 }}
@@ -355,7 +355,7 @@ export const ParameterHistoryModal = ({
               >
                 <LineChartOutlined style={{ fontSize: isMobile ? 20 : 24, color: 'white', marginBottom: isMobile ? 6 : 8 }} />
                 <Text style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
-                  Average
+                  ค่าเฉลี่ย
                 </Text>
                 <Text style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: 'white', display: 'block' }}>
                   {stats.average.toFixed(1)}
@@ -377,7 +377,7 @@ export const ParameterHistoryModal = ({
               >
                 <FallOutlined style={{ fontSize: isMobile ? 20 : 24, color: 'white', marginBottom: isMobile ? 6 : 8 }} />
                 <Text style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
-                  Minimum
+                  ต่ำสุด
                 </Text>
                 <Text style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: 'white', display: 'block' }}>
                   {stats.min.toFixed(1)}
@@ -399,7 +399,7 @@ export const ParameterHistoryModal = ({
               >
                 <RiseOutlined style={{ fontSize: isMobile ? 20 : 24, color: 'white', marginBottom: isMobile ? 6 : 8 }} />
                 <Text style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
-                  Maximum
+                  สูงสุด
                 </Text>
                 <Text style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: 'white', display: 'block' }}>
                   {stats.max.toFixed(1)}

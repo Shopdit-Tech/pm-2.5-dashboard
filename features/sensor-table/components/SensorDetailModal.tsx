@@ -138,10 +138,10 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
               <div>
                 <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
                   <EnvironmentOutlined style={{ marginRight: 4 }} />
-                  Linked Location
+                  ตำแหน่งที่
                 </Text>
                 <Text strong style={{ fontSize: 15 }}>
-                  {sensor.type === 'indoor' ? 'Indoor' : 'Outdoor'} {sensor.name}
+                  {sensor.type === 'indoor' ? 'ภายใน' : 'ภายนอก'} {sensor.name}
                 </Text>
               </div>
 
@@ -165,7 +165,7 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
                 {/* Status */}
                 <Col xs={24} sm={12}>
                   <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
-                    Status
+                    สถานะ
                   </Text>
                   <Tag color={sensor.status === 'online' ? 'success' : 'error'} style={{ fontSize: 13 }}>
                     {sensor.status.toUpperCase()}
@@ -250,7 +250,7 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
               bodyStyle={{ padding: isMobile ? '16px' : '20px' }}
             >
               <Title level={5} style={{ marginTop: 0, marginBottom: isMobile ? 12 : 16, fontSize: 16 }}>
-                Current Readings
+                ค่าวัดปัจจุบัน
               </Title>
 
               <Row gutter={[12, 12]} justify="center">
