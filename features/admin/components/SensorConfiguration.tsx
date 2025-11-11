@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Table, Button, Input, Select, Space, message, Tag } from 'antd';
+import { Table, Button, Input, Select, Space, message, Tag, Modal, Form, InputNumber } from 'antd';
 import { EditOutlined, SaveOutlined, CloseOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { SENSOR_TABLE_DATA } from '@/features/sensor-table/services/sensorTableData';
 import { MOBILE_SENSOR_DATA } from '@/features/mobile-sensor-table/services/mobileSensorData';
@@ -10,6 +10,9 @@ import type { SensorData } from '@/types/sensor';
 const { Option } = Select;
 
 const STORAGE_KEY = 'sensor_config';
+const CUSTOM_SENSORS_KEY = 'sensor_config_custom';
+const BASE_SENSORS = [...SENSOR_TABLE_DATA, ...MOBILE_SENSOR_DATA];
+const BASE_SENSOR_IDS = new Set(BASE_SENSORS.map((sensor) => sensor.id));
 
 type SensorConfig = {
   id: string;
@@ -22,6 +25,8 @@ export const SensorConfiguration = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{ name: string; type: string }>({ name: '', type: '' });
   const [isMobile, setIsMobile] = useState(false);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [createForm] = Form.useForm();
 
   // Mobile detection
   useEffect(() => {
@@ -38,26 +43,43 @@ export const SensorConfiguration = () => {
   }, []);
 
   const loadSensors = () => {
-    // Load all sensors
-    const allSensors = [...SENSOR_TABLE_DATA, ...MOBILE_SENSOR_DATA];
-    
-    // Load custom configurations from localStorage
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
+    if (typeof window === 'undefined') {
+      setSensors(BASE_SENSORS.map((sensor) => ({ ...sensor })));
+      return;
+    }
+
+    const baseSensors = BASE_SENSORS.map((sensor) => ({ ...sensor }));
+
+    let configuredBaseSensors = baseSensors;
+    const savedConfigs = localStorage.getItem(STORAGE_KEY);
+    if (savedConfigs) {
       try {
-        const configs: SensorConfig[] = JSON.parse(saved);
-        const updatedSensors = allSensors.map((sensor) => {
+        const configs: SensorConfig[] = JSON.parse(savedConfigs);
+        configuredBaseSensors = baseSensors.map((sensor) => {
           const config = configs.find((c) => c.id === sensor.id);
           return config ? { ...sensor, name: config.name, type: config.type as any } : sensor;
         });
-        setSensors(updatedSensors);
       } catch (error) {
         console.error('Failed to load sensor config:', error);
-        setSensors(allSensors);
+        configuredBaseSensors = baseSensors;
       }
-    } else {
-      setSensors(allSensors);
     }
+
+    let customSensors: SensorData[] = [];
+    const savedCustom = localStorage.getItem(CUSTOM_SENSORS_KEY);
+    if (savedCustom) {
+      try {
+        const parsed: SensorData[] = JSON.parse(savedCustom);
+        customSensors = parsed.map((sensor) => ({
+          ...sensor,
+          timestamp: sensor.timestamp || new Date().toISOString(),
+        }));
+      } catch (error) {
+        console.error('Failed to load custom sensors:', error);
+      }
+    }
+
+    setSensors([...configuredBaseSensors, ...customSensors]);
   };
 
   const handleEdit = (sensor: SensorData) => {
@@ -73,12 +95,19 @@ export const SensorConfiguration = () => {
     setSensors(updatedSensors);
 
     // Save to localStorage
-    const configs: SensorConfig[] = updatedSensors.map((s) => ({
-      id: s.id,
-      name: s.name,
-      type: s.type,
-    }));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(configs));
+    const baseConfigs: SensorConfig[] = updatedSensors
+      .filter((s) => BASE_SENSOR_IDS.has(s.id))
+      .map((s) => ({
+        id: s.id,
+        name: s.name,
+        type: s.type,
+      }));
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(baseConfigs));
+      const customSensors = updatedSensors.filter((s) => !BASE_SENSOR_IDS.has(s.id));
+      localStorage.setItem(CUSTOM_SENSORS_KEY, JSON.stringify(customSensors));
+    }
 
     message.success('บันทึกการตั้งค่าเซ็นเซอร์แล้ว');
     setEditingId(null);
@@ -91,8 +120,79 @@ export const SensorConfiguration = () => {
 
   const handleReset = () => {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(CUSTOM_SENSORS_KEY);
     loadSensors();
     message.success('รีเซ็ตการตั้งค่าเซ็นเซอร์แล้ว');
+  };
+
+  const handleOpenCreateModal = () => {
+    createForm.resetFields();
+    createForm.setFieldsValue({
+      type: 'outdoor',
+      status: 'online',
+      latitude: 0,
+      longitude: 0,
+    });
+    setCreateModalVisible(true);
+  };
+
+  const handleCreateCancel = () => {
+    setCreateModalVisible(false);
+    createForm.resetFields();
+  };
+
+  const handleCreateSensor = async () => {
+    try {
+      const values = await createForm.validateFields();
+
+      if (sensors.some((sensor) => sensor.id === values.id)) {
+        message.error('รหัสเซ็นเซอร์นี้ถูกใช้งานแล้ว');
+        return;
+      }
+
+      const newSensor: SensorData = {
+        id: values.id,
+        code: values.code || undefined,
+        name: values.name,
+        type: values.type,
+        status: values.status,
+        latitude: values.latitude ?? 0,
+        longitude: values.longitude ?? 0,
+        temperature: 0,
+        humidity: 0,
+        co2: 0,
+        pm1: 0,
+        pm25: 0,
+        pm10: 0,
+        tvoc: 0,
+        timestamp: new Date().toISOString(),
+      };
+
+      const updatedSensors = [...sensors, newSensor];
+      setSensors(updatedSensors);
+
+      if (typeof window !== 'undefined') {
+        const customSensors = updatedSensors.filter((sensor) => !BASE_SENSOR_IDS.has(sensor.id));
+        localStorage.setItem(CUSTOM_SENSORS_KEY, JSON.stringify(customSensors));
+
+        const baseConfigs: SensorConfig[] = updatedSensors
+          .filter((sensor) => BASE_SENSOR_IDS.has(sensor.id))
+          .map((sensor) => ({
+            id: sensor.id,
+            name: sensor.name,
+            type: sensor.type,
+          }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(baseConfigs));
+      }
+
+      message.success('สร้างเซ็นเซอร์ใหม่สำเร็จ');
+      handleCreateCancel();
+    } catch (error: any) {
+      if (error?.errorFields) {
+        return;
+      }
+      message.error('ไม่สามารถสร้างเซ็นเซอร์ใหม่');
+    }
   };
 
   const columns = [
@@ -139,6 +239,7 @@ export const SensorConfiguration = () => {
               onChange={(value) => setEditForm({ ...editForm, type: value })}
               style={{ width: '100%' }}
             >
+              <Option value="indoor">ภายใน</Option>
               <Option value="outdoor">ภายนอก</Option>
               <Option value="mobile">เคลื่อนที่</Option>
             </Select>
@@ -212,14 +313,28 @@ export const SensorConfiguration = () => {
             {isMobile ? `${sensors.length} เซ็นเซอร์` : `ตั้งค่าชื่อและประเภทของเซ็นเซอร์ (${sensors.length} เซ็นเซอร์ทั้งหมด)`}
           </p>
         </div>
-        <Button
-          onClick={handleReset}
-          danger
-          size={isMobile ? 'middle' : 'large'}
-          block={isMobile}
+        <Space
+          direction={isMobile ? 'vertical' : 'horizontal'}
+          size={isMobile ? 8 : 12}
+          style={{ width: isMobile ? '100%' : 'auto' }}
         >
-          {isMobile ? 'รีเซ็ต' : 'รีเซ็ตเป็นค่าเริ่มต้น'}
-        </Button>
+          <Button
+            type="primary"
+            onClick={handleOpenCreateModal}
+            size={isMobile ? 'middle' : 'large'}
+            block={isMobile}
+          >
+            {isMobile ? 'เพิ่มเซ็นเซอร์' : 'เพิ่มเซ็นเซอร์ใหม่'}
+          </Button>
+          <Button
+            onClick={handleReset}
+            danger
+            size={isMobile ? 'middle' : 'large'}
+            block={isMobile}
+          >
+            {isMobile ? 'รีเซ็ต' : 'รีเซ็ตเป็นค่าเริ่มต้น'}
+          </Button>
+        </Space>
       </div>
 
       <Table
@@ -235,6 +350,66 @@ export const SensorConfiguration = () => {
         <strong>หมายเหตุ:</strong> การเปลี่ยนแปลงจะถูกบันทึกใน localStorage ของเบราว์เซอร์
         คลิก "รีเซ็ตเป็นค่าเริ่มต้น" เพื่อคืนค่าเซ็นเซอร์เดิม
       </div>
+
+      <Modal
+        open={createModalVisible}
+        title="เพิ่มเซ็นเซอร์ใหม่"
+        onCancel={handleCreateCancel}
+        onOk={handleCreateSensor}
+        okText="สร้าง"
+        cancelText="ยกเลิก"
+        destroyOnClose
+        width={isMobile ? '95%' : 520}
+      >
+        <Form form={createForm} layout="vertical">
+          <Form.Item
+            name="id"
+            label="รหัสเซ็นเซอร์"
+            rules={[{ required: true, message: 'กรุณากรอกรหัสเซ็นเซอร์' }]}
+          >
+            <Input placeholder="เช่น airgradient:123456" />
+          </Form.Item>
+          <Form.Item name="code" label="Sensor Code">
+            <Input placeholder="รหัสสำหรับ API (ถ้ามี)" />
+          </Form.Item>
+          <Form.Item
+            name="name"
+            label="ชื่อเซ็นเซอร์"
+            rules={[{ required: true, message: 'กรุณากรอกชื่อเซ็นเซอร์' }]}
+          >
+            <Input placeholder="ชื่อที่ต้องการแสดง" />
+          </Form.Item>
+          <Form.Item
+            name="type"
+            label="ประเภท"
+            rules={[{ required: true, message: 'กรุณาเลือกประเภทเซ็นเซอร์' }]}
+          >
+            <Select placeholder="เลือกประเภท">
+              <Option value="indoor">ภายใน</Option>
+              <Option value="outdoor">ภายนอก</Option>
+              <Option value="mobile">เคลื่อนที่</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="status"
+            label="สถานะ"
+            rules={[{ required: true, message: 'กรุณาเลือกสถานะ' }]}
+          >
+            <Select placeholder="เลือกสถานะ">
+              <Option value="online">ออนไลน์</Option>
+              <Option value="offline">ออฟไลน์</Option>
+            </Select>
+          </Form.Item>
+          <Space size={16} style={{ width: '100%' }} direction={isMobile ? 'vertical' : 'horizontal'}>
+            <Form.Item name="latitude" label="ละติจูด" style={{ flex: 1 }}>
+              <InputNumber style={{ width: '100%' }} placeholder="เช่น 13.7563" />
+            </Form.Item>
+            <Form.Item name="longitude" label="ลองจิจูด" style={{ flex: 1 }}>
+              <InputNumber style={{ width: '100%' }} placeholder="เช่น 100.5018" />
+            </Form.Item>
+          </Space>
+        </Form>
+      </Modal>
     </div>
   );
 };
