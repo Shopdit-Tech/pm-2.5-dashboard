@@ -131,9 +131,8 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           {!collapsed ? (
             <div>
               <Title level={4} className="mb-0" style={{ fontSize: 18, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.3px' }}>
-                Air Quality
+                ศูนย์ข้อมูลคุณภาพอากาศ
               </Title>
-              <Text style={{ fontSize: 12, color: '#9ca3af', fontWeight: 500 }}>Monitoring System</Text>
             </div>
           ) : (
             <div style={{

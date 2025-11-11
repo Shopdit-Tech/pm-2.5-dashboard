@@ -19,11 +19,12 @@ import { useChartData } from '@/features/analytics-charts/hooks/useChartData';
 import type { TimeRange } from '@/features/analytics-charts/types/chartTypes';
 import { getTimeRangeLabel, getTimeRangeId } from '@/features/analytics-charts/types/chartTypes';
 import { TIME_RANGES, getTimeRangeByIdOrDefault } from '@/features/analytics-charts/constants/timeRanges';
+import { useThreshold } from '@/contexts/ThresholdContext';
 import {
-  getZonesForParameter,
   getParameterLabel,
   getParameterUnit,
 } from '../utils/parameterThresholds';
+import type { QualityZone } from '../utils/parameterThresholds';
 
 const { Text, Title } = Typography;
 
@@ -42,6 +43,9 @@ export const ParameterHistoryModal = ({
   visible,
   onClose,
 }: ParameterHistoryModalProps) => {
+  // Use threshold context for dynamic zones
+  const { getThresholdsForMetric } = useThreshold();
+  
   // Use the default time range config (24h with 15min intervals)
   const [timeRange, setTimeRange] = useState<TimeRange>(getTimeRangeByIdOrDefault('24h'));
   const [isMobile, setIsMobile] = useState(false);
@@ -97,10 +101,23 @@ export const ParameterHistoryModal = ({
     };
   }, [chartData, currentValue]);
 
-  // Get quality zones for background
-  const zones = useMemo(() => {
-    return getZonesForParameter(parameter);
-  }, [parameter]);
+  // Get quality zones from threshold configuration
+  const zones = useMemo((): QualityZone[] => {
+    const thresholds = getThresholdsForMetric(paramKey);
+    
+    if (thresholds.length === 0) {
+      return [];
+    }
+    
+    // Convert thresholds to quality zones
+    return thresholds.map((threshold) => ({
+      min: threshold.min_value,
+      max: threshold.max_value,
+      label: threshold.level.replace('_', ' ').charAt(0).toUpperCase() + threshold.level.slice(1).replace('_', ' '),
+      color: threshold.color_hex,
+      opacity: 0.15,
+    }));
+  }, [paramKey, getThresholdsForMetric]);
 
   // Format data for chart
   const formattedChartData = useMemo(() => {
@@ -231,7 +248,6 @@ export const ParameterHistoryModal = ({
                     y2={zone.max}
                     fill={zone.color}
                     fillOpacity={zone.opacity}
-                    ifOverflow="extendDomain"
                   />
                 ))}
 
@@ -266,11 +282,16 @@ export const ParameterHistoryModal = ({
                 />
                 
                 <YAxis
-                  domain={[0, (dataMax: number) => {
-                    // For TVOC and low-value parameters, use appropriate scaling
-                    if (dataMax < 50) return Math.ceil(dataMax * 1.2);
-                    return Math.ceil(dataMax * 1.1);
-                  }]}
+                  domain={[
+                    (dataMin: number) => {
+                      const min = Math.max(0, dataMin * 0.8); // 20% padding below, but not negative
+                      return Math.floor(min);
+                    },
+                    (dataMax: number) => {
+                      const max = dataMax * 1.2; // 20% padding above
+                      return Math.ceil(max);
+                    }
+                  ]}
                   tick={{ fontSize: 11 }}
                   stroke="#8c8c8c"
                   label={{

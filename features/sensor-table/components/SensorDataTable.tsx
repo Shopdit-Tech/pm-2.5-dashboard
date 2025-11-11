@@ -11,7 +11,7 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import type { Breakpoint } from 'antd/es/_util/responsiveObserver';
 import { SensorData } from '@/types/sensor';
-import { getParameterColor } from '@/utils/airQualityUtils';
+import { useThreshold } from '@/contexts/ThresholdContext';
 import { SensorDetailModal } from './SensorDetailModal';
 import { ParameterHistoryModal } from './ParameterHistoryModal';
 import { useSensorTableData } from '../hooks/useSensorTableData';
@@ -23,6 +23,7 @@ type ColumnKey = 'temperature' | 'humidity' | 'co2' | 'pm25' | 'pm10' | 'tvoc';
 export const SensorDataTable = () => {
   // Use real API data
   const { sensors, loading, error, refetch } = useSensorTableData(60000); // Auto-refresh every 60 seconds
+  const { getColorForValue } = useThreshold();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSensor, setSelectedSensor] = useState<SensorData | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -90,7 +91,7 @@ export const SensorDataTable = () => {
 
   // Render color-coded parameter cell (clickable)
   const renderParameterCell = (value: number, parameter: string, sensor: SensorData) => {
-    const color = getParameterColor(parameter as any, value);
+    const color = getColorForValue(parameter as any, value);
     
     return (
       <div 

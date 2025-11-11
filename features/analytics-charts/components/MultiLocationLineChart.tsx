@@ -12,6 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
+  ReferenceArea,
 } from 'recharts';
 import { SensorData } from '@/types/sensor';
 import { TimeRange, getTimeRangeLabel, getTimeRangeId } from '../types/chartTypes';
@@ -20,6 +21,7 @@ import { fetchRealChartData, getLocationColor } from '../services/chartDataServi
 import { getParameterLabel, getParameterUnit } from '@/features/sensor-table/utils/parameterThresholds';
 import { ParameterTabs } from './ParameterTabs';
 import { LocationSelector } from './LocationSelector';
+import { useThreshold } from '@/contexts/ThresholdContext';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -29,6 +31,7 @@ type MultiLocationLineChartProps = {
 };
 
 export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps) => {
+  const { getThresholdsForMetric } = useThreshold();
   const [parameter, setParameter] = useState('pm25');
   const [timeRange, setTimeRange] = useState<TimeRange>(getTimeRangeByIdOrDefault('24h'));
   const [selectedSensorIds, setSelectedSensorIds] = useState<string[]>([]);
@@ -114,6 +117,24 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
     });
     return colors;
   }, [selectedSensorIds]);
+
+  // Get threshold zones for background
+  const thresholdZones = useMemo(() => {
+    const thresholds = getThresholdsForMetric(parameter as any);
+    
+    if (thresholds.length === 0) {
+      return [];
+    }
+    
+    // Convert thresholds to zones for ReferenceArea
+    return thresholds.map((threshold) => ({
+      min: threshold.min_value,
+      max: threshold.max_value,
+      label: threshold.level.replace('_', ' ').charAt(0).toUpperCase() + threshold.level.slice(1).replace('_', ' '),
+      color: threshold.color_hex,
+      opacity: 0.15,
+    }));
+  }, [parameter, getThresholdsForMetric]);
 
 
   // Merge data from all sensors into single dataset for Recharts
@@ -334,11 +355,16 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
               />
               
               <YAxis
-                domain={[0, (dataMax: number) => {
-                  // For TVOC and low-value parameters, use appropriate scaling
-                  if (dataMax < 50) return Math.ceil(dataMax * 1.2);
-                  return Math.ceil(dataMax * 1.1);
-                }]}
+                domain={[
+                  (dataMin: number) => {
+                    const min = Math.max(0, dataMin * 0.8); // 20% padding below, but not negative
+                    return Math.floor(min);
+                  },
+                  (dataMax: number) => {
+                    const max = dataMax * 1.2; // 20% padding above
+                    return Math.ceil(max);
+                  }
+                ]}
                 tick={{ fontSize: 11 }}
                 stroke="#8c8c8c"
                 label={{
@@ -350,6 +376,17 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
                 scale="linear"
                 allowDataOverflow={false}
               />
+
+              {/* Background threshold zones */}
+              {thresholdZones.map((zone, index) => (
+                <ReferenceArea
+                  key={index}
+                  y1={zone.min}
+                  y2={zone.max}
+                  fill={zone.color}
+                  fillOpacity={zone.opacity}
+                />
+              ))}
 
               <Tooltip content={<CustomTooltip />} />
               

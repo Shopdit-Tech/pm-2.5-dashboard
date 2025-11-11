@@ -1,0 +1,63 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import axios from 'axios';
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { method, headers } = req;
+
+  try {
+    // Forward Authorization header
+    const authHeader = headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Authorization header required' });
+    }
+
+    const config = {
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/json',
+      },
+      timeout: 30000,
+    };
+
+    if (method === 'GET') {
+      // Get all sensors
+      const response = await axios.get(`${SUPABASE_URL}/sensors-admin`, config);
+      return res.status(200).json(response.data);
+    } else if (method === 'POST') {
+      // Create sensor
+      const response = await axios.post(`${SUPABASE_URL}/sensors-admin`, req.body, config);
+      return res.status(201).json(response.data);
+    } else if (method === 'PATCH') {
+      // Update sensor
+      const response = await axios.patch(`${SUPABASE_URL}/sensors-admin`, req.body, config);
+      return res.status(200).json(response.data);
+    } else if (method === 'DELETE') {
+      // Delete sensor
+      const { id } = req.query;
+      
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ error: 'id is required' });
+      }
+
+      const response = await axios.delete(`${SUPABASE_URL}/sensors-admin`, {
+        ...config,
+        params: { id },
+      });
+      
+      return res.status(200).json(response.data);
+    } else {
+      res.setHeader('Allow', ['GET', 'POST', 'PATCH', 'DELETE']);
+      return res.status(405).json({ error: `Method ${method} Not Allowed` });
+    }
+  } catch (error: any) {
+    console.error('Sensors Admin API Proxy Error:', error);
+    
+    if (error.response) {
+      return res.status(error.response.status).json(error.response.data);
+    }
+    
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+}

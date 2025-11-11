@@ -1,0 +1,1065 @@
+{
+	"info": {
+		"_postman_id": "e876533a-179c-4088-a3e1-171759a9c02a",
+		"name": "NMU Dashboard Copy 2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49604851"
+	},
+	"item": [
+		{
+			"name": "ingest",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-ingest-key",
+						"value": "super-long-random-token",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"sensor_code\": \"airgradient:744dbdbfdaac\", // (required) รหัสเซนเซอร์ เช่น MAC / Serial / Code\n  \"ts\": \"2025-10-07T10:37:00Z\",              // (required) เวลาที่อ่านค่าจริง (UTC ISO8601)\n\n  // --- ค่าที่วัดได้ (optional ทุกตัว) ---\n  \"pm1\": 18.9,             // PM1 (µg/m³)\n  \"pm25\": 27.8,            // PM2.5 (µg/m³)\n  \"pm10\": 28.8,            // PM10 (µg/m³)\n  \"particle_0p3\": 3665,    // จำนวนอนุภาค 0.3µm\n  \"co2_ppm\": 520,          // CO₂ (ppm)\n  \"temperature_c\": 29.7,   // อุณหภูมิ (°C)\n  \"humidity_rh\": 79.4,     // ความชื้น (%RH)\n  \"tvoc_ppb\": 71.7763,     // TVOC (ppb)\n  \"tvoc_index\": 76,        // TVOC index (ค่าความเข้มข้นแบบ normalized)\n  \"nox_index\": 1,          // NOx index\n  \"tvoc_raw_logr\": 4.87,   // ค่าดิบ log(R) ของ TVOC sensor\n  \"nox_raw_logr\": 5.12,    // ค่าดิบ log(R) ของ NOx sensor\n\n  // --- ตำแหน่ง (optional แต่จำเป็นสำหรับ sensor เคลื่อนที่) ---\n  \"lat\": 13.7292,          // ละติจูด\n  \"lng\": 100.5282,         // ลองจิจูด\n\n  // --- เมตาดาต้าเสริม (optional) ---\n  \"channel\": \"-\",          // ช่อง sensor ถ้ามีหลายช่อง (CH1/CH2/ฯลฯ)\n  \"location_external_id\": \"67284\" // รหัสอ้างอิง location จากระบบต้นทาง\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/ingest",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"ingest"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "archive-raw-month",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-archive-key",
+						"value": "Ducmek-hukbaw-5tundy",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"dry_run\": false,\n    \"month\": 10,\n    \"days\": [25]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/archive-raw-month",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"archive-raw-month"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sensors-latest",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-ingest-key",
+						"value": "Tychu3-xijsuw-kundyb",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/sensors-latest?movable=true",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"sensors-latest"
+					],
+					"query": [
+						{
+							"key": "movable",
+							"value": "true"
+						},
+						{
+							"key": "format",
+							"value": "geojson",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sensor-history",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-ingest-key",
+						"value": "super-long-random-token",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/sensor-history?sensor_code=airgradient:744dbdbfdabd&metric=all&agg_minutes=60&from=2025-10-01T00:00:00Z&to=2025-10-31T00:00:00Z",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"sensor-history"
+					],
+					"query": [
+						{
+							"key": "sensor_code",
+							"value": "airgradient:744dbdbfdabd"
+						},
+						{
+							"key": "metric",
+							"value": "all"
+						},
+						{
+							"key": "since_hours",
+							"value": "24",
+							"disabled": true
+						},
+						{
+							"key": "agg_minutes",
+							"value": "60"
+						},
+						{
+							"key": "from",
+							"value": "2025-10-01T00:00:00Z"
+						},
+						{
+							"key": "to",
+							"value": "2025-10-31T00:00:00Z"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth-login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"admin@test.com\",\n    \"password\": \"Password12345!\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/auth-login",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"auth-login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth-refresh",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"refresh_token\": \"6th5t6bxb7gp\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/auth-refresh",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"auth-refresh"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth-me",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ikg0L1loVXJTcmJZaXZPbmgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3ZubWl0bWVxcXp1enF1ZXZ4c2F6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1N2Y5YWM3Mi1iNTc2LTQzZjAtOTVkMS1hMzg2N2U0MGM1ZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYxNjQyMzI4LCJpYXQiOjE3NjE2Mzg3MjgsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2MTYzODcyOH1dLCJzZXNzaW9uX2lkIjoiODJiYjUxYjEtYzJhNy00YWE1LWIzZjgtMDYyMzdkYmRlY2UxIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.BfpSoWJednPPUSUQa-98AX2-1BDl9E-KTzZ-lLwQ86w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"test\",\n    \"password\": \"test\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/auth-me",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"auth-me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "users-admin",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ikg0L1loVXJTcmJZaXZPbmgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3ZubWl0bWVxcXp1enF1ZXZ4c2F6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1N2Y5YWM3Mi1iNTc2LTQzZjAtOTVkMS1hMzg2N2U0MGM1ZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYxNjQyMzI4LCJpYXQiOjE3NjE2Mzg3MjgsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2MTYzODcyOH1dLCJzZXNzaW9uX2lkIjoiODJiYjUxYjEtYzJhNy00YWE1LWIzZjgtMDYyMzdkYmRlY2UxIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.BfpSoWJednPPUSUQa-98AX2-1BDl9E-KTzZ-lLwQ86w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"test\",\n    \"password\": \"test\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/users-admin",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"users-admin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "users-admin (create)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ikg0L1loVXJTcmJZaXZPbmgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3ZubWl0bWVxcXp1enF1ZXZ4c2F6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1N2Y5YWM3Mi1iNTc2LTQzZjAtOTVkMS1hMzg2N2U0MGM1ZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYxNjQyMzI4LCJpYXQiOjE3NjE2Mzg3MjgsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2MTYzODcyOH1dLCJzZXNzaW9uX2lkIjoiODJiYjUxYjEtYzJhNy00YWE1LWIzZjgtMDYyMzdkYmRlY2UxIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.BfpSoWJednPPUSUQa-98AX2-1BDl9E-KTzZ-lLwQ86w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"test2@test.com\",\n    \"password\": \"Password12345!\",\n    \"role\": \"user\" // admin,user\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/users-admin",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"users-admin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "users-admin (delete)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ikg0L1loVXJTcmJZaXZPbmgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3ZubWl0bWVxcXp1enF1ZXZ4c2F6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1N2Y5YWM3Mi1iNTc2LTQzZjAtOTVkMS1hMzg2N2U0MGM1ZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYxNjQyMzI4LCJpYXQiOjE3NjE2Mzg3MjgsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2MTYzODcyOH1dLCJzZXNzaW9uX2lkIjoiODJiYjUxYjEtYzJhNy00YWE1LWIzZjgtMDYyMzdkYmRlY2UxIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.BfpSoWJednPPUSUQa-98AX2-1BDl9E-KTzZ-lLwQ86w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"test2@test.com\",\n    \"password\": \"Password12345!\",\n    \"role\": \"user\" // admin,user\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/users-admin?user_id=2f227798-f58d-4d89-b505-0719f7e04a9b",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"users-admin"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "2f227798-f58d-4d89-b505-0719f7e04a9b"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sensors-admin",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ikg0L1loVXJTcmJZaXZPbmgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3ZubWl0bWVxcXp1enF1ZXZ4c2F6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1N2Y5YWM3Mi1iNTc2LTQzZjAtOTVkMS1hMzg2N2U0MGM1ZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYyODc0ODIzLCJpYXQiOjE3NjI4NzEyMjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl0sInJvbGUiOiJhZG1pbiJ9LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2Mjg3MTIyM31dLCJzZXNzaW9uX2lkIjoiYjYyN2FlODAtNGM1MC00YzM5LTkyMjQtMGZmMTNjNzcyMmM5IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.gbQcio6Vnlu_9zP77wVOHI1G1aLbHEhQ3bhqE__SZCw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/sensors-admin",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"sensors-admin"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "sensors-admin",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "/functions/v1/sensors-admin",
+							"path": [
+								"functions",
+								"v1",
+								"sensors-admin"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Tue, 11 Nov 2025 15:12:27 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "914"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Server",
+							"value": "cloudflare"
+						},
+						{
+							"key": "CF-Ray",
+							"value": "99ceba56e8c9ee39-BKK"
+						},
+						{
+							"key": "CF-Cache-Status",
+							"value": "DYNAMIC"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=31536000; includeSubDomains; preload"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding"
+						},
+						{
+							"key": "access-control-allow-headers",
+							"value": "authorization, content-type"
+						},
+						{
+							"key": "access-control-allow-methods",
+							"value": "GET, POST, PATCH, DELETE, OPTIONS"
+						},
+						{
+							"key": "sb-project-ref",
+							"value": "vnmitmeqqzuzquevxsaz"
+						},
+						{
+							"key": "sb-request-id",
+							"value": "019a7379-b25b-7be6-a2ab-d6d10d5bdc97"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "x-deno-execution-id",
+							"value": "143708c7-bd17-48b4-af12-29c4efc2fb19"
+						},
+						{
+							"key": "x-sb-edge-region",
+							"value": "ap-southeast-1"
+						},
+						{
+							"key": "x-served-by",
+							"value": "supabase-edge-runtime"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "__cf_bm=J_C57Fn.drWgHsXC6NNTQt632tvzC67V0_7JCmeOleM-1762873947-1.0.1.1-JitYzqs7hE55ZXkmpF5iTdX9PCy9FhLMcurEmegDtyGTPOFnJaCvroXh.1UMqVwRYHnDpQYawKSBytBedxilxLPUELykbNdV4WHcMuSjXGw; path=/; expires=Tue, 11-Nov-25 15:42:27 GMT; domain=.supabase.co; HttpOnly; Secure; SameSite=None"
+						},
+						{
+							"key": "alt-svc",
+							"value": "h3=\":443\"; ma=86400"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"sensors\": [\n        {\n            \"id\": \"ceaf34ca-7812-4cb1-b309-b706ba27e072\",\n            \"code\": \"airgradient:744dbdbfdaac\",\n            \"name\": null,\n            \"type\": \"INDOOR\",\n            \"model\": \"AirGradient-DIY\",\n            \"is_movable\": false,\n            \"fixed_lat\": 13.7292,\n            \"fixed_lng\": 100.5282,\n            \"fixed_geom\": {\n                \"type\": \"Point\",\n                \"crs\": {\n                    \"type\": \"name\",\n                    \"properties\": {\n                        \"name\": \"EPSG:4326\"\n                    }\n                },\n                \"coordinates\": [\n                    100.5282,\n                    13.7292\n                ]\n            },\n            \"address\": null,\n            \"meta\": {\n                \"note\": \"test sensor for ingestion\",\n                \"firmware\": \"v1.3.2\",\n                \"calibrated_at\": \"2025-10-07T10:00:00Z\"\n            },\n            \"is_online\": false,\n            \"last_seen\": \"2025-11-06T11:05:35+00:00\",\n            \"created_at\": \"2025-10-07T12:54:26.56307+00:00\"\n        },\n        {\n            \"id\": \"fd03b5a4-afec-434d-b40c-1ee82d519a67\",\n            \"code\": \"airgradient:744dbdbfdaae\",\n            \"name\": null,\n            \"type\": \"INDOOR\",\n            \"model\": \"AirGradient-Mobile\",\n            \"is_movable\": true,\n            \"fixed_lat\": null,\n            \"fixed_lng\": null,\n            \"fixed_geom\": null,\n            \"address\": null,\n            \"meta\": {\n                \"note\": \"Used for outdoor campaigns\",\n                \"location\": \"Field unit\"\n            },\n            \"is_online\": true,\n            \"last_seen\": \"2025-11-11T15:12:00+00:00\",\n            \"created_at\": \"2025-10-24T15:01:33.880998+00:00\"\n        },\n        {\n            \"id\": \"eee9e94c-af81-42f1-99f5-25df13b8fed1\",\n            \"code\": \"airgradient:744dbdbfdaaf\",\n            \"name\": null,\n            \"type\": \"INDOOR\",\n            \"model\": \"AirGradient-Pro\",\n            \"is_movable\": false,\n            \"fixed_lat\": 13.75,\n            \"fixed_lng\": 100.52,\n            \"fixed_geom\": {\n                \"type\": \"Point\",\n                \"crs\": {\n                    \"type\": \"name\",\n                    \"properties\": {\n                        \"name\": \"EPSG:4326\"\n                    }\n                },\n                \"coordinates\": [\n                    100.52,\n                    13.75\n                ]\n            },\n            \"address\": null,\n            \"meta\": {\n                \"note\": \"Long-term monitoring\",\n                \"location\": \"Warehouse\"\n            },\n            \"is_online\": true,\n            \"last_seen\": \"2025-11-11T15:12:00+00:00\",\n            \"created_at\": \"2025-10-24T15:01:33.880998+00:00\"\n        },\n        {\n            \"id\": \"7c655709-64a0-4336-ad7b-509d2e120486\",\n            \"code\": \"airgradient:744dbdbfdabc\",\n            \"name\": null,\n            \"type\": \"INDOOR\",\n            \"model\": \"AirGradient-Pro\",\n            \"is_movable\": false,\n            \"fixed_lat\": 13.7372,\n            \"fixed_lng\": 100.5239,\n            \"fixed_geom\": {\n                \"type\": \"Point\",\n                \"crs\": {\n                    \"type\": \"name\",\n                    \"properties\": {\n                        \"name\": \"EPSG:4326\"\n                    }\n                },\n                \"coordinates\": [\n                    100.5239,\n                    13.7372\n                ]\n            },\n            \"address\": null,\n            \"meta\": {\n                \"note\": \"Reference for device #3\",\n                \"location\": \"Lobby Sensor\"\n            },\n            \"is_online\": true,\n            \"last_seen\": \"2025-11-11T15:12:00+00:00\",\n            \"created_at\": \"2025-10-24T15:01:33.880998+00:00\"\n        },\n        {\n            \"id\": \"a52fce73-d776-460c-81e4-f54dbb154411\",\n            \"code\": \"airgradient:744dbdbfdabd\",\n            \"name\": null,\n            \"type\": \"INDOOR\",\n            \"model\": \"AirGradient-Mobile\",\n            \"is_movable\": true,\n            \"fixed_lat\": 13.7372,\n            \"fixed_lng\": 100.5239,\n            \"fixed_geom\": {\n                \"type\": \"Point\",\n                \"crs\": {\n                    \"type\": \"name\",\n                    \"properties\": {\n                        \"name\": \"EPSG:4326\"\n                    }\n                },\n                \"coordinates\": [\n                    100.5239,\n                    13.7372\n                ]\n            },\n            \"address\": null,\n            \"meta\": {\n                \"note\": \"Usually near sensor #2\",\n                \"location\": \"Portable demo unit\"\n            },\n            \"is_online\": true,\n            \"last_seen\": \"2025-11-11T15:12:00+00:00\",\n            \"created_at\": \"2025-10-24T15:01:33.880998+00:00\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "sensors-admin (create)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ikg0L1loVXJTcmJZaXZPbmgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3ZubWl0bWVxcXp1enF1ZXZ4c2F6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1N2Y5YWM3Mi1iNTc2LTQzZjAtOTVkMS1hMzg2N2U0MGM1ZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYyODc0ODIzLCJpYXQiOjE3NjI4NzEyMjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl0sInJvbGUiOiJhZG1pbiJ9LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2Mjg3MTIyM31dLCJzZXNzaW9uX2lkIjoiYjYyN2FlODAtNGM1MC00YzM5LTkyMjQtMGZmMTNjNzcyMmM5IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.gbQcio6Vnlu_9zP77wVOHI1G1aLbHEhQ3bhqE__SZCw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"code\": \"sensor-001\",\n  \"name\": \"Indoor คลองเตยล็อค6\",\n  \"type\": \"Indoor\",\n  \"model\": \"AirGradient-DIY\",\n  \"is_movable\": false,\n  \"fixed_lat\": 13.73,\n  \"fixed_lng\": 100.52,\n  \"address\": \"Khongtei Lock6\",\n  \"meta\": { \"note\": \"ห้องประชุม\" }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/sensors-admin",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"sensors-admin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sensors-admin (update)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ikg0L1loVXJTcmJZaXZPbmgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3ZubWl0bWVxcXp1enF1ZXZ4c2F6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1N2Y5YWM3Mi1iNTc2LTQzZjAtOTVkMS1hMzg2N2U0MGM1ZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYyODc0ODIzLCJpYXQiOjE3NjI4NzEyMjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl0sInJvbGUiOiJhZG1pbiJ9LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2Mjg3MTIyM31dLCJzZXNzaW9uX2lkIjoiYjYyN2FlODAtNGM1MC00YzM5LTkyMjQtMGZmMTNjNzcyMmM5IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.gbQcio6Vnlu_9zP77wVOHI1G1aLbHEhQ3bhqE__SZCw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"code\": \"sensor-001\",\n  \"name\": \"Indoor คลองเตยล็อค6 (ปรับชื่อใหม่)\",\n  \"is_movable\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/sensors-admin",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"sensors-admin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sensors-admin (delete)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ikg0L1loVXJTcmJZaXZPbmgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3ZubWl0bWVxcXp1enF1ZXZ4c2F6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1N2Y5YWM3Mi1iNTc2LTQzZjAtOTVkMS1hMzg2N2U0MGM1ZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYyODc0ODIzLCJpYXQiOjE3NjI4NzEyMjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl0sInJvbGUiOiJhZG1pbiJ9LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2Mjg3MTIyM31dLCJzZXNzaW9uX2lkIjoiYjYyN2FlODAtNGM1MC00YzM5LTkyMjQtMGZmMTNjNzcyMmM5IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.gbQcio6Vnlu_9zP77wVOHI1G1aLbHEhQ3bhqE__SZCw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"code\": \"sensor-001\",\n  \"name\": \"Indoor คลองเตยล็อค6 (ปรับชื่อใหม่)\",\n  \"is_movable\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/sensors-admin?id=dfc5e304-d53d-4b12-bfdf-5e31e75e069c",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"sensors-admin"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "dfc5e304-d53d-4b12-bfdf-5e31e75e069c"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "thresholds-admin",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ikg0L1loVXJTcmJZaXZPbmgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3ZubWl0bWVxcXp1enF1ZXZ4c2F6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1N2Y5YWM3Mi1iNTc2LTQzZjAtOTVkMS1hMzg2N2U0MGM1ZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYyODc0ODIzLCJpYXQiOjE3NjI4NzEyMjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl0sInJvbGUiOiJhZG1pbiJ9LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2Mjg3MTIyM31dLCJzZXNzaW9uX2lkIjoiYjYyN2FlODAtNGM1MC00YzM5LTkyMjQtMGZmMTNjNzcyMmM5IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.gbQcio6Vnlu_9zP77wVOHI1G1aLbHEhQ3bhqE__SZCw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"code\": \"sensor-001\",\n  \"name\": \"Indoor คลองเตยล็อค6 (ปรับชื่อใหม่)\",\n  \"is_movable\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/thresholds-admin",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"thresholds-admin"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "thresholds-admin",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"sensor-001\",\n  \"name\": \"Indoor คลองเตยล็อค6 (ปรับชื่อใหม่)\",\n  \"is_movable\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "/functions/v1/thresholds-admin",
+							"path": [
+								"functions",
+								"v1",
+								"thresholds-admin"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Tue, 11 Nov 2025 15:28:08 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "211"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Server",
+							"value": "cloudflare"
+						},
+						{
+							"key": "CF-Ray",
+							"value": "99ced1526da2d340-BKK"
+						},
+						{
+							"key": "CF-Cache-Status",
+							"value": "DYNAMIC"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=31536000; includeSubDomains; preload"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding"
+						},
+						{
+							"key": "access-control-allow-headers",
+							"value": "authorization, content-type"
+						},
+						{
+							"key": "access-control-allow-methods",
+							"value": "GET, POST, PATCH, DELETE, OPTIONS"
+						},
+						{
+							"key": "sb-project-ref",
+							"value": "vnmitmeqqzuzquevxsaz"
+						},
+						{
+							"key": "sb-request-id",
+							"value": "019a7388-0f94-73e7-8672-64a786daa8da"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "x-deno-execution-id",
+							"value": "d15e8754-cace-4ecd-9ca6-8b6931004a32"
+						},
+						{
+							"key": "x-sb-edge-region",
+							"value": "ap-southeast-1"
+						},
+						{
+							"key": "x-served-by",
+							"value": "supabase-edge-runtime"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "__cf_bm=m9cqvPL6JzXIEqlicl8sxelROd6icIRK5B9v4WjmiYU-1762874888-1.0.1.1-fH_KHzwplUFMy_d1k_18D6epmCFyuJpwB7XrcAThPu5DHbO44BMtrnMmNp02leqVWi3wnJNdg21M2hm0uI_Ib1YfHX44wKQgxgZGScE26BU; path=/; expires=Tue, 11-Nov-25 15:58:08 GMT; domain=.supabase.co; HttpOnly; Secure; SameSite=None"
+						},
+						{
+							"key": "alt-svc",
+							"value": "h3=\":443\"; ma=86400"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"items\": [\n        {\n            \"id\": \"951bb428-4029-445f-81d2-88d5e2ea73e6\",\n            \"metric\": \"pm25\",\n            \"level\": \"good\",\n            \"sort_order\": 0,\n            \"color_hex\": \"#52c41a\",\n            \"min_value\": 0,\n            \"max_value\": 12,\n            \"created_at\": \"2025-11-11T15:27:53.322637+00:00\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "thresholds-admin (create)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ikg0L1loVXJTcmJZaXZPbmgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3ZubWl0bWVxcXp1enF1ZXZ4c2F6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1N2Y5YWM3Mi1iNTc2LTQzZjAtOTVkMS1hMzg2N2U0MGM1ZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYyODc0ODIzLCJpYXQiOjE3NjI4NzEyMjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl0sInJvbGUiOiJhZG1pbiJ9LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2Mjg3MTIyM31dLCJzZXNzaW9uX2lkIjoiYjYyN2FlODAtNGM1MC00YzM5LTkyMjQtMGZmMTNjNzcyMmM5IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.gbQcio6Vnlu_9zP77wVOHI1G1aLbHEhQ3bhqE__SZCw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"metric\": \"pm25\",\n  \"level\": \"good\",\n  \"sort_order\": 0,\n  \"color_hex\": \"#52c41a\",\n  \"min_value\": 0,\n  \"max_value\": 12\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/thresholds-admin",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"thresholds-admin"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "thresholds-admin (create)",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"metric\": \"pm25\",\n  \"level\": \"good\",\n  \"sort_order\": 0,\n  \"color_hex\": \"#52c41a\",\n  \"min_value\": 0,\n  \"max_value\": 12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "/functions/v1/thresholds-admin",
+							"path": [
+								"functions",
+								"v1",
+								"thresholds-admin"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Tue, 11 Nov 2025 15:27:53 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "208"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Server",
+							"value": "cloudflare"
+						},
+						{
+							"key": "CF-Ray",
+							"value": "99ced0f3edcbd340-BKK"
+						},
+						{
+							"key": "CF-Cache-Status",
+							"value": "DYNAMIC"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=31536000; includeSubDomains; preload"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding"
+						},
+						{
+							"key": "access-control-allow-headers",
+							"value": "authorization, content-type"
+						},
+						{
+							"key": "access-control-allow-methods",
+							"value": "GET, POST, PATCH, DELETE, OPTIONS"
+						},
+						{
+							"key": "sb-project-ref",
+							"value": "vnmitmeqqzuzquevxsaz"
+						},
+						{
+							"key": "sb-request-id",
+							"value": "019a7387-d484-7ae5-9abd-6421ad0c9a06"
+						},
+						{
+							"key": "x-deno-execution-id",
+							"value": "00407ed1-d468-4d98-8484-7496445cb3e7"
+						},
+						{
+							"key": "x-sb-edge-region",
+							"value": "ap-southeast-1"
+						},
+						{
+							"key": "x-served-by",
+							"value": "supabase-edge-runtime"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "__cf_bm=_dgSHrd9BL32bpEmpy01bLBaJ0P8DygysRhGb_ZNR9U-1762874873-1.0.1.1-w7lnUcvS1neaDS75VVcUMtgjp_we1ImMpBbERK731v20nC9l1IKiHDXyxG2YEiJt_Mxg7jywbmZa5y1Ksy2egLrDFTl7mYWsG_1Xct4bXvg; path=/; expires=Tue, 11-Nov-25 15:57:53 GMT; domain=.supabase.co; HttpOnly; Secure; SameSite=None"
+						},
+						{
+							"key": "alt-svc",
+							"value": "h3=\":443\"; ma=86400"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"item\": {\n        \"id\": \"951bb428-4029-445f-81d2-88d5e2ea73e6\",\n        \"metric\": \"pm25\",\n        \"level\": \"good\",\n        \"sort_order\": 0,\n        \"color_hex\": \"#52c41a\",\n        \"min_value\": 0,\n        \"max_value\": 12,\n        \"created_at\": \"2025-11-11T15:27:53.322637+00:00\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "thresholds-admin (update)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ikg0L1loVXJTcmJZaXZPbmgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3ZubWl0bWVxcXp1enF1ZXZ4c2F6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1N2Y5YWM3Mi1iNTc2LTQzZjAtOTVkMS1hMzg2N2U0MGM1ZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYyODc0ODIzLCJpYXQiOjE3NjI4NzEyMjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl0sInJvbGUiOiJhZG1pbiJ9LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2Mjg3MTIyM31dLCJzZXNzaW9uX2lkIjoiYjYyN2FlODAtNGM1MC00YzM5LTkyMjQtMGZmMTNjNzcyMmM5IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.gbQcio6Vnlu_9zP77wVOHI1G1aLbHEhQ3bhqE__SZCw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"31a6cf92-6aec-4a0d-b21c-4ef19016cfc5\",\n  \"color_hex\": \"#4caf50\",\n  \"max_value\": 10\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/thresholds-admin",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"thresholds-admin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "thresholds-admin (delete)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6Ikg0L1loVXJTcmJZaXZPbmgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3ZubWl0bWVxcXp1enF1ZXZ4c2F6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1N2Y5YWM3Mi1iNTc2LTQzZjAtOTVkMS1hMzg2N2U0MGM1ZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYyODc0ODIzLCJpYXQiOjE3NjI4NzEyMjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl0sInJvbGUiOiJhZG1pbiJ9LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2Mjg3MTIyM31dLCJzZXNzaW9uX2lkIjoiYjYyN2FlODAtNGM1MC00YzM5LTkyMjQtMGZmMTNjNzcyMmM5IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.gbQcio6Vnlu_9zP77wVOHI1G1aLbHEhQ3bhqE__SZCw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"31a6cf92-6aec-4a0d-b21c-4ef19016cfc5\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/functions/v1/thresholds-admin",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"thresholds-admin"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
