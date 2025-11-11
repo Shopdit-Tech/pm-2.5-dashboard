@@ -49,6 +49,8 @@ export type CSVRow = {
   noxIndex: string;
   pm1: string;
   pm10: string;
+  latitude?: string; // Optional: only for mobile sensors
+  longitude?: string; // Optional: only for mobile sensors
 };
 
 export type ExportParams = {

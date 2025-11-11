@@ -37,7 +37,7 @@ export async function generateCSV(params: ExportParams): Promise<string> {
     console.log(`📄 Generated ${rows.length} CSV rows`);
 
     // Convert to CSV string
-    return rowsToCSV(rows);
+    return rowsToCSV(rows, sensor.type);
   } catch (error) {
     console.error('❌ Error generating CSV:', error);
     throw new Error('Failed to generate CSV export');
@@ -81,6 +81,8 @@ function buildCSVRows(
           tvoc_raw_logr: null,
           tvoc_index: null,
           nox_index: null,
+          lat: point.lat || null,
+          lng: point.lng || null,
         };
       }
 
@@ -121,7 +123,7 @@ function buildCSVRows(
     const localDateTime = formatLocalDateTime(date);
     const utcDateTime = date.toISOString();
 
-    return {
+    const baseRow = {
       locationId: sensor.id || '-',
       locationName: sensor.name || '-',
       locationGroup: '-', // Not available in API
@@ -147,6 +149,17 @@ function buildCSVRows(
       pm1: formatValue(data.pm1),
       pm10: formatValue(data.pm10),
     };
+
+    // Add lat/lng for mobile sensors
+    if (sensor.type === 'mobile') {
+      return {
+        ...baseRow,
+        latitude: formatValue(data.lat),
+        longitude: formatValue(data.lng),
+      };
+    }
+
+    return baseRow;
   });
 
   return rows;
@@ -182,7 +195,7 @@ function formatValue(value: number | null | undefined): string {
 /**
  * Convert rows to CSV string
  */
-function rowsToCSV(rows: CSVRow[]): string {
+function rowsToCSV(rows: CSVRow[], sensorType?: string): string {
   // CSV Header
   const headers = [
     'Location ID',
@@ -210,6 +223,11 @@ function rowsToCSV(rows: CSVRow[]): string {
     'PM1 (μg/m³)',
     'PM10 (μg/m³)',
   ];
+
+  // Add lat/lng headers for mobile sensors
+  if (sensorType === 'mobile') {
+    headers.push('Latitude', 'Longitude');
+  }
 
   // Build CSV content
   const csvLines: string[] = [];
@@ -244,6 +262,8 @@ function rowsToCSV(rows: CSVRow[]): string {
       row.noxIndex,
       row.pm1,
       row.pm10,
+      // Add lat/lng for mobile sensors
+      ...(sensorType === 'mobile' ? [row.latitude || '-', row.longitude || '-'] : []),
     ];
 
     csvLines.push(values.map((v) => escapeCSVField(v)).join(','));
