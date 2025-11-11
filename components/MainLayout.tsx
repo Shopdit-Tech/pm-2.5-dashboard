@@ -3,19 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Layout, Menu, Typography, Badge, Button, Avatar, Dropdown, Space } from 'antd';
 import {
-  EnvironmentOutlined,
-  LineChartOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  DashboardOutlined,
-  TableOutlined,
-  MobileOutlined,
-  BarChartOutlined,
   UserOutlined,
-  LogoutOutlined,
-  SettingOutlined,
   LoginOutlined,
-  DownloadOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginModal } from './LoginModal';
@@ -62,31 +53,26 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   const baseMenuItems = [
     {
       key: 'static-sensors',
-      icon: <EnvironmentOutlined />,
       label: 'เซ็นเซอร์ติดตั้ง',
       title: 'แผนที่เซ็นเซอร์ติดตั้ง',
     },
     {
       key: 'mobile-routes',
-      icon: <LineChartOutlined />,
       label: 'เส้นทางเคลื่อนที่',
       title: 'เส้นทางอุปกรณ์เคลื่อนที่',
     },
     {
       key: 'sensor-data-table',
-      icon: <TableOutlined />,
       label: 'ตารางข้อมูล',
       title: 'ตารางข้อมูลเซ็นเซอร์',
     },
     {
       key: 'mobile-data-table',
-      icon: <MobileOutlined />,
       label: 'ข้อมูลเคลื่อนที่',
       title: 'ตารางข้อมูลอุปกรณ์เคลื่อนที่',
     },
     {
       key: 'analytics',
-      icon: <BarChartOutlined />,
       label: 'การวิเคราะห์',
       title: 'กราฟวิเคราะห์',
     },
@@ -98,13 +84,11 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         ...baseMenuItems,
         {
           key: 'data-export',
-          icon: <DownloadOutlined />,
           label: 'ส่งออกข้อมูล',
           title: 'ส่งออกข้อมูล',
         },
         {
           key: 'admin-settings',
-          icon: <SettingOutlined />,
           label: 'การตั้งค่าผู้ดูแล',
           title: 'การตั้งค่าระบบ',
         },
@@ -119,7 +103,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         collapsible
         collapsed={collapsed}
         width={280}
-        collapsedWidth={isMobile ? 0 : 80}
+        collapsedWidth={0}
         style={{
           position: 'fixed',
           left: 0,
@@ -145,25 +129,11 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           }}
         >
           {!collapsed ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(102,126,234,0.3)'
-              }}>
-                <DashboardOutlined style={{ fontSize: 24, color: 'white' }} />
-              </div>
-              <div>
-                <Title level={4} className="mb-0" style={{ fontSize: 18, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.3px' }}>
-                  Air Quality
-                </Title>
-                <Text style={{ fontSize: 12, color: '#9ca3af', fontWeight: 500 }}>Monitoring System</Text>
-              </div>
+            <div>
+              <Title level={4} className="mb-0" style={{ fontSize: 18, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.3px' }}>
+                Air Quality
+              </Title>
+              <Text style={{ fontSize: 12, color: '#9ca3af', fontWeight: 500 }}>Monitoring System</Text>
             </div>
           ) : (
             <div style={{
@@ -174,9 +144,12 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(102,126,234,0.3)'
+              boxShadow: '0 4px 12px rgba(102,126,234,0.3)',
+              fontSize: '18px',
+              fontWeight: 700,
+              color: 'white'
             }}>
-              <DashboardOutlined style={{ fontSize: 22, color: 'white' }} />
+              AQ
             </div>
           )}
         </div>
@@ -231,7 +204,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       `}</style>
 
       {/* Main Content */}
-      <Layout style={{ marginLeft: collapsed ? (isMobile ? 0 : 80) : 280, transition: 'margin-left 0.2s' }}>
+      <Layout style={{ marginLeft: collapsed ? 0 : 280, transition: 'margin-left 0.2s' }}>
         {/* Header with toggle button */}
         <div
           style={{
@@ -314,7 +287,6 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                           {
                             key: 'admin',
                             label: 'การตั้งค่าผู้ดูแล',
-                            icon: <SettingOutlined />,
                             onClick: () => {
                               setActiveView('admin-settings');
                               // Auto-close sidebar on mobile
@@ -329,7 +301,6 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                     {
                       key: 'logout',
                       label: 'ออกจากระบบ',
-                      icon: <LogoutOutlined />,
                       onClick: () => logout(),
                     },
                   ],

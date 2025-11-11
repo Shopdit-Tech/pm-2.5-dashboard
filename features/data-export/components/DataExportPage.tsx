@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, Typography, Spin, Alert, Space } from 'antd';
-import { DownloadOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Card, Typography, Spin, Alert } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
 import type { SensorData } from '@/types/sensor';
 import { ExportForm } from './ExportForm';
 

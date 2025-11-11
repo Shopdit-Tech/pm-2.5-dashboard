@@ -138,18 +138,22 @@ export const MobileSensorDataTable = () => {
       dataIndex: 'name',
       key: 'name',
       fixed: isMobile ? false : 'left',
-      width: isMobile ? 180 : 220,
-      render: (name: string, record: SensorData) => (
-        <div>
-          <Text strong style={{ fontSize: isMobile ? 12 : 13, wordBreak: 'break-word' }}>
-            {name}
-          </Text>
-          {record.status === 'offline' && (
-            <Tag color="red" style={{ marginLeft: 8, fontSize: 11 }}>
-              offline
-            </Tag>
-          )}
-        </div>
+      width: isMobile ? 150 : 180,
+      render: (name: string) => (
+        <Text strong style={{ fontSize: isMobile ? 12 : 13, wordBreak: 'break-word' }}>
+          {name}
+        </Text>
+      ),
+    },
+    {
+      title: 'สถานะ',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      render: (status: string) => (
+        <Tag color={status === 'online' ? 'green' : 'red'} style={{ fontSize: 11 }}>
+          {status === 'online' ? 'online' : 'offline'}
+        </Tag>
       ),
     },
     ...(visibleColumns.includes('pm1')

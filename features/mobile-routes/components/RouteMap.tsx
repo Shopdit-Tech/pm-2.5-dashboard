@@ -49,19 +49,21 @@ const StartMarker = ({ onClick }: StartMarkerProps) => (
   >
     <div
       style={{
-        width: '32px',
+        minWidth: '50px',
         height: '32px',
         backgroundColor: '#52c41a',
-        borderRadius: '50%',
+        borderRadius: '16px',
         border: '3px solid white',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         color: 'white',
-        fontSize: '16px',
+        fontSize: '11px',
         fontWeight: 'bold',
+        padding: '0 8px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
         transition: 'transform 0.2s',
+        whiteSpace: 'nowrap',
       }}
       onMouseEnter={(e) => {
         if (onClick) e.currentTarget.style.transform = 'scale(1.1)';
@@ -70,7 +72,7 @@ const StartMarker = ({ onClick }: StartMarkerProps) => (
         if (onClick) e.currentTarget.style.transform = 'scale(1)';
       }}
     >
-      S
+      เริ่มต้น
     </div>
   </div>
 );
@@ -92,19 +94,21 @@ const EndMarker = ({ onClick }: EndMarkerProps) => (
   >
     <div
       style={{
-        width: '32px',
+        minWidth: '50px',
         height: '32px',
         backgroundColor: '#ff4d4f',
-        borderRadius: '50%',
+        borderRadius: '16px',
         border: '3px solid white',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         color: 'white',
-        fontSize: '16px',
+        fontSize: '11px',
         fontWeight: 'bold',
+        padding: '0 8px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
         transition: 'transform 0.2s',
+        whiteSpace: 'nowrap',
       }}
       onMouseEnter={(e) => {
         if (onClick) e.currentTarget.style.transform = 'scale(1.1)';
@@ -113,7 +117,7 @@ const EndMarker = ({ onClick }: EndMarkerProps) => (
         if (onClick) e.currentTarget.style.transform = 'scale(1)';
       }}
     >
-      E
+      สิ้นสุด
     </div>
   </div>
 );

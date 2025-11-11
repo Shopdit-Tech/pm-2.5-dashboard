@@ -139,7 +139,6 @@ export const SensorConfiguration = () => {
               onChange={(value) => setEditForm({ ...editForm, type: value })}
               style={{ width: '100%' }}
             >
-              <Option value="indoor">ภายใน</Option>
               <Option value="outdoor">ภายนอก</Option>
               <Option value="mobile">เคลื่อนที่</Option>
             </Select>

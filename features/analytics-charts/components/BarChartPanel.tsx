@@ -178,6 +178,11 @@ export const BarChartPanel = ({
           />
           
           <YAxis
+            domain={[0, (dataMax: number) => {
+              // For TVOC and low-value parameters, use appropriate scaling
+              if (dataMax < 50) return Math.ceil(dataMax * 1.2);
+              return Math.ceil(dataMax * 1.1);
+            }]}
             tick={{ fontSize: 11 }}
             stroke="#8c8c8c"
             label={{
@@ -186,6 +191,8 @@ export const BarChartPanel = ({
               position: 'insideLeft',
               style: { fontSize: 11, fill: '#595959' },
             }}
+            scale="linear"
+            allowDataOverflow={false}
           />
           
           <Tooltip content={<CustomTooltip />} />

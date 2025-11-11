@@ -7,6 +7,7 @@ import { MOCK_ROUTES } from '../services/mockRouteData';
 import { RouteMap } from './RouteMap';
 import { RouteTimeline, useRoutePlayback } from './RouteTimeline';
 import { formatDuration } from '../utils/routeUtils';
+import { MobileSensorDataTable } from '@/features/mobile-sensor-table/components/MobileSensorDataTable';
 
 const { Text } = Typography;
 

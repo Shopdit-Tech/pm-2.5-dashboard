@@ -6,8 +6,6 @@ import {
   SearchOutlined,
   ReloadOutlined,
   SettingOutlined,
-  CheckOutlined,
-  CloseOutlined,
   MoreOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -140,32 +138,22 @@ export const SensorDataTable = () => {
       key: 'name',
       fixed: isMobile ? false : 'left',
       width: isMobile ? 180 : 250,
-      render: (name: string, record: SensorData) => (
-        <div>
-          <Text strong style={{ fontSize: isMobile ? 12 : 13, wordBreak: 'break-word' }}>
-            {name}
-          </Text>
-          {record.status === 'offline' && (
-            <Tag color="red" style={{ marginLeft: 8, fontSize: 11 }}>
-              offline
-            </Tag>
-          )}
-        </div>
+      render: (name: string) => (
+        <Text strong style={{ fontSize: isMobile ? 12 : 13, wordBreak: 'break-word' }}>
+          {name}
+        </Text>
       ),
     },
     {
-      title: 'ประเภท',
-      dataIndex: 'type',
-      key: 'type',
-      width: 90,
-      align: 'center',
+      title: 'สถานะ',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
       responsive: ['md'] as Breakpoint[],
-      render: (type: string) => (
-        type === 'outdoor' ? (
-          <CheckOutlined style={{ color: '#52c41a', fontSize: 16 }} />
-        ) : (
-          <CloseOutlined style={{ color: '#d9d9d9', fontSize: 16 }} />
-        )
+      render: (status: string) => (
+        <Tag color={status === 'online' ? 'green' : 'red'} style={{ fontSize: 11 }}>
+          {status === 'online' ? 'online' : 'offline'}
+        </Tag>
       ),
     },
     ...(visibleColumns.includes('pm25')

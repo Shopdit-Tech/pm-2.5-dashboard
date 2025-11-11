@@ -1,19 +1,37 @@
 import { useState } from 'react';
-import { Card, Alert, Button, Space, Tag, Statistic, Row, Col, Select, DatePicker, Empty } from 'antd';
-import { ReloadOutlined, CarOutlined, EnvironmentOutlined, CalendarOutlined } from '@ant-design/icons';
+import {
+  Card,
+  Alert,
+  Button,
+  Space,
+  Tag,
+  Statistic,
+  Row,
+  Col,
+  Select,
+  DatePicker,
+  Empty,
+} from 'antd';
+import {
+  ReloadOutlined,
+  CarOutlined,
+  EnvironmentOutlined,
+  CalendarOutlined,
+} from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import { GoogleMapComponent } from '@/features/map-dashboard/components/GoogleMapComponent';
 import { RouteMap } from './RouteMap';
 import { useMobileSensors } from '../hooks/useMobileSensors';
 import { MobileRoute } from '@/types/route';
 import { mobileRouteService } from '../services/mobileRouteService';
+import { MobileSensorDataTable } from '@/features/mobile-sensor-table/components';
 
 const { Option } = Select;
 
 export const MobileSensorsDashboard = () => {
   const { sensors, error, refetch, loading } = useMobileSensors(30000); // Auto-refresh every 30 seconds
   const [refreshing, setRefreshing] = useState(false);
-  
+
   // Route viewing state
   const [selectedSensorId, setSelectedSensorId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
@@ -47,7 +65,7 @@ export const MobileSensorsDashboard = () => {
       return;
     }
 
-    const sensor = sensors.find(s => s.id === sensorId);
+    const sensor = sensors.find((s) => s.id === sensorId);
     if (!sensor) {
       console.error('❌ Sensor not found:', sensorId);
       setSelectedRoute(null);
@@ -59,13 +77,18 @@ export const MobileSensorsDashboard = () => {
     setSelectedRoute(null);
     setLoadingRoute(true);
     setRouteError(null);
-    
+
     try {
-      console.log('📍 Loading route for sensor:', sensor.name, 'on date:', date.format('YYYY-MM-DD'));
-      
+      console.log(
+        '📍 Loading route for sensor:',
+        sensor.name,
+        'on date:',
+        date.format('YYYY-MM-DD')
+      );
+
       // Call real API to fetch route
       const route = await mobileRouteService.getSensorRoute(sensor, date.format('YYYY-MM-DD'));
-      
+
       if (route) {
         setSelectedRoute(route);
         setRouteError(null);
@@ -96,23 +119,35 @@ export const MobileSensorsDashboard = () => {
   const onlineSensors = sensors.filter((s) => s.status === 'online');
   const offlineSensors = sensors.filter((s) => s.status === 'offline');
 
-  const avgPM25 =
-    onlineSensors.length > 0
-      ? onlineSensors.reduce((sum, s) => sum + s.pm25, 0) / onlineSensors.length
-      : 0;
-
-  const maxPM25 =
-    onlineSensors.length > 0
-      ? Math.max(...onlineSensors.map((s) => s.pm25))
-      : 0;
-
   return (
-    <div style={{ padding: '16px', background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)', minHeight: '100%' }}>
+    <div
+      style={{
+        padding: '16px',
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)',
+        minHeight: '100%',
+      }}
+    >
       {/* Header */}
       <div className="mb-6" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: '12px',
+            flexWrap: 'wrap',
+          }}
+        >
           <div style={{ flex: 1, minWidth: '200px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
+            <h2
+              style={{
+                fontSize: '20px',
+                fontWeight: 700,
+                margin: 0,
+                color: '#1a1a1a',
+                letterSpacing: '-0.5px',
+              }}
+            >
               <CarOutlined style={{ marginRight: 8, color: '#f5576c' }} />
               ติดตามเซ็นเซอร์เคลื่อนที่
             </h2>
@@ -150,12 +185,26 @@ export const MobileSensorsDashboard = () => {
               borderRadius: 12,
               border: '1px solid rgba(255,255,255,0.6)',
               boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              background: 'linear-gradient(135deg, rgba(240,147,251,0.1) 0%, rgba(245,87,108,0.1) 100%)',
+              background:
+                'linear-gradient(135deg, rgba(240,147,251,0.1) 0%, rgba(245,87,108,0.1) 100%)',
             }}
             bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>อุปกรณ์เคลื่อนที่ทั้งหมด</div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#f5576c', marginBottom: 2 }}>{sensors.length}</div>
+            <div
+              style={{
+                fontSize: 11,
+                color: '#666',
+                fontWeight: 600,
+                marginBottom: 6,
+                textTransform: 'uppercase',
+                letterSpacing: '0.3px',
+              }}
+            >
+              อุปกรณ์เคลื่อนที่ทั้งหมด
+            </div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#f5576c', marginBottom: 2 }}>
+              {sensors.length}
+            </div>
             <div style={{ fontSize: 11, color: '#999' }}>🚗 อุปกรณ์ติดตาม</div>
           </Card>
         </Col>
@@ -165,47 +214,27 @@ export const MobileSensorsDashboard = () => {
               borderRadius: 12,
               border: '1px solid rgba(255,255,255,0.6)',
               boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              background: 'linear-gradient(135deg, rgba(82,196,26,0.1) 0%, rgba(115,209,61,0.1) 100%)',
+              background:
+                'linear-gradient(135deg, rgba(82,196,26,0.1) 0%, rgba(115,209,61,0.1) 100%)',
             }}
             bodyStyle={{ padding: '16px' }}
           >
-            <div style={{ fontSize: 11, color: '#666', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.3px' }}>ใช้งานอยู่</div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#52c41a', marginBottom: 2 }}>{onlineSensors.length}</div>
+            <div
+              style={{
+                fontSize: 11,
+                color: '#666',
+                fontWeight: 600,
+                marginBottom: 6,
+                textTransform: 'uppercase',
+                letterSpacing: '0.3px',
+              }}
+            >
+              ใช้งานอยู่
+            </div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#52c41a', marginBottom: 2 }}>
+              {onlineSensors.length}
+            </div>
             <div style={{ fontSize: 11, color: '#999' }}>จาก {sensors.length} ออนไลน์</div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={12} md={6}>
-          <Card
-            style={{
-              borderRadius: 12,
-              border: '1px solid rgba(255,255,255,0.6)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              background: 'linear-gradient(135deg, rgba(24,144,255,0.08) 0%, rgba(24,144,255,0.05) 100%)',
-            }}
-            bodyStyle={{ padding: '16px' }}
-          >
-            <div style={{ marginBottom: 6 }}>
-              <Tag color="blue" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>📊 เฉลี่ย</Tag>
-            </div>
-            <div style={{ fontSize: 26, fontWeight: 700, color: '#1890ff', marginBottom: 2 }}>{avgPM25.toFixed(1)}</div>
-            <div style={{ fontSize: 11, color: '#999' }}>µg/m³ PM2.5</div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={12} md={6}>
-          <Card
-            style={{
-              borderRadius: 12,
-              border: '1px solid rgba(255,255,255,0.6)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              background: 'linear-gradient(135deg, rgba(255,77,79,0.08) 0%, rgba(255,77,79,0.05) 100%)',
-            }}
-            bodyStyle={{ padding: '16px' }}
-          >
-            <div style={{ marginBottom: 6 }}>
-              <Tag color="red" style={{ borderRadius: 6, padding: '3px 10px', fontWeight: 600, border: 'none', fontSize: '11px' }}>🔺 สูงสุด</Tag>
-            </div>
-            <div style={{ fontSize: 26, fontWeight: 700, color: '#ff4d4f', marginBottom: 2 }}>{maxPM25.toFixed(1)}</div>
-            <div style={{ fontSize: 11, color: '#999' }}>µg/m³ PM2.5</div>
           </Card>
         </Col>
       </Row>
@@ -268,7 +297,9 @@ export const MobileSensorsDashboard = () => {
         </div>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={8}>
-            <div style={{ marginBottom: 4, fontSize: 13, color: '#595959' }}>เลือกเซ็นเซอร์เคลื่อนที่</div>
+            <div style={{ marginBottom: 4, fontSize: 13, color: '#595959' }}>
+              เลือกเซ็นเซอร์เคลื่อนที่
+            </div>
             <Select
               placeholder="เลือกเซ็นเซอร์"
               value={selectedSensorId}
@@ -278,7 +309,7 @@ export const MobileSensorsDashboard = () => {
               allowClear
               onClear={handleClearRoute}
             >
-              {sensors.map(sensor => (
+              {sensors.map((sensor) => (
                 <Option key={sensor.id} value={sensor.id}>
                   <CarOutlined style={{ marginRight: 8 }} />
                   {sensor.name}
@@ -320,17 +351,39 @@ export const MobileSensorsDashboard = () => {
         }}
         bodyStyle={{ padding: 0 }}
       >
-        <div style={{ 
-          height: typeof window !== 'undefined' && window.innerWidth < 768 ? '400px' : 'calc(100vh - 500px)', 
-          minHeight: typeof window !== 'undefined' && window.innerWidth < 768 ? '400px' : '500px' 
-        }}>
+        <div
+          style={{
+            height:
+              typeof window !== 'undefined' && window.innerWidth < 768
+                ? '400px'
+                : 'calc(100vh - 500px)',
+            minHeight: typeof window !== 'undefined' && window.innerWidth < 768 ? '400px' : '500px',
+          }}
+        >
           {loadingRoute ? (
-            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+            <div
+              style={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 16,
+              }}
+            >
               <ReloadOutlined spin style={{ fontSize: 48, color: '#1890ff' }} />
               <div style={{ fontSize: 16, color: '#595959' }}>กำลังโหลดข้อมูลเส้นทาง...</div>
             </div>
           ) : routeError ? (
-            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+            <div
+              style={{
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 24,
+              }}
+            >
               <Alert
                 type="error"
                 message="ไม่สามารถโหลดเส้นทาง"
@@ -338,10 +391,19 @@ export const MobileSensorsDashboard = () => {
                   <div>
                     <p style={{ marginBottom: 12 }}>{routeError}</p>
                     {routeError.includes('GPS coordinates') && (
-                      <div style={{ marginTop: 12, padding: 12, background: '#fff7e6', border: '1px solid #ffd591', borderRadius: 4 }}>
+                      <div
+                        style={{
+                          marginTop: 12,
+                          padding: 12,
+                          background: '#fff7e6',
+                          border: '1px solid #ffd591',
+                          borderRadius: 4,
+                        }}
+                      >
                         <strong>💡 Solution:</strong>
                         <p style={{ marginTop: 8, marginBottom: 0 }}>
-                          Update your Supabase function to include <code>latitude</code> and <code>longitude</code> fields in each data point.
+                          Update your Supabase function to include <code>latitude</code> and{' '}
+                          <code>longitude</code> fields in each data point.
                         </p>
                       </div>
                     )}
@@ -354,7 +416,14 @@ export const MobileSensorsDashboard = () => {
           ) : selectedRoute ? (
             <RouteMap key={selectedRoute.id} route={selectedRoute} />
           ) : selectedSensorId && selectedDate ? (
-            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div
+              style={{
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <Empty
                 description="ไม่มีข้อมูลเส้นทางสำหรับเซ็นเซอร์และวันที่ที่เลือก"
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -380,39 +449,88 @@ export const MobileSensorsDashboard = () => {
             <Col xs={12} sm={12} md={6}>
               <Statistic
                 title="เวลาเริ่มต้น"
-                value={new Date(selectedRoute.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#52c41a' }}
+                value={new Date(selectedRoute.startTime).toLocaleTimeString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+                valueStyle={{
+                  fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20,
+                  color: '#52c41a',
+                }}
               />
             </Col>
             <Col xs={12} sm={12} md={6}>
               <Statistic
                 title="เวลาสิ้นสุด"
-                value={new Date(selectedRoute.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#ff4d4f' }}
+                value={new Date(selectedRoute.endTime).toLocaleTimeString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+                valueStyle={{
+                  fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20,
+                  color: '#ff4d4f',
+                }}
               />
             </Col>
-            <Col xs={8} sm={8} md={4}>
+            <Col xs={12} sm={12} md={6}>
+              <Statistic
+                title="ระยะเวลา"
+                value={(() => {
+                  const duration =
+                    new Date(selectedRoute.endTime).getTime() -
+                    new Date(selectedRoute.startTime).getTime();
+                  const hours = Math.floor(duration / (1000 * 60 * 60));
+                  const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
+                  return `${hours}h ${minutes}m`;
+                })()}
+                valueStyle={{
+                  fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20,
+                  color: '#722ed1',
+                }}
+              />
+            </Col>
+            <Col xs={8} sm={8} md={6}>
               <Statistic
                 title="ระยะทาง"
                 value={selectedRoute.totalDistance}
                 suffix="km"
-                valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#1890ff' }}
+                valueStyle={{
+                  fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20,
+                  color: '#1890ff',
+                }}
               />
             </Col>
-            <Col xs={8} sm={8} md={4}>
+            <Col xs={8} sm={8} md={6}>
               <Statistic
                 title="PM2.5 เฉลี่ย"
                 value={selectedRoute.averagePm25}
                 suffix="µg/m³"
-                valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#faad14' }}
+                valueStyle={{
+                  fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20,
+                  color: '#faad14',
+                }}
               />
             </Col>
-            <Col xs={8} sm={8} md={4}>
+            <Col xs={8} sm={8} md={6}>
+              <Statistic
+                title="PM2.5 ต่ำสุด"
+                value={selectedRoute.minPm25}
+                suffix="µg/m³"
+                valueStyle={{
+                  fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20,
+                  color: '#52c41a',
+                }}
+              />
+            </Col>
+            <Col xs={8} sm={8} md={6}>
               <Statistic
                 title="PM2.5 สูงสุด"
                 value={selectedRoute.maxPm25}
                 suffix="µg/m³"
-                valueStyle={{ fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20, color: '#ff4d4f' }}
+                valueStyle={{
+                  fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 16 : 20,
+                  color: '#ff4d4f',
+                }}
               />
             </Col>
           </Row>
@@ -424,23 +542,32 @@ export const MobileSensorsDashboard = () => {
       )}
 
       {/* Legend */}
-      <div style={{ 
-        marginTop: 16, 
-        textAlign: 'center', 
-        padding: '12px 16px',
-        background: 'rgba(255,255,255,0.9)',
-        borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-      }}>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: typeof window !== 'undefined' && window.innerWidth < 768 ? '1fr 1fr' : 'repeat(5, 1fr)',
-          gap: '8px',
-          fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? '12px' : '13px',
-          color: '#595959',
-          fontWeight: 600
-        }}>
-          <span><CarOutlined /> Mobile Sensors</span>
+      <div
+        style={{
+          marginTop: 16,
+          textAlign: 'center',
+          padding: '12px 16px',
+          background: 'rgba(255,255,255,0.9)',
+          borderRadius: 12,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+        }}
+      >
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns:
+              typeof window !== 'undefined' && window.innerWidth < 768
+                ? '1fr 1fr'
+                : 'repeat(5, 1fr)',
+            gap: '8px',
+            fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? '12px' : '13px',
+            color: '#595959',
+            fontWeight: 600,
+          }}
+        >
+          <span>
+            <CarOutlined /> Mobile Sensors
+          </span>
           <span>🟢 Good (0-12)</span>
           <span>🟡 Moderate (12-35)</span>
           <span>🟠 Unhealthy (35-55)</span>
@@ -464,11 +591,15 @@ export const MobileSensorsDashboard = () => {
               ติดตามเซ็นเซอร์เคลื่อนที่แบบเรียลไทม์
             </div>
             <div style={{ fontSize: 13, color: '#595959' }}>
-              แสดงตำแหน่งปัจจุบันของเซ็นเซอร์คุณภาพอากาศเคลื่อนที่ เลือกเซ็นเซอร์และวันที่ด้านบนเพื่อดูเส้นทางเชิงประวัติศาสตร์
+              แสดงตำแหน่งปัจจุบันของเซ็นเซอร์คุณภาพอากาศเคลื่อนที่
+              เลือกเซ็นเซอร์และวันที่ด้านบนเพื่อดูเส้นทางเชิงประวัติศาสตร์
             </div>
           </Space>
         </Card>
       )}
+      <div style={{ marginTop: 24 }}>
+        <MobileSensorDataTable />
+      </div>
     </div>
   );
 };

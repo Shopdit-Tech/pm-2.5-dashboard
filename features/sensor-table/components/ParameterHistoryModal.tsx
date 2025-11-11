@@ -138,12 +138,6 @@ export const ParameterHistoryModal = ({
     return null;
   };
 
-  // Get Y-axis domain
-  const yAxisDomain = useMemo(() => {
-    const maxZone = zones.length > 0 ? zones[zones.length - 1].max : stats.max * 1.2;
-    return [0, Math.max(maxZone, stats.max * 1.1)];
-  }, [zones, stats.max]);
-
   return (
     <Modal
       open={visible}
@@ -272,7 +266,11 @@ export const ParameterHistoryModal = ({
                 />
                 
                 <YAxis
-                  domain={yAxisDomain}
+                  domain={[0, (dataMax: number) => {
+                    // For TVOC and low-value parameters, use appropriate scaling
+                    if (dataMax < 50) return Math.ceil(dataMax * 1.2);
+                    return Math.ceil(dataMax * 1.1);
+                  }]}
                   tick={{ fontSize: 11 }}
                   stroke="#8c8c8c"
                   label={{
@@ -281,6 +279,8 @@ export const ParameterHistoryModal = ({
                     position: 'insideLeft',
                     style: { fontSize: 12, fill: '#595959' },
                   }}
+                  scale="linear"
+                  allowDataOverflow={false}
                 />
                 
                 <Tooltip content={<CustomTooltip />} />

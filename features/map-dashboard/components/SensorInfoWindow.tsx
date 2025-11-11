@@ -1,4 +1,4 @@
-import { SensorData, ParameterType } from '@/types/sensor';
+import { SensorData } from '@/types/sensor';
 import { CloseOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { getParameterColor } from '@/utils/airQualityUtils';
 
@@ -7,18 +7,14 @@ type SensorInfoWindowProps = {
   onClose?: () => void;
 };
 
-// Circular Progress Component with white background
-const CircularProgress = ({ value, max, size = 145, strokeWidth = 16, color = '#00b050' }: {
+// Circular Progress Component with full colored circle
+const CircularProgress = ({ value, size = 145, strokeWidth = 16, color = '#00b050' }: {
   value: number;
-  max: number;
   size?: number;
   strokeWidth?: number;
   color?: string;
 }) => {
   const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const percentage = Math.min((value / max) * 100, 100);
-  const offset = circumference - (percentage / 100) * circumference;
   const isMobile = size < 120;
 
   return (
@@ -32,17 +28,8 @@ const CircularProgress = ({ value, max, size = 145, strokeWidth = 16, color = '#
         boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
       }}
     >
-      <svg width={size} height={size} className="transform -rotate-90">
-        {/* Background circle */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="#f0f0f0"
-          strokeWidth={strokeWidth}
-          fill="none"
-        />
-        {/* Progress circle */}
+      <svg width={size} height={size}>
+        {/* Full colored circle */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -50,10 +37,6 @@ const CircularProgress = ({ value, max, size = 145, strokeWidth = 16, color = '#
           stroke={color}
           strokeWidth={strokeWidth}
           fill="none"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          style={{ transition: 'stroke-dashoffset 0.5s ease' }}
         />
       </svg>
       <div
@@ -151,26 +134,13 @@ const AirQualityLegend = () => {
 };
 
 // Simplified Metric Card with Progress Bar (matching image design)
-const MetricCardWithBar = ({ label, value, unit, parameter }: {
+const MetricCardWithBar = ({ label, value, unit }: {
   label: string;
   value: number;
   unit: string;
-  parameter: ParameterType;
 }) => {
-  const color = getParameterColor(parameter, value);
+  const color = getParameterColor('pm25', value);
   
-  // Calculate progress percentage (0-100)
-  const maxValues: Record<ParameterType, number> = {
-    pm25: 250,
-    pm10: 400,
-    pm1: 150,
-    co2: 2000,
-    temperature: 50,
-    humidity: 100,
-    tvoc: 1000,
-  };
-  const progress = Math.min((value / (maxValues[parameter] || 100)) * 100, 100);
-
   return (
     <div style={{ textAlign: 'center' }}>
       {/* Label */}
@@ -200,23 +170,15 @@ const MetricCardWithBar = ({ label, value, unit, parameter }: {
         }}>{unit}</span>
       </div>
       
-      {/* Progress bar */}
+      {/* Full progress bar with color */}
       <div style={{
         width: '80%',
         height: '6px',
-        background: '#e5e7eb',
+        backgroundColor: color,
         borderRadius: '3px',
-        overflow: 'hidden',
-        margin: '0 auto'
-      }}>
-        <div style={{
-          height: '100%',
-          width: `${progress}%`,
-          backgroundColor: color,
-          borderRadius: '3px',
-          transition: 'width 0.5s ease'
-        }} />
-      </div>
+        margin: '0 auto',
+        transition: 'background-color 0.3s ease'
+      }} />
     </div>
   );
 };
@@ -255,6 +217,35 @@ export const SensorInfoWindow = ({ sensor, onClose }: SensorInfoWindowProps) => 
         <CloseOutlined style={{ fontSize: 20, color: '#9ca3af' }} />
       </button>
 
+      {/* Sensor Name with Icon */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        marginBottom: '8px'
+      }}>
+        <EnvironmentOutlined style={{ color: '#10b981', fontSize: 18 }} />
+        <div style={{ fontSize: '18px', fontWeight: 700, color: '#1f2937' }}>
+          {sensor.name}
+        </div>
+      </div>
+      
+      {/* Last Update */}
+      <div style={{
+        fontSize: '11px',
+        color: '#9ca3af',
+        marginBottom: '16px',
+        paddingLeft: '26px'
+      }}>
+        อัพเดทล่าสุด: {new Date(sensor.timestamp).toLocaleString('th-TH', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })}
+      </div>
+
       {/* Main Content: Circle + Temperature & Humidity */}
       <div style={{ 
         display: 'flex', 
@@ -266,7 +257,6 @@ export const SensorInfoWindow = ({ sensor, onClose }: SensorInfoWindowProps) => 
         <div style={{ flexShrink: 0 }}>
           <CircularProgress
             value={sensor.pm25}
-            max={250}
             size={typeof window !== 'undefined' && window.innerWidth < 768 ? 100 : 140}
             strokeWidth={typeof window !== 'undefined' && window.innerWidth < 768 ? 12 : 16}
             color={pm25Color}
@@ -360,25 +350,21 @@ export const SensorInfoWindow = ({ sensor, onClose }: SensorInfoWindowProps) => 
           label="PM 10"
           value={sensor.pm10}
           unit="μg/m³"
-          parameter="pm10"
         />
         <MetricCardWithBar
           label="CO2"
           value={sensor.co2}
           unit="ppm"
-          parameter="co2"
         />
         <MetricCardWithBar
           label="PM1"
           value={sensor.pm1 || 0}
           unit="μg/m³"
-          parameter="pm1"
         />
         <MetricCardWithBar
           label="TVOC"
           value={sensor.tvoc}
           unit="ppb"
-          parameter="tvoc"
         />
       </div>
     </div>
