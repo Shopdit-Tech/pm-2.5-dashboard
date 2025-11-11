@@ -126,7 +126,7 @@ export const ExportForm = ({ sensors }: ExportFormProps) => {
 
       {/* Bucket Size Selection */}
       <Form.Item
-        label="Select Bucket Size"
+        label="เลือกเวลา"
         name="bucketSize"
         rules={[{ required: true, message: 'Please select a bucket size' }]}
         extra="Aggregation interval for the exported data"

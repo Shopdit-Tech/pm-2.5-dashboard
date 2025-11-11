@@ -193,7 +193,7 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
                 {/* PM2.5 Calibration */}
                 <div>
                   <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>
-                    PM₂.₅ Calibration Formulas Applied
+                    PM2.5Calibration Formulas Applied
                   </Text>
                   <ul style={{ marginLeft: 20, marginBottom: 0 }}>
                     {sensor.calibrationInfo.pm25Methods.map((method, index) => (

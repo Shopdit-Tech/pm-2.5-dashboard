@@ -172,7 +172,7 @@ export const MobileSensorDataTable = () => {
     ...(visibleColumns.includes('pm25')
       ? [
           {
-            title: 'PM₂.₅ (μg/m³)',
+            title: 'PM2.5(μg/m³)',
             dataIndex: 'pm25',
             key: 'pm25',
             width: 140,

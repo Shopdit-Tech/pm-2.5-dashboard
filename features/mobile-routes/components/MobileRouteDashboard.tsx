@@ -82,7 +82,7 @@ export const MobileRouteDashboard = () => {
       {/* Statistics Cards */}
       {selectedRoute && (
         <Row gutter={[16, 16]} className="mb-6">
-          <Col xs={12} sm={12} md={6}>
+          <Col xs={12} sm={12} md={12}>
             <Card 
               style={{ 
                 borderRadius: '16px',
@@ -102,7 +102,7 @@ export const MobileRouteDashboard = () => {
               </div>
             </Card>
           </Col>
-          <Col xs={12} sm={12} md={6}>
+          <Col xs={12} sm={12} md={12}>
             <Card 
               style={{ 
                 borderRadius: '16px',
@@ -123,7 +123,7 @@ export const MobileRouteDashboard = () => {
               </div>
             </Card>
           </Col>
-          <Col xs={12} sm={12} md={6}>
+          <Col xs={12} sm={12} md={12}>
             <Card 
               style={{ 
                 borderRadius: '16px',
@@ -147,7 +147,7 @@ export const MobileRouteDashboard = () => {
               </div>
             </Card>
           </Col>
-          <Col xs={12} sm={12} md={6}>
+          <Col xs={12} sm={12} md={12}>
             <Card 
               style={{ 
                 borderRadius: '16px',

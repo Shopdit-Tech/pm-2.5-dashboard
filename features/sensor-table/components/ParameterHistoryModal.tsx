@@ -333,7 +333,7 @@ export const ParameterHistoryModal = ({
               >
                 <DashboardOutlined style={{ fontSize: isMobile ? 20 : 24, color: 'white', marginBottom: isMobile ? 6 : 8 }} />
                 <Text style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
-                  Current
+                  ค่าปัจจุบัน
                 </Text>
                 <Text style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: 'white', display: 'block' }}>
                   {stats.current.toFixed(1)}

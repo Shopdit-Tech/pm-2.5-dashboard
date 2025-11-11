@@ -61,16 +61,16 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       label: 'เส้นทางเคลื่อนที่',
       title: 'เส้นทางอุปกรณ์เคลื่อนที่',
     },
-    {
-      key: 'sensor-data-table',
-      label: 'ตารางข้อมูล',
-      title: 'ตารางข้อมูลเซ็นเซอร์',
-    },
-    {
-      key: 'mobile-data-table',
-      label: 'ข้อมูลเคลื่อนที่',
-      title: 'ตารางข้อมูลอุปกรณ์เคลื่อนที่',
-    },
+    // {
+    //   key: 'sensor-data-table',
+    //   label: 'ตารางข้อมูล',
+    //   title: 'ตารางข้อมูลเซ็นเซอร์',
+    // },
+    // {
+    //   key: 'mobile-data-table',
+    //   label: 'ข้อมูลเคลื่อนที่',
+    //   title: 'ตารางข้อมูลอุปกรณ์เคลื่อนที่',
+    // },
     {
       key: 'analytics',
       label: 'การวิเคราะห์',

@@ -59,7 +59,7 @@ export const MapDashboard = () => {
 
       {/* Statistics Cards */}
       <Row gutter={[12, 12]} className="mb-6">
-        <Col xs={12} sm={12} md={6}>
+        <Col xs={12} sm={12} md={12}>
           <Card
             style={{
               borderRadius: 12,
@@ -74,7 +74,7 @@ export const MapDashboard = () => {
             <div style={{ fontSize: 11, color: '#999' }}>จุดติดตาม</div>
           </Card>
         </Col>
-        <Col xs={12} sm={12} md={6}>
+        <Col xs={12} sm={12} md={12}>
           <Card
             style={{
               borderRadius: 12,
@@ -183,10 +183,10 @@ export const MapDashboard = () => {
           gap: '8px',
           fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? '12px' : '14px'
         }}>
-          <span style={{ color: '#52c41a', fontWeight: 600 }}>● Good (0-12)</span>
-          <span style={{ color: '#faad14', fontWeight: 600 }}>● Moderate (12-35)</span>
-          <span style={{ color: '#fa8c16', fontWeight: 600 }}>● Unhealthy (35-55)</span>
-          <span style={{ color: '#f5222d', fontWeight: 600 }}>● Hazardous (&gt;55)</span>
+          <span style={{ color: '#52c41a', fontWeight: 600 }}>● ดีมาก (0-12)</span>
+          <span style={{ color: '#faad14', fontWeight: 600 }}>● ปานกลาง (12-35)</span>
+          <span style={{ color: '#fa8c16', fontWeight: 600 }}>● เริ่มมีผลต่อสุขภาพ (35-55)</span>
+          <span style={{ color: '#f5222d', fontWeight: 600 }}>● อันตรายต่อสุขภาพ (&gt;55)</span>
         </div>
       </div>
 

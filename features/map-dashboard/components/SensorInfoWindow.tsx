@@ -347,6 +347,11 @@ export const SensorInfoWindow = ({ sensor, onClose }: SensorInfoWindowProps) => 
         gap: '20px'
       }}>
         <MetricCardWithBar
+          label="PM1"
+          value={sensor.pm1 || 0}
+          unit="μg/m³"
+        />
+        <MetricCardWithBar
           label="PM 10"
           value={sensor.pm10}
           unit="μg/m³"
@@ -355,11 +360,6 @@ export const SensorInfoWindow = ({ sensor, onClose }: SensorInfoWindowProps) => 
           label="CO2"
           value={sensor.co2}
           unit="ppm"
-        />
-        <MetricCardWithBar
-          label="PM1"
-          value={sensor.pm1 || 0}
-          unit="μg/m³"
         />
         <MetricCardWithBar
           label="TVOC"

@@ -18,7 +18,7 @@ export default async function handler(
   }
 
   try {
-    const { sensor_code, metric, since_hours, agg_minutes } = req.query;
+    const { sensor_code, metric, since_hours, agg_minutes, from, to } = req.query;
 
     // Validate required parameters
     if (!sensor_code) {
@@ -32,8 +32,10 @@ export default async function handler(
       params: {
         sensor_code,
         metric: metric || 'All',
-        since_hours: since_hours || 24,
+        since_hours: since_hours,
         agg_minutes: agg_minutes || 5,
+        from: from,
+        to: to,
       },
       headers: {
         'x-ingest-key': API_KEY,

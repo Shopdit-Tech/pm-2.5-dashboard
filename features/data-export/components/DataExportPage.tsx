@@ -83,7 +83,7 @@ export const DataExportPage = ({ sensors, loading, error }: DataExportPageProps)
       </Card>
 
       {/* Additional Information */}
-      <Card
+      {/* <Card
         style={{
           marginTop: 24,
           borderRadius: 12,
@@ -114,7 +114,7 @@ export const DataExportPage = ({ sensors, loading, error }: DataExportPageProps)
         <Paragraph type="secondary" style={{ marginBottom: 0 }}>
           Fields not available from the sensor will be marked with "-" in the CSV file.
         </Paragraph>
-      </Card>
+      </Card> */}
     </div>
   );
 };

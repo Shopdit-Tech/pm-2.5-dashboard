@@ -5,6 +5,11 @@ import { mapApiSensorsToAppSensors } from '@/utils/sensorMapper';
 import axios from 'axios';
 import { API_CONFIG, API_ENDPOINTS } from '@/lib/api/config';
 
+const formatTimestampForApi = (date: Date): string => {
+  const isoString = date.toISOString();
+  return isoString.replace(/\.\d{3}Z$/, 'Z');
+};
+
 export const mobileRouteService = {
   // Get all mobile sensors (movable=true)
   getMobileSensors: async (): Promise<SensorData[]> => {
@@ -72,10 +77,10 @@ export const mobileRouteService = {
       // User selects Oct 28 → means Oct 28 00:00 to 23:59 in UTC+7
       // API needs: Oct 27 17:00 to Oct 28 16:59 in UTC
       const selectedDate = new Date(date + 'T00:00:00+07:00'); // Start of day in UTC+7
-      const fromDate = selectedDate.toISOString(); // Converts to UTC
-      
+      const fromDate = formatTimestampForApi(selectedDate); // Converts to UTC
+
       const endDate = new Date(date + 'T23:59:59+07:00'); // End of day in UTC+7
-      const toDate = endDate.toISOString(); // Converts to UTC
+      const toDate = formatTimestampForApi(endDate); // Converts to UTC
       
       console.log('🕐 Timezone conversion:', {
         selectedDate: date,
@@ -92,7 +97,7 @@ export const mobileRouteService = {
           metric: 'All', // Get all parameters
           from: fromDate, // Start of selected date
           to: toDate,     // End of selected date
-          agg_minutes: 5, // 5-minute intervals for route accuracy
+          agg_minutes: 60, // 5-minute intervals for route accuracy
         },
         timeout: API_CONFIG.timeout,
       });

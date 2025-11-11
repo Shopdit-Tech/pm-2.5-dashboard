@@ -179,7 +179,7 @@ export const MobileSensorsDashboard = () => {
 
       {/* Statistics Cards */}
       <Row gutter={[12, 12]} className="mb-6">
-        <Col xs={12} sm={12} md={6}>
+        <Col xs={12} sm={12} md={12}>
           <Card
             style={{
               borderRadius: 12,
@@ -208,7 +208,7 @@ export const MobileSensorsDashboard = () => {
             <div style={{ fontSize: 11, color: '#999' }}>🚗 อุปกรณ์ติดตาม</div>
           </Card>
         </Col>
-        <Col xs={12} sm={12} md={6}>
+        <Col xs={12} sm={12} md={12}>
           <Card
             style={{
               borderRadius: 12,
@@ -568,10 +568,10 @@ export const MobileSensorsDashboard = () => {
           <span>
             <CarOutlined /> Mobile Sensors
           </span>
-          <span>🟢 Good (0-12)</span>
-          <span>🟡 Moderate (12-35)</span>
-          <span>🟠 Unhealthy (35-55)</span>
-          <span>🔴 Hazardous (&gt;55)</span>
+          <span>🟢 ดีมาก (0-12)</span>
+          <span>🟡 ปานกลาง (12-35)</span>
+          <span>🟠 เริ่มมีผลต่อสุขภาพ (35-55)</span>
+          <span>🔴 อันตรายต่อสุขภาพ (&gt;55)</span>
         </div>
       </div>
 
