@@ -25,18 +25,13 @@ export type ExportFormData = {
 };
 
 export type CSVRow = {
-  locationId: string;
   locationName: string;
-  locationGroup: string;
   locationType: string;
   sensorId: string;
-  placeOpen: string;
   localDateTime: string;
   utcDateTime: string;
-  aggregatedRecords: string;
   pm25Raw: string;
   pm25Corrected: string;
-  particleCount: string;
   co2Raw: string;
   co2Corrected: string;
   temperatureRaw: string;
@@ -46,7 +41,6 @@ export type CSVRow = {
   humidityCorrected: string;
   tvoc: string;
   tvocIndex: string;
-  noxIndex: string;
   pm1: string;
   pm10: string;
   latitude?: string; // Optional: only for mobile sensors

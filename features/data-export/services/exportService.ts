@@ -124,18 +124,13 @@ function buildCSVRows(
     const utcDateTime = date.toISOString();
 
     const baseRow = {
-      locationId: sensor.id || '-',
       locationName: sensor.name || '-',
-      locationGroup: '-', // Not available in API
       locationType: sensor.type || 'Indoor',
       sensorId: sensor.code || '-',
-      placeOpen: 'false',
       localDateTime,
       utcDateTime,
-      aggregatedRecords: '1', // Could be enhanced if API provides this
       pm25Raw: formatValue(data.pm25),
       pm25Corrected: formatValue(data.pm25), // No correction available
-      particleCount: formatValue(data.particle_0p3),
       co2Raw: formatValue(data.co2_ppm),
       co2Corrected: formatValue(data.co2_ppm), // No correction available
       temperatureRaw: formatValue(data.temperature_c), // Fixed: use temperature_c
@@ -145,7 +140,6 @@ function buildCSVRows(
       humidityCorrected: formatValue(data.humidity_rh), // Fixed: use humidity_rh
       tvoc: formatValue(data.tvoc_ppb), // Fixed: use tvoc_ppb (actual ppb value)
       tvocIndex: formatValue(data.tvoc_index),
-      noxIndex: formatValue(data.nox_index),
       pm1: formatValue(data.pm1),
       pm10: formatValue(data.pm10),
     };
@@ -198,18 +192,13 @@ function formatValue(value: number | null | undefined): string {
 function rowsToCSV(rows: CSVRow[], sensorType?: string): string {
   // CSV Header
   const headers = [
-    'Location ID',
     'Location Name',
-    'Location Group',
     'Location Type',
     'Sensor ID',
-    'Place Open',
     'Local Date/Time',
     'UTC Date/Time',
-    '# of aggregated records',
     'PM2.5 (μg/m³) raw',
     'PM2.5 (μg/m³) corrected',
-    '0.3μm particle count',
     'CO2 (ppm) raw',
     'CO2 (ppm) corrected',
     'Temperature (°C) raw',
@@ -219,7 +208,6 @@ function rowsToCSV(rows: CSVRow[], sensorType?: string): string {
     'Humidity (%) corrected',
     'TVOC (ppb)',
     'TVOC index',
-    'NOX index',
     'PM1 (μg/m³)',
     'PM10 (μg/m³)',
   ];
@@ -238,18 +226,13 @@ function rowsToCSV(rows: CSVRow[], sensorType?: string): string {
   // Add data rows
   rows.forEach((row) => {
     const values = [
-      row.locationId,
       row.locationName,
-      row.locationGroup,
       row.locationType,
       row.sensorId,
-      row.placeOpen,
       row.localDateTime,
       row.utcDateTime,
-      row.aggregatedRecords,
       row.pm25Raw,
       row.pm25Corrected,
-      row.particleCount,
       row.co2Raw,
       row.co2Corrected,
       row.temperatureRaw,
@@ -259,7 +242,6 @@ function rowsToCSV(rows: CSVRow[], sensorType?: string): string {
       row.humidityCorrected,
       row.tvoc,
       row.tvocIndex,
-      row.noxIndex,
       row.pm1,
       row.pm10,
       // Add lat/lng for mobile sensors

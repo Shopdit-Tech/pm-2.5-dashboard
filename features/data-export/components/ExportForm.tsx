@@ -129,7 +129,7 @@ export const ExportForm = ({ sensors }: ExportFormProps) => {
         label="เลือกเวลา"
         name="bucketSize"
         rules={[{ required: true, message: 'Please select a bucket size' }]}
-        extra="Aggregation interval for the exported data"
+        extra=""
       >
         <Select placeholder="Choose data aggregation interval" size="large">
           {BUCKET_SIZES.map((bucket) => (
