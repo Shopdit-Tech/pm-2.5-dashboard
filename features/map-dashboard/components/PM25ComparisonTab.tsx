@@ -125,22 +125,58 @@ export const PM25ComparisonTab = () => {
       render: (rank: number) => {
         if (rank === 1) {
           return (
-            <div style={{ fontSize: 24, color: '#f5222d' }}>
-              <TrophyOutlined />
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              backgroundColor: '#fff1f0',
+              border: '2px solid #f5222d',
+              fontSize: 18,
+              fontWeight: 700,
+              color: '#f5222d'
+            }}>
+              {rank}
             </div>
           );
         }
         if (rank === 2) {
           return (
-            <div style={{ fontSize: 20, color: '#fa8c16' }}>
-              <TrophyOutlined />
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              backgroundColor: '#fff7e6',
+              border: '2px solid #fa8c16',
+              fontSize: 16,
+              fontWeight: 700,
+              color: '#fa8c16'
+            }}>
+              {rank}
             </div>
           );
         }
         if (rank === 3) {
           return (
-            <div style={{ fontSize: 18, color: '#faad14' }}>
-              <TrophyOutlined />
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 30,
+              height: 30,
+              borderRadius: '50%',
+              backgroundColor: '#fffbe6',
+              border: '2px solid #faad14',
+              fontSize: 15,
+              fontWeight: 700,
+              color: '#faad14'
+            }}>
+              {rank}
             </div>
           );
         }
@@ -211,16 +247,19 @@ export const PM25ComparisonTab = () => {
 
         const { avgPm25 } = record;
 
+        if (avgPm25 <= 15) {
+          return <Tag color="blue">คุณภาพอากาศดีมาก</Tag>;
+        }
         if (avgPm25 <= 25) {
-          return <Tag color="success">ดีมาก</Tag>;
+          return <Tag color="success">คุณภาพอากาศดี</Tag>;
         }
         if (avgPm25 <= 37.5) {
-          return <Tag color="warning">ปานกลาง</Tag>;
+          return <Tag color="warning">คุณภาพอากาศปานกลาง</Tag>;
         }
-        if (avgPm25 <= 55) {
-          return <Tag color="orange">เริ่มมีผลต่อสุขภาพ</Tag>;
+        if (avgPm25 <= 75) {
+          return <Tag color="orange">เริ่มมีผลกระทบต่อสุขภาพ</Tag>;
         }
-        return <Tag color="error">มีผลต่อสุขภาพ</Tag>;
+        return <Tag color="error">มีผลกระทบต่อสุขภาพ</Tag>;
       },
     },
     {

@@ -35,20 +35,33 @@ export const formatParameterValue = (value: number, decimals: number = 1): strin
 
 export const getLevelLabel = (level: AirQualityLevel): string => {
   const labels: Record<AirQualityLevel, string> = {
+    excellent: 'คุณภาพอากาศดีมาก',
+    good: 'คุณภาพอากาศดี',
+    moderate: 'คุณภาพอากาศปานกลาง',
+    unhealthy: 'เริ่มมีผลกระทบต่อสุขภาพ',
+    hazardous: 'มีผลกระทบต่อสุขภาพ',
+  };
+  return labels[level];
+};
+
+export const getLevelLabelShort = (level: AirQualityLevel): string => {
+  const labels: Record<AirQualityLevel, string> = {
+    excellent: 'ดีมาก',
     good: 'ดี',
     moderate: 'ปานกลาง',
-    unhealthy: 'ไม่ดีต่อสุขภาพ',
-    hazardous: 'อันตราย',
+    unhealthy: 'เริ่มมีผลกระทบ',
+    hazardous: 'มีผลกระทบ',
   };
   return labels[level];
 };
 
 export const getLevelColor = (level: AirQualityLevel): string => {
   const colors: Record<AirQualityLevel, string> = {
-    good: '#52c41a',
-    moderate: '#faad14',
-    unhealthy: '#fa8c16',
-    hazardous: '#f5222d',
+    excellent: '#4299E1',
+    good: '#48BB78',
+    moderate: '#ECC94B',
+    unhealthy: '#ED8936',
+    hazardous: '#F56565',
   };
   return colors[level];
 };

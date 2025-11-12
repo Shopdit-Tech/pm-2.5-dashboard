@@ -69,10 +69,11 @@ const CircularProgress = ({ value, max, size = 145, strokeWidth = 18, color = '#
 // Quality Indicator Tabs
 const QualityIndicatorTabs = ({ currentLevel }: { currentLevel: number }) => {
   const levels = [
-    { label: 'ดี', color: '#52c41a', level: 1 },
-    { label: 'ปานกลาง', color: '#faad14', level: 2 },
-    { label: 'เริ่มมีผลกระทบ', color: '#fa8c16', level: 3 },
-    { label: 'มีผลกระทบ', color: '#f5222d', level: 4 },
+    { label: 'ดีมาก', color: '#4299E1', level: 1 },
+    { label: 'ดี', color: '#48BB78', level: 2 },
+    { label: 'ปานกลาง', color: '#ECC94B', level: 3 },
+    { label: 'เริ่มมีผลกระทบ', color: '#ED8936', level: 4 },
+    { label: 'มีผลกระทบ', color: '#F56565', level: 5 },
   ];
 
   return (
@@ -149,6 +150,18 @@ const MetricCardWithBar = ({ label, value, unit, parameter }: {
 export const RoutePointInfoWindow = ({ point, onClose }: RoutePointInfoWindowProps) => {
   const pm25Color = getParameterColor('pm25', point.pm25);
   const pm25Level = getParameterLevel('pm25', point.pm25);
+  
+  // Map AirQualityLevel to numeric level for tabs
+  const levelToNumber = (level: string): number => {
+    const mapping: Record<string, number> = {
+      'excellent': 1,
+      'good': 2,
+      'moderate': 3,
+      'unhealthy': 4,
+      'hazardous': 5,
+    };
+    return mapping[level] || 3;
+  };
 
   // Format timestamp in UTC+7 (Asia/Bangkok timezone)
   const timestamp = new Date(point.timestamp);
@@ -265,7 +278,7 @@ export const RoutePointInfoWindow = ({ point, onClose }: RoutePointInfoWindowPro
         {/* Right: Quality Indicator */}
         <div className="flex-1 w-full md:w-auto">
           <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 md:mb-3">คุณภาพอากาศ</div>
-          <QualityIndicatorTabs currentLevel={Number(pm25Level)} />
+          <QualityIndicatorTabs currentLevel={levelToNumber(pm25Level)} />
         </div>
       </div>
 

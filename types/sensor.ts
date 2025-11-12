@@ -4,7 +4,7 @@ export type ParameterType = 'temperature' | 'humidity' | 'co2' | 'pm1' | 'pm25' 
 
 export type SensorStatus = 'online' | 'offline';
 
-export type AirQualityLevel = 'good' | 'moderate' | 'unhealthy' | 'hazardous';
+export type AirQualityLevel = 'excellent' | 'good' | 'moderate' | 'unhealthy' | 'hazardous';
 
 export type SensorData = {
   id: string;

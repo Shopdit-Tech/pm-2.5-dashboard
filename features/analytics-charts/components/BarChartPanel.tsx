@@ -142,6 +142,7 @@ export const BarChartPanel = ({
           width={180}
           height={28}
           fill="#1d63dc"
+          fillOpacity="0.75"
           rx={14}
           stroke="#1d63dc"
           strokeWidth={2}
@@ -311,13 +312,13 @@ export const BarChartPanel = ({
                   />
                   <ReferenceLine
                     y={37.5}
-                    stroke="#ECC94B"
+                    stroke="yellow"
                     strokeWidth={2}
                     strokeDasharray="5 5"
                     label={{
                       // value: 'เฝ้าระวัง (37.5)',
                       position: 'insideTopRight',
-                      fill: '#ECC94B',
+                      fill: 'yellow',
                       fontSize: 11,
                       fontWeight: 600,
                       offset: 10,

@@ -94,7 +94,7 @@ const AirQualityLegend = () => {
           padding: '0 4px'
         }}>
           <span style={{ 
-            fontSize: '8px', 
+            fontSize: '7px', 
             fontWeight: 700, 
             color: 'white',
             textShadow: '0 1px 2px rgba(0,0,0,0.4)',
@@ -103,7 +103,7 @@ const AirQualityLegend = () => {
             lineHeight: '1.1'
           }}>ดีมาก</span>
           <span style={{ 
-            fontSize: '8px', 
+            fontSize: '7px', 
             fontWeight: 700, 
             color: 'white',
             textShadow: '0 1px 2px rgba(0,0,0,0.4)',
