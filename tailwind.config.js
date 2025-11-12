@@ -21,6 +21,9 @@ module.exports = {
           900: '#002766',
         },
       },
+      fontFamily: {
+        sans: ['var(--font-noto-sans-thai)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+      },
     },
   },
   plugins: [],
