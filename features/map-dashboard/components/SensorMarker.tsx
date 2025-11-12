@@ -45,18 +45,14 @@ export const SensorMarker = ({ sensor, onClick, isSelected }: SensorMarkerProps)
         <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>
           {sensor.name}
         </div>
-        <div style={{ color: '#8c8c8c', fontSize: 12, marginBottom: 8 }}>
-          {sensor.type === 'indoor' ? 'เซ็นเซอร์ภายในอาคาร' : 'เซ็นเซอร์ภายนอกอาคาร'}
-        </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
         <Badge color={color} />
         <span style={{ fontWeight: 500 }}>
-          PM2.5: {sensor.pm25.toFixed(1)} μg/m³ | AQI TH: {calculateAQITH(sensor.pm25)}
+          PM2.5: {sensor.pm25.toFixed(1)} μg/m³
         </span>
       </div>
       <div style={{ fontSize: 12, color: '#8c8c8c' }}>
-        <div style={{ marginBottom: 2 }}>ค่าอากาศจากศูนยกลาง</div>
         <div>อัพเดทล่าสุด: {formatTimestamp(sensor.timestamp)}</div>
       </div>
     </div>
