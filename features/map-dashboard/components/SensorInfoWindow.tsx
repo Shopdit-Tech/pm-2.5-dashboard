@@ -69,15 +69,15 @@ const CircularProgress = ({ value, size = 145, strokeWidth = 16, color = '#00b05
   );
 };
 
-// Horizontal Gradient Legend Bar
+// Horizontal Gradient Legend Bar with 5 levels
 const AirQualityLegend = () => {
   return (
     <div style={{ width: '100%', marginBottom: '20px' }}>
-      {/* Gradient Bar */}
+      {/* Gradient Bar with 5 segments */}
       <div style={{
         height: '32px',
         borderRadius: '16px',
-        background: 'linear-gradient(to right, #00b050 0%, #00b050 25%, #ffc107 25%, #ffc107 50%, #ff9800 50%, #ff9800 75%, #f44336 75%, #f44336 100%)',
+        background: 'linear-gradient(to right, #4299E1 0%, #4299E1 20%, #48BB78 20%, #48BB78 40%, #ECC94B 40%, #ECC94B 60%, #ED8936 60%, #ED8936 80%, #F56565 80%, #F56565 100%)',
         position: 'relative',
         overflow: 'visible',
         boxShadow: '0 2px 8px rgba(0,0,0,0.12)'
@@ -91,42 +91,53 @@ const AirQualityLegend = () => {
           left: 0,
           right: 0,
           transform: 'translateY(-50%)',
-          padding: '0 8px'
+          padding: '0 4px'
         }}>
           <span style={{ 
-            fontSize: '9px', 
+            fontSize: '8px', 
             fontWeight: 700, 
             color: 'white',
-            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+            textShadow: '0 1px 2px rgba(0,0,0,0.4)',
             flex: 1,
-            textAlign: 'center'
+            textAlign: 'center',
+            lineHeight: '1.1'
+          }}>ดีมาก</span>
+          <span style={{ 
+            fontSize: '8px', 
+            fontWeight: 700, 
+            color: 'white',
+            textShadow: '0 1px 2px rgba(0,0,0,0.4)',
+            flex: 1,
+            textAlign: 'center',
+            lineHeight: '1.1'
           }}>ดี</span>
           <span style={{ 
-            fontSize: '9px', 
+            fontSize: '7px', 
             fontWeight: 700, 
             color: 'white',
-            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+            textShadow: '0 1px 2px rgba(0,0,0,0.4)',
             flex: 1,
-            textAlign: 'center'
+            textAlign: 'center',
+            lineHeight: '1.1'
           }}>ปานกลาง</span>
           <span style={{ 
-            fontSize: '8px', 
+            fontSize: '6px', 
             fontWeight: 700, 
             color: 'white',
-            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+            textShadow: '0 1px 2px rgba(0,0,0,0.4)',
             flex: 1,
             textAlign: 'center',
             lineHeight: '1.1'
-          }}>เริ่มมีผลกระทบต่อสุขภาพ</span>
+          }}>เริ่มมีผลกระทบ</span>
           <span style={{ 
-            fontSize: '8px', 
+            fontSize: '6px', 
             fontWeight: 700, 
             color: 'white',
-            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+            textShadow: '0 1px 2px rgba(0,0,0,0.4)',
             flex: 1,
             textAlign: 'center',
             lineHeight: '1.1'
-          }}>มีผลกระทบต่อสุขภาพ</span>
+          }}>มีผลกระทบ</span>
         </div>
       </div>
     </div>

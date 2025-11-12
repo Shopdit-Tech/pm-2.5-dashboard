@@ -102,7 +102,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         trigger={null}
         collapsible
         collapsed={collapsed}
-        width={350}
+        width={370}
         collapsedWidth={0}
         style={{
           position: 'fixed',

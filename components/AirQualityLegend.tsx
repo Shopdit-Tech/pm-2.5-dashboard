@@ -17,22 +17,22 @@ const LEGEND_ITEMS: LegendItem[] = [
   {
     icon: '/blue.png',
     label: 'คุณภาพอากาศดีมาก',
-    range: '0-25',
+    range: '0-15',
   },
   {
     icon: '/green.png',
     label: 'คุณภาพอากาศดี',
-    range: '25-37.5',
+    range: '15-25',
   },
   {
     icon: '/yellow.png',
     label: 'คุณภาพอากาศปานกลาง',
-    range: '37.5-55',
+    range: '25-37.5',
   },
   {
     icon: '/orange.png',
     label: 'เริ่มมีผลกระทบต่อสุขภาพ',
-    range: '55-75',
+    range: '37.5-75',
   },
   {
     icon: '/red.png',

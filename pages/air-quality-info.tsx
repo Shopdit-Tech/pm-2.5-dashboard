@@ -300,66 +300,10 @@ const AirQualityInfoPage = () => {
             bordered
             scroll={{ x: 1000 }}
           />
-
-          <div style={{ marginTop: 24, padding: '16px', background: '#fff7e6', borderRadius: 8, border: '1px solid #ffd666' }}>
-            <Text style={{ fontSize: '13px', color: '#ad6800' }}>
-              <strong>กลุ่มเสี่ยง ได้แก่:</strong> เด็ก, ผู้สูงอายุ, หญิงตั้งครรภ์, ผู้ป่วยโรคหัวใจ, ผู้ป่วยโรคปอด, 
-              ผู้ป่วยโรคหอบหืด, ผู้ที่มีภูมิคุ้มกันต่ำ และผู้ที่ทำงานกลางแจ้ง
-            </Text>
-          </div>
         </Card>
 
-        {/* Standards Table */}
-        <Card
-          style={{
-            borderRadius: 16,
-            marginBottom: 24,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-          }}
-        >
-          <Title level={4} style={{ marginTop: 0 }}>
-            มาตรฐานคุณภาพอากาศในบรรยากาศโดยทั่วไป
-          </Title>
-          <Paragraph style={{ fontSize: '14px', color: '#666', marginBottom: 24 }}>
-            ตามประกาศคณะกรรมการสิ่งแวดล้อมแห่งชาติ
-          </Paragraph>
-          <Table
-            columns={standardColumns}
-            dataSource={standards}
-            pagination={false}
-            rowKey="pollutantEn"
-            bordered
-            scroll={{ x: 800 }}
-          />
-
-          <div style={{ marginTop: 24, padding: '16px', background: '#fef3c7', borderRadius: 8, border: '1px solid #fbbf24' }}>
-            <Text style={{ fontSize: '13px', color: '#92400e' }}>
-              <strong>หมายเหตุ:</strong><br />
-              • ppm คือ ส่วนในล้านส่วน<br />
-              • mg/m³ คือ มิลลิกรัมต่อลูกบาศก์เมตร<br />
-              • μg/m³ คือ ไมโครกรัมต่อลูกบาศก์เมตร
-            </Text>
-          </div>
-        </Card>
 
         {/* Reference */}
-        <Card
-          style={{
-            borderRadius: 16,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-            background: '#f0fdf4',
-            border: '1px solid #86efac',
-          }}
-        >
-          <Title level={5} style={{ marginTop: 0, color: '#166534' }}>
-            แหล่งอ้างอิง
-          </Title>
-          <div style={{ fontSize: '12px', color: '#166534', lineHeight: '1.8' }}>
-            <div>• กรมควบคุมมลพิษ กระทรวงทรัพยากรธรรมชาติและสิ่งแวดล้อม</div>
-            <div>• ประกาศคณะกรรมการสิ่งแวดล้อมแห่งชาติ ฉบับต่าง ๆ</div>
-            <div>• มาตรฐานคุณภาพอากาศในบรรยากาศโดยทั่วไป พ.ศ. 2538 - 2565</div>
-          </div>
-        </Card>
       </div>
     </div>
   );

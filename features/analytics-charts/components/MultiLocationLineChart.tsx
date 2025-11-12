@@ -108,7 +108,8 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
     if (selectedSensorIds.length > 0) {
       fetchAllSensorsData();
     }
-  }, [selectedSensorIds, parameter, timeRange, fetchAllSensorsData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSensorIds, parameter, timeRange]);
 
   // Generate colors for selected sensors
   const sensorColors = useMemo(() => {

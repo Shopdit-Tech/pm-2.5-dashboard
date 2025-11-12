@@ -1,10 +1,11 @@
 import { ColorRange, ParameterType } from '@/types/sensor';
 
 export const PM25_COLOR_RANGES: ColorRange[] = [
-  { min: 0, max: 12, color: '#52c41a', level: 'good' }, // Green
-  { min: 12.1, max: 35.4, color: '#faad14', level: 'moderate' }, // Yellow
-  { min: 35.5, max: 55.4, color: '#fa8c16', level: 'unhealthy' }, // Orange
-  { min: 55.5, max: 999, color: '#f5222d', level: 'hazardous' }, // Red
+  { min: 0, max: 15.0, color: '#4299E1', level: 'good' }, // Blue - Excellent
+  { min: 15.1, max: 25.0, color: '#48BB78', level: 'good' }, // Green - Good
+  { min: 25.1, max: 37.5, color: '#ECC94B', level: 'moderate' }, // Yellow - Moderate
+  { min: 37.6, max: 75.0, color: '#ED8936', level: 'unhealthy' }, // Orange - Starting to affect health
+  { min: 75.1, max: 999, color: '#F56565', level: 'hazardous' }, // Red - Affects health
 ];
 
 export const PM10_COLOR_RANGES: ColorRange[] = [

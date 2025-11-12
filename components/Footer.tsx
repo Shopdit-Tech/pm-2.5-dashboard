@@ -74,11 +74,11 @@ export const Footer = () => {
                       064-415-5852
                     </Text>
                   </div>
-                  <div style={{ marginTop: 8 }}>
+                  {/* <div style={{ marginTop: 8 }}>
                     <Text style={{ fontSize: 13, color: '#00bcd4', fontWeight: 500 }}>
                       👁️ Visitors: {pageViews.allTime.toLocaleString()} • Today: {pageViews.today}
                     </Text>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
