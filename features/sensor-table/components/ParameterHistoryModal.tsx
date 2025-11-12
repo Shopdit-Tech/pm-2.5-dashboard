@@ -83,19 +83,6 @@ export const ParameterHistoryModal = ({
   // Fetch real historical data from API
   const { chartData, loading, error } = useChartData(sensor, paramKey, timeRange);
 
-  // Calculate X-axis ticks manually for proper display
-  const xAxisTicks = useMemo(() => {
-    if (!chartData || chartData.data.length === 0) return [];
-    
-    // Show max 12 ticks
-    const maxTicks = 12;
-    const step = Math.max(1, Math.ceil(chartData.data.length / maxTicks));
-    
-    return chartData.data
-      .filter((_, index) => index % step === 0)
-      .map(d => d.timestamp);
-  }, [chartData]);
-
   // Calculate statistics from real data
   const stats = useMemo(() => {
     if (!chartData) {
@@ -223,7 +210,7 @@ export const ParameterHistoryModal = ({
             <Card style={{ borderRadius: 12, textAlign: 'center', padding: 60, marginBottom: 24 }}>
               <Spin size="large" />
               <div style={{ marginTop: 16, color: '#8c8c8c' }}>
-                กำลังโหลดข้อมูลเชิงประวัติศาสตร์...
+                กำลังโหลดเส้นทาง...
               </div>
             </Card>
           )}
@@ -232,7 +219,7 @@ export const ParameterHistoryModal = ({
           {error && (
             <Alert
               message="ข้อผิดพลาดในการโหลดข้อมูล"
-              description="ไม่สามารถโหลดข้อมูลเชิงประวัติศาสตร์ แสดงเฉพาะค่าปัจจุบันเท่านั้น"
+              description="ไม่สามารถโหลดเส้นทาง แสดงเฉพาะค่าปัจจุบันเท่านั้น"
               type="warning"
               showIcon
               style={{ marginBottom: 24, borderRadius: 12 }}
@@ -281,9 +268,6 @@ export const ParameterHistoryModal = ({
 
                 <XAxis
                   dataKey="timestamp"
-                  type="number"
-                  domain={['dataMin', 'dataMax']}
-                  ticks={xAxisTicks}
                   tickFormatter={(timestamp) => {
                     const date = new Date(timestamp);
                     const hour = date.getHours();
@@ -295,6 +279,7 @@ export const ParameterHistoryModal = ({
                   stroke="#BDBDBD"
                   tickLine={false}
                   height={80}
+                  interval="preserveStartEnd"
                   angle={-45}
                   textAnchor="end"
                 />

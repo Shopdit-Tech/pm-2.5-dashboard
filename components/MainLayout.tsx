@@ -321,7 +321,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       )}
 
       {/* Main Content */}
-      <Layout style={{ marginLeft: collapsed ? 0 : 350, transition: 'margin-left 0.2s' }}>
+      <Layout style={{ marginLeft: 0 }}>
         {/* Header with toggle button */}
         <div
           style={{

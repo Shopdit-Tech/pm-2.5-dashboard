@@ -29,7 +29,7 @@ export const DataExportPage = ({ sensors, loading, error }: DataExportPageProps)
           <span style={{ fontSize: 'inherit' }}>BMA | ส่งออกข้อมูล</span>
         </Title>
         <Text type="secondary" style={{ fontSize: 14 }}>
-          ส่งออกข้อมูลเซ็นเซอร์เชิงประวัติศาสตร์เป็นไฟล์ CSV
+          ส่งออกข้อมูลเซ็นเซอร์เป็นไฟล์ CSV
         </Text>
       </div>
 

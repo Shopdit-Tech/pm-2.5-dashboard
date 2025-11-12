@@ -208,7 +208,7 @@ export const MobileSensorsDashboard = () => {
       >
         <div style={{ marginBottom: 12, fontWeight: 600, fontSize: 15 }}>
           <CalendarOutlined style={{ marginRight: 8, color: '#1890ff' }} />
-          ดูเส้นทางเชิงประวัติศาสตร์
+          ดูเส้นทาง
         </div>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={8}>
@@ -481,7 +481,7 @@ export const MobileSensorsDashboard = () => {
             </div>
             <div style={{ fontSize: 13, color: '#595959' }}>
               แสดงตำแหน่งปัจจุบันของเซ็นเซอร์คุณภาพอากาศเคลื่อนที่
-              เลือกเซ็นเซอร์และวันที่ด้านบนเพื่อดูเส้นทางเชิงประวัติศาสตร์
+              เลือกเซ็นเซอร์และวันที่ด้านบนเพื่อดูเส้นทาง
             </div>
           </Space>
         </Card>

@@ -292,6 +292,40 @@ export const BarChartPanel = ({
                 ))}
               </Bar>
               
+              {/* PM2.5 Reference Lines - Good (25) and Warning (37.5) thresholds */}
+              {parameter === 'pm25' && (
+                <>
+                  <ReferenceLine
+                    y={25}
+                    stroke="#48BB78"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    label={{
+                      // value: 'ดี (25)',
+                      position: 'insideTopRight',
+                      fill: '#48BB78',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      offset: 10,
+                    }}
+                  />
+                  <ReferenceLine
+                    y={37.5}
+                    stroke="#ECC94B"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    label={{
+                      // value: 'เฝ้าระวัง (37.5)',
+                      position: 'insideTopRight',
+                      fill: '#ECC94B',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      offset: 10,
+                    }}
+                  />
+                </>
+              )}
+              
               {/* 24-Hour Average Line - AFTER bars for top layer rendering */}
               {chartData.avg24h && (
                 <ReferenceLine
