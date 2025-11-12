@@ -6,7 +6,6 @@ import {
   SearchOutlined,
   ReloadOutlined,
   SettingOutlined,
-  MoreOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { Breakpoint } from 'antd/es/_util/responsiveObserver';
@@ -265,22 +264,6 @@ export const SensorDataTable = () => {
           </div>
         );
       },
-    },
-    {
-      title: 'ดำเนินการ',
-      key: 'action',
-      fixed: isMobile ? false : 'right',
-      width: isMobile ? 60 : 80,
-      align: 'center',
-      render: (_: any, record: SensorData) => (
-        <Button
-          type="text"
-          icon={<MoreOutlined />}
-          onClick={() => handleViewDetails(record)}
-          size={isMobile ? 'small' : 'middle'}
-          style={{ padding: isMobile ? '2px 4px' : '4px 8px' }}
-        />
-      ),
     },
   ];
 

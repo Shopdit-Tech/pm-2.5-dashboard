@@ -42,6 +42,16 @@ export type UserProfile = {
   last_sign_in_at: string;
 };
 
+export type RefreshTokenRequest = {
+  refresh_token: string;
+};
+
+export type RefreshTokenResponse = {
+  access_token: string;
+  refresh_token: string;
+  user: UserProfile;
+};
+
 export const authService = {
   /**
    * Login user with email and password
@@ -104,6 +114,37 @@ export const authService = {
       }
       
       throw new Error(error.response?.data?.message || 'Failed to fetch user profile');
+    }
+  },
+
+  /**
+   * Refresh access token using refresh token
+   */
+  async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
+    try {
+      console.log('🔄 Refreshing access token...');
+      
+      const response = await axios.post<RefreshTokenResponse>(
+        `${API_BASE_URL}/auth/refresh`,
+        { refresh_token: refreshToken },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          timeout: 30000,
+        }
+      );
+      
+      console.log('✅ Token refreshed successfully');
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Token refresh failed:', error);
+      
+      if (error.response?.status === 401) {
+        throw new Error('Refresh token expired. Please login again.');
+      }
+      
+      throw new Error(error.response?.data?.message || 'Failed to refresh token');
     }
   },
 };

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   Alert,
@@ -9,8 +9,8 @@ import {
   Row,
   Col,
   Select,
-  DatePicker,
   Empty,
+  DatePicker,
 } from 'antd';
 import {
   ReloadOutlined,
@@ -34,7 +34,7 @@ export const MobileSensorsDashboard = () => {
 
   // Route viewing state
   const [selectedSensorId, setSelectedSensorId] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
   const [selectedRoute, setSelectedRoute] = useState<MobileRoute | null>(null);
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
@@ -48,18 +48,18 @@ export const MobileSensorsDashboard = () => {
   // Handle sensor selection
   const handleSensorSelect = (sensorId: string) => {
     setSelectedSensorId(sensorId);
-    loadRoute(sensorId, selectedDate);
   };
 
-  // Handle date selection
-  const handleDateSelect = (date: Dayjs | null) => {
-    setSelectedDate(date);
-    loadRoute(selectedSensorId, date);
-  };
+  // Auto-submit when both sensor and date range are selected
+  useEffect(() => {
+    if (selectedSensorId && dateRange && dateRange[0] && dateRange[1]) {
+      loadRoute(selectedSensorId, dateRange[0], dateRange[1]);
+    }
+  }, [selectedSensorId, dateRange]);
 
-  // Load route for selected sensor and date
-  const loadRoute = async (sensorId: string | null, date: Dayjs | null) => {
-    if (!sensorId || !date) {
+  // Load route for selected sensor and date range
+  const loadRoute = async (sensorId: string | null, start: Dayjs | null, end: Dayjs | null) => {
+    if (!sensorId || !start || !end) {
       setSelectedRoute(null);
       setRouteError(null);
       return;
@@ -73,21 +73,18 @@ export const MobileSensorsDashboard = () => {
       return;
     }
 
-    // Clear current route first to force RouteMap unmount (like manual clear/select)
     setSelectedRoute(null);
     setLoadingRoute(true);
     setRouteError(null);
 
     try {
-      console.log(
-        '📍 Loading route for sensor:',
-        sensor.name,
-        'on date:',
-        date.format('YYYY-MM-DD')
-      );
+      // Set end date to end of day (23:59:59)
+      const endOfDay = end.clone().endOf('day');
+      
+      console.log('🗺️ Loading route for:', sensor.name, 'from:', start.toISOString(), 'to:', endOfDay.toISOString());
 
       // Call real API to fetch route
-      const route = await mobileRouteService.getSensorRoute(sensor, date.format('YYYY-MM-DD'));
+      const route = await mobileRouteService.getSensorRouteRange(sensor, start.toISOString(), endOfDay.toISOString());
 
       if (route) {
         setSelectedRoute(route);
@@ -110,7 +107,7 @@ export const MobileSensorsDashboard = () => {
   // Clear route selection
   const handleClearRoute = () => {
     setSelectedSensorId(null);
-    setSelectedDate(null);
+    setDateRange(null);
     setSelectedRoute(null);
     setRouteError(null);
   };
@@ -177,90 +174,6 @@ export const MobileSensorsDashboard = () => {
         </div>
       </div>
 
-      {/* Statistics Cards */}
-      <Row gutter={[12, 12]} className="mb-6">
-        <Col xs={12} sm={12} md={12}>
-          <Card
-            style={{
-              borderRadius: 12,
-              border: '1px solid rgba(255,255,255,0.6)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              background:
-                'linear-gradient(135deg, rgba(240,147,251,0.1) 0%, rgba(245,87,108,0.1) 100%)',
-            }}
-            bodyStyle={{ padding: '16px' }}
-          >
-            <div
-              style={{
-                fontSize: 11,
-                color: '#666',
-                fontWeight: 600,
-                marginBottom: 6,
-                textTransform: 'uppercase',
-                letterSpacing: '0.3px',
-              }}
-            >
-              อุปกรณ์เคลื่อนที่ทั้งหมด
-            </div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#f5576c', marginBottom: 2 }}>
-              {sensors.length}
-            </div>
-            <div style={{ fontSize: 11, color: '#999' }}>🚗 อุปกรณ์ติดตาม</div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={12} md={12}>
-          <Card
-            style={{
-              borderRadius: 12,
-              border: '1px solid rgba(255,255,255,0.6)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              background:
-                'linear-gradient(135deg, rgba(82,196,26,0.1) 0%, rgba(115,209,61,0.1) 100%)',
-            }}
-            bodyStyle={{ padding: '16px' }}
-          >
-            <div
-              style={{
-                fontSize: 11,
-                color: '#666',
-                fontWeight: 600,
-                marginBottom: 6,
-                textTransform: 'uppercase',
-                letterSpacing: '0.3px',
-              }}
-            >
-              ใช้งานอยู่
-            </div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#52c41a', marginBottom: 2 }}>
-              {onlineSensors.length}
-            </div>
-            <div style={{ fontSize: 11, color: '#999' }}>จาก {sensors.length} ออนไลน์</div>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Alerts */}
-      {error && (
-        <Alert
-          message="ข้อผิดพลาดในการโหลดข้อมูล"
-          description="ไม่สามารถโหลดข้อมูลเซ็นเซอร์เคลื่อนที่ กรุณาลองใหม่อีกครั้ง"
-          type="error"
-          closable
-          className="mb-4"
-          style={{ borderRadius: 8 }}
-        />
-      )}
-
-      {loading && sensors.length === 0 && (
-        <Alert
-          message="กำลังโหลดเซ็นเซอร์เคลื่อนที่"
-          description="กำลังดึงข้อมูลเซ็นเซอร์เคลื่อนที่แบบเรียลไทม์..."
-          type="info"
-          className="mb-4"
-          style={{ borderRadius: 8 }}
-        />
-      )}
-
       {!loading && sensors.length === 0 && !error && (
         <Alert
           message="ไม่มีเซ็นเซอร์เคลื่อนที่"
@@ -317,15 +230,18 @@ export const MobileSensorsDashboard = () => {
               ))}
             </Select>
           </Col>
-          <Col xs={24} sm={12} md={8}>
-            <div style={{ marginBottom: 4, fontSize: 13, color: '#595959' }}>เลือกวันที่</div>
-            <DatePicker
-              placeholder="เลือกวันที่"
-              value={selectedDate}
-              onChange={handleDateSelect}
+          <Col xs={24} sm={12} md={12}>
+            <div style={{ marginBottom: 4, fontSize: 13, color: '#595959' }}>เลือกช่วงวันที่</div>
+            <DatePicker.RangePicker
+              format="YYYY-MM-DD"
+              value={dateRange}
+              onChange={(dates) => {
+                console.log('✅ Date range selected:', dates);
+                setDateRange(dates);
+              }}
+              placeholder={['วันที่เริ่มต้น', 'วันที่สิ้นสุด']}
               style={{ width: '100%' }}
               size="large"
-              format="YYYY-MM-DD"
             />
           </Col>
           {selectedRoute && (
@@ -415,7 +331,7 @@ export const MobileSensorsDashboard = () => {
             </div>
           ) : selectedRoute ? (
             <RouteMap key={selectedRoute.id} route={selectedRoute} />
-          ) : selectedSensorId && selectedDate ? (
+          ) : selectedSensorId && dateRange && dateRange[0] && dateRange[1] ? (
             <div
               style={{
                 height: '100%',

@@ -50,14 +50,16 @@ const createAuthClient = () => {
 
 export const thresholdService = {
   /**
-   * Get all thresholds (admin only)
+   * Get all thresholds (PUBLIC API - no auth required, uses x-ingest-key via proxy)
    */
   async getThresholds(): Promise<Threshold[]> {
     try {
-      console.log('📊 Fetching all thresholds...');
+      console.log('📊 Fetching all thresholds (public)...');
       
-      const client = createAuthClient();
-      const response = await client.get<GetThresholdsResponse>('/thresholds');
+      // Call Next.js API proxy (same pattern as sensors/latest)
+      const response = await axios.get<GetThresholdsResponse>(`${API_BASE_URL}/thresholds`, {
+        timeout: 30000,
+      });
       
       console.log('✅ Fetched', response.data.items.length, 'thresholds');
       return response.data.items;

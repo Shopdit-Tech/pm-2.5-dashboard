@@ -8,6 +8,7 @@ type AuthContextType = {
   user: User | null;
   login: (credentials: UserCredentials) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  refreshToken: () => Promise<{ success: boolean; error?: string }>;
   isAuthenticated: boolean;
   isAdmin: boolean;
   loading: boolean;
@@ -75,6 +76,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const refreshToken = async (): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const storedData = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (!storedData) {
+        return { success: false, error: 'No refresh token found' };
+      }
+      
+      const parsedData = JSON.parse(storedData);
+      if (!parsedData.refresh_token) {
+        return { success: false, error: 'No refresh token found' };
+      }
+      
+      console.log('🔄 Attempting to refresh token...');
+      const response = await authService.refreshToken(parsedData.refresh_token);
+      
+      // Map API user to app User type
+      const appUser: User = {
+        id: response.user.id,
+        username: response.user.email,
+        email: response.user.email,
+        role: response.user.app_metadata.role,
+      };
+      
+      // Update stored data with new tokens
+      const authData = {
+        user: appUser,
+        access_token: response.access_token,
+        refresh_token: response.refresh_token,
+      };
+      
+      setUser(appUser);
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData));
+      
+      console.log('✅ Token refreshed successfully');
+      return { success: true };
+    } catch (error: any) {
+      console.error('❌ Token refresh error:', error);
+      // If refresh fails, logout user
+      logout();
+      return { success: false, error: error.message || 'Token refresh failed' };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
@@ -85,12 +129,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     user,
     login,
     logout,
+    refreshToken,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
     loading,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {

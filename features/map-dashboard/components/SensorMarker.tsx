@@ -1,6 +1,6 @@
 import { SensorData } from '@/types/sensor';
 import { getParameterColor } from '@/utils/airQualityUtils';
-import { HomeOutlined, ShopOutlined } from '@ant-design/icons';
+import { Popover, Badge } from 'antd';
 
 type SensorMarkerProps = {
   sensor: SensorData;
@@ -18,14 +18,64 @@ export const SensorMarker = ({ sensor, onClick, isSelected }: SensorMarkerProps)
     onClick();
   };
 
+  // Calculate AQI TH from PM2.5 (simplified Thailand AQI calculation)
+  const calculateAQITH = (pm25: number): number => {
+    if (pm25 <= 15) return Math.round((pm25 / 15) * 25);
+    if (pm25 <= 25) return Math.round(25 + ((pm25 - 15) / 10) * 25);
+    if (pm25 <= 37.5) return Math.round(50 + ((pm25 - 25) / 12.5) * 25);
+    if (pm25 <= 75) return Math.round(75 + ((pm25 - 37.5) / 37.5) * 25);
+    return Math.min(Math.round(100 + ((pm25 - 75) / 75) * 100), 200);
+  };
+
+  // Format timestamp to Thai format
+  const formatTimestamp = (timestamp: string): string => {
+    const date = new Date(timestamp);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear() + 543; // Thai Buddhist year
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${day} พ.ย. ${year} ${hours}:${minutes} น.`;
+  };
+
+  // Tooltip content
+  const tooltipContent = (
+    <div style={{ maxWidth: 320 }}>
+      <div style={{ marginBottom: 8 }}>
+        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>
+          {sensor.name}
+        </div>
+        <div style={{ color: '#8c8c8c', fontSize: 12, marginBottom: 8 }}>
+          {sensor.type === 'indoor' ? 'เซ็นเซอร์ภายในอาคาร' : 'เซ็นเซอร์ภายนอกอาคาร'}
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        <Badge color={color} />
+        <span style={{ fontWeight: 500 }}>
+          PM2.5: {sensor.pm25.toFixed(1)} μg/m³ | AQI TH: {calculateAQITH(sensor.pm25)}
+        </span>
+      </div>
+      <div style={{ fontSize: 12, color: '#8c8c8c' }}>
+        <div style={{ marginBottom: 2 }}>ค่าอากาศจากศูนยกลาง</div>
+        <div>อัพเดทล่าสุด: {formatTimestamp(sensor.timestamp)}</div>
+      </div>
+    </div>
+  );
+
   return (
-    <div
-      onClick={handleClick}
-      className="relative cursor-pointer transform transition-all duration-200 hover:scale-110"
-      style={{
-        transform: isSelected ? 'scale(1.2)' : 'scale(1)',
-      }}
+    <Popover
+      content={tooltipContent}
+      trigger="hover"
+      placement="top"
+      overlayStyle={{ maxWidth: 350 }}
     >
+      <div
+        onClick={handleClick}
+        className="relative cursor-pointer transform transition-all duration-200 hover:scale-110"
+        style={{
+          transform: isSelected ? 'scale(1.2)' : 'scale(1)',
+        }}
+      >
       {/* Marker Container */}
       <div className="relative">
         {/* Pulse effect for selected marker */}
@@ -51,7 +101,7 @@ export const SensorMarker = ({ sensor, onClick, isSelected }: SensorMarkerProps)
             height: '42px',
             backgroundColor: isOffline ? '#d9d9d9' : color,
             borderRadius: '50%',
-            border: `3px solid ${isSelected ? '#1890ff' : 'white'}`,
+            border: `2px solid ${isSelected ? '#1890ff' : 'black'}`,
             boxShadow: isSelected
               ? '0 4px 12px rgba(0,0,0,0.3)'
               : '0 2px 8px rgba(0,0,0,0.2)',
@@ -61,11 +111,10 @@ export const SensorMarker = ({ sensor, onClick, isSelected }: SensorMarkerProps)
           <div className="text-white text-xs font-bold leading-none">
             {isOffline ? '-' : sensor.pm25.toFixed(0)}
           </div>
-          <div className="text-white text-[8px] leading-none mt-0.5">PM2.5</div>
         </div>
 
         {/* Indoor/Outdoor Icon Badge */}
-        <div
+        {/* <div
           className="absolute -bottom-1 -right-1 flex items-center justify-center"
           style={{
             width: '18px',
@@ -80,11 +129,11 @@ export const SensorMarker = ({ sensor, onClick, isSelected }: SensorMarkerProps)
           ) : (
             <ShopOutlined style={{ fontSize: '8px', color: 'white' }} />
           )}
-        </div>
+        </div> */}
       </div>
 
       {/* Location Name Label */}
-      <div
+      {/* <div
         className="absolute top-full mt-1 left-1/2 transform -translate-x-1/2 whitespace-nowrap px-2 py-1 text-xs font-medium rounded shadow-md"
         style={{
           backgroundColor: 'rgba(0, 0, 0, 0.75)',
@@ -93,16 +142,17 @@ export const SensorMarker = ({ sensor, onClick, isSelected }: SensorMarkerProps)
         }}
       >
         {sensor.name}
-      </div>
+      </div> */}
 
-      {/* Offline Indicator */}
-      {isOffline && (
-        <div
-          className="absolute top-0 right-0 w-3 h-3 rounded-full border-2 border-white"
-          style={{ backgroundColor: '#ff4d4f' }}
-          title="ออฟไลน์"
-        />
-      )}
-    </div>
+        {/* Offline Indicator */}
+        {isOffline && (
+          <div
+            className="absolute top-0 right-0 w-3 h-3 rounded-full border-2 border-white"
+            style={{ backgroundColor: '#ff4d4f' }}
+            title="ออฟไลน์"
+          />
+        )}
+      </div>
+    </Popover>
   );
 };

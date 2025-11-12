@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { Card, Select, Typography, Space, Row, Col, Spin, Alert } from 'antd';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Card, Select, Typography, Space, Row, Col, Spin, Alert, Button } from 'antd';
+import { ReloadOutlined } from '@ant-design/icons';
 import {
   LineChart,
   Line,
@@ -12,7 +13,6 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
-  ReferenceArea,
 } from 'recharts';
 import { SensorData } from '@/types/sensor';
 import { TimeRange, getTimeRangeLabel, getTimeRangeId } from '../types/chartTypes';
@@ -21,7 +21,6 @@ import { fetchRealChartData, getLocationColor } from '../services/chartDataServi
 import { getParameterLabel, getParameterUnit } from '@/features/sensor-table/utils/parameterThresholds';
 import { ParameterTabs } from './ParameterTabs';
 import { LocationSelector } from './LocationSelector';
-import { useThreshold } from '@/contexts/ThresholdContext';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -31,7 +30,6 @@ type MultiLocationLineChartProps = {
 };
 
 export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps) => {
-  const { getThresholdsForMetric } = useThreshold();
   const [parameter, setParameter] = useState('pm25');
   const [timeRange, setTimeRange] = useState<TimeRange>(getTimeRangeByIdOrDefault('24h'));
   const [selectedSensorIds, setSelectedSensorIds] = useState<string[]>([]);
@@ -58,56 +56,59 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
     }
   }, [sensors]);
 
-  // Fetch real data for all selected sensors
-  useEffect(() => {
-    const fetchAllSensorsData = async () => {
-      if (selectedSensorIds.length === 0) {
-        setChartsData([]);
-        return;
-      }
+  // Manual fetch function
+  const fetchAllSensorsData = useCallback(async () => {
+    if (selectedSensorIds.length === 0) {
+      setChartsData([]);
+      return;
+    }
 
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      try {
-        console.log('📊 Fetching data for multiple sensors:', selectedSensorIds);
+    try {
+      console.log('📊 Fetching data for multiple sensors:', selectedSensorIds);
 
-        const promises = selectedSensorIds.map(async (sensorId, index) => {
-          const sensor = sensors.find((s) => s.id === sensorId);
-          if (!sensor) return null;
+      const promises = selectedSensorIds.map(async (sensorId, index) => {
+        const sensor = sensors.find((s) => s.id === sensorId);
+        if (!sensor) return null;
 
-          try {
-            const data = await fetchRealChartData(sensor, parameter as any, timeRange);
-            console.log(`✅ Fetched data for ${sensor.name}`);
-            
-            return {
-              ...data,
-              color: getLocationColor(index),
-            };
-          } catch (err) {
-            console.error(`❌ Failed to fetch data for ${sensor.name}:`, err);
-            return null;
-          }
-        });
-
-        const results = await Promise.all(promises);
-        const validResults = results.filter((r) => r !== null);
-        
-        setChartsData(validResults);
-        
-        if (validResults.length === 0) {
-          setError('ไม่มีข้อมูลสำหรับเซ็นเซอร์ที่เลือก');
+        try {
+          const data = await fetchRealChartData(sensor, parameter as any, timeRange);
+          console.log(`✅ Fetched data for ${sensor.name}`);
+          
+          return {
+            ...data,
+            color: getLocationColor(index),
+          };
+        } catch (err) {
+          console.error(`❌ Failed to fetch data for ${sensor.name}:`, err);
+          return null;
         }
-      } catch (err) {
-        console.error('❌ Error fetching charts data:', err);
-        setError('ไม่สามารถโหลดข้อมูลกราฟ');
-      } finally {
-        setLoading(false);
-      }
-    };
+      });
 
-    fetchAllSensorsData();
-  }, [sensors, selectedSensorIds, parameter, timeRange]);
+      const results = await Promise.all(promises);
+      const validResults = results.filter((r) => r !== null);
+      
+      setChartsData(validResults);
+      
+      if (validResults.length === 0) {
+        setError('ไม่มีข้อมูลสำหรับเซ็นเซอร์ที่เลือก');
+      }
+    } catch (err) {
+      console.error('❌ Error fetching charts data:', err);
+      setError('ไม่สามารถโหลดข้อมูลกราฟ');
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedSensorIds, parameter, timeRange, sensors]);
+
+  // Auto-fetch data when selections change
+  useEffect(() => {
+    if (selectedSensorIds.length > 0) {
+      fetchAllSensorsData();
+    }
+  }, [selectedSensorIds, parameter, timeRange, fetchAllSensorsData]);
 
   // Generate colors for selected sensors
   const sensorColors = useMemo(() => {
@@ -117,25 +118,6 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
     });
     return colors;
   }, [selectedSensorIds]);
-
-  // Get threshold zones for background
-  const thresholdZones = useMemo(() => {
-    const thresholds = getThresholdsForMetric(parameter as any);
-    
-    if (thresholds.length === 0) {
-      return [];
-    }
-    
-    // Convert thresholds to zones for ReferenceArea
-    return thresholds.map((threshold) => ({
-      min: threshold.min_value,
-      max: threshold.max_value,
-      label: threshold.level.replace('_', ' ').charAt(0).toUpperCase() + threshold.level.slice(1).replace('_', ' '),
-      color: threshold.color_hex,
-      opacity: 0.15,
-    }));
-  }, [parameter, getThresholdsForMetric]);
-
 
   // Merge data from all sensors into single dataset for Recharts
   const mergedChartData = useMemo(() => {
@@ -196,6 +178,19 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
 
     return result;
   }, [chartsData]);
+
+  // Calculate X-axis ticks manually for proper display
+  const xAxisTicks = useMemo(() => {
+    if (mergedChartData.length === 0) return [];
+    
+    // Show max 12 ticks
+    const maxTicks = 12;
+    const step = Math.max(1, Math.ceil(mergedChartData.length / maxTicks));
+    
+    return mergedChartData
+      .filter((_, index) => index % step === 0)
+      .map(d => d.timestamp);
+  }, [mergedChartData]);
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload }: any) => {
@@ -300,7 +295,7 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
 
             <Col xs={24} md={16}>
               <Text strong style={{ display: 'block', marginBottom: 8, fontSize: isMobile ? 13 : 14 }}>
-                Locations:
+                Select Locations (up to 5):
               </Text>
               <LocationSelector
                 sensors={sensors}
@@ -308,6 +303,18 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
                 onChange={setSelectedSensorIds}
                 colors={sensorColors}
               />
+            </Col>
+            <Col xs={24} md={24}>
+              <Button
+                type="primary"
+                icon={<ReloadOutlined />}
+                onClick={fetchAllSensorsData}
+                loading={loading}
+                size="large"
+                style={{ width: isMobile ? '100%' : 'auto' }}
+              >
+                Refresh Data
+              </Button>
             </Col>
           </Row>
         </Space>
@@ -343,15 +350,20 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
                 dataKey="timestamp"
                 type="number"
                 domain={['dataMin', 'dataMax']}
-                tickFormatter={(timestamp) =>
-                  new Date(timestamp).toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false,
-                  })
-                }
-                tick={{ fontSize: 11 }}
-                stroke="#8c8c8c"
+                ticks={xAxisTicks}
+                tickFormatter={(timestamp) => {
+                  const date = new Date(timestamp);
+                  const hour = date.getHours();
+                  const hour12 = hour % 12 || 12;
+                  const ampm = hour >= 12 ? 'PM' : 'AM';
+                  return `${hour12}${ampm}`;
+                }}
+                tick={{ fontSize: 12, fill: '#424242' }}
+                stroke="#BDBDBD"
+                tickLine={false}
+                height={80}
+                angle={-45}
+                textAnchor="end"
               />
               
               <YAxis
@@ -376,17 +388,6 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
                 scale="linear"
                 allowDataOverflow={false}
               />
-
-              {/* Background threshold zones */}
-              {thresholdZones.map((zone, index) => (
-                <ReferenceArea
-                  key={index}
-                  y1={zone.min}
-                  y2={zone.max}
-                  fill={zone.color}
-                  fillOpacity={zone.opacity}
-                />
-              ))}
 
               <Tooltip content={<CustomTooltip />} />
               

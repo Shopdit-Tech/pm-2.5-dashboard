@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Layout, Menu, Typography, Badge, Button, Avatar, Dropdown, Space } from 'antd';
+import { Layout, Menu, Typography, Button, Avatar, Dropdown } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginModal } from './LoginModal';
+import { Footer } from './Footer';
 
 const { Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -20,7 +21,7 @@ type MainLayoutProps = {
 
 export const MainLayout = ({ children }: MainLayoutProps) => {
   const { user, logout, isAdmin } = useAuth();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [activeView, setActiveView] = useState<string>('static-sensors');
   const [isMobile, setIsMobile] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -53,13 +54,13 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   const baseMenuItems = [
     {
       key: 'static-sensors',
-      label: 'เซ็นเซอร์ติดตั้ง',
-      title: 'แผนที่เซ็นเซอร์ติดตั้ง',
+      label: 'สถานีตรวจวัดคุณภาพอากาศ',
+      title: 'ศูนย์ข้อมูลเฝ้าระวังคุณภาพอากาศ ศูนย์บริหารวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
     },
     {
       key: 'mobile-routes',
-      label: 'เส้นทางเคลื่อนที่',
-      title: 'เส้นทางอุปกรณ์เคลื่อนที่',
+      label: 'เซ็นเซอร์ตรวจวัดคุณภาพอากาศแบบติดตัวบุคคล',
+      title: 'ศูนย์ข้อมูลเฝ้าระวังคุณภาพอากาศ ศูนย์บริหารวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
     },
     // {
     //   key: 'sensor-data-table',
@@ -73,8 +74,8 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     // },
     {
       key: 'analytics',
-      label: 'การวิเคราะห์',
-      title: 'กราฟวิเคราะห์',
+      label: 'ข้อมูลย้อนหลัง',
+      title: 'ศูนย์ข้อมูลเฝ้าระวังคุณภาพอากาศ ศูนย์บริหารวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
     },
   ];
 
@@ -154,7 +155,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         </div>
 
         {/* Menu */}
-        <div style={{ padding: '20px 16px' }}>
+        <div style={{ padding: '20px 16px', flex: 1 }}>
           <Menu
             mode="inline"
             selectedKeys={[activeView]}
@@ -173,6 +174,102 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             }}
             className="modern-menu"
           />
+        </div>
+
+        {/* Auth Section - Bottom of Sidebar */}
+        <div
+          style={{
+            padding: '16px',
+            borderTop: '1px solid #f0f0f0',
+            background: 'white',
+          }}
+        >
+          {user ? (
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: 'logout',
+                    label: 'ออกจากระบบ',
+                    icon: <LoginOutlined />,
+                    onClick: () => logout(),
+                  },
+                ],
+              }}
+              placement="topRight"
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '12px',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  background: '#f9fafb',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f3f4f6';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#f9fafb';
+                }}
+              >
+                <Avatar
+                  icon={<UserOutlined />}
+                  style={{ background: '#667eea', flexShrink: 0 }}
+                  size={40}
+                />
+                {!collapsed && (
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <Text
+                      strong
+                      style={{
+                        fontSize: 14,
+                        display: 'block',
+                        color: '#1a1a1a',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {user.username}
+                    </Text>
+                    <Text
+                      type="secondary"
+                      style={{
+                        fontSize: 12,
+                        display: 'block',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {user.role === 'admin' ? 'ผู้ดูแลระบบ' : 'ผู้ใช้'}
+                    </Text>
+                  </div>
+                )}
+              </div>
+            </Dropdown>
+          ) : (
+            <Button
+              type="primary"
+              icon={<LoginOutlined />}
+              onClick={() => setShowLoginModal(true)}
+              size="large"
+              block
+              style={{
+                height: 48,
+                borderRadius: 12,
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                border: 'none',
+                fontWeight: 600,
+              }}
+            >
+              {collapsed ? '' : 'เข้าสู่ระบบ'}
+            </Button>
+          )}
         </div>
       </Sider>
 
@@ -262,73 +359,6 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
               </Title>
             </div>
           </div>
-          
-          {/* Auth Section */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {!isMobile && (
-              <Badge 
-                status="success" 
-                text="System Online" 
-                style={{ 
-                  fontSize: 14, 
-                  fontWeight: 500,
-                  marginRight: 12,
-                }} 
-              />
-            )}
-            
-            {user ? (
-              <Dropdown
-                menu={{
-                  items: [
-                    ...(isAdmin
-                      ? [
-                          {
-                            key: 'admin',
-                            label: 'การตั้งค่าผู้ดูแล',
-                            onClick: () => {
-                              setActiveView('admin-settings');
-                              // Auto-close sidebar on mobile
-                              if (isMobile) {
-                                setCollapsed(true);
-                              }
-                            },
-                          },
-                          { type: 'divider' as const },
-                        ]
-                      : []),
-                    {
-                      key: 'logout',
-                      label: 'ออกจากระบบ',
-                      onClick: () => logout(),
-                    },
-                  ],
-                }}
-                placement="bottomRight"
-              >
-                <Space style={{ cursor: 'pointer' }}>
-                  <Avatar icon={<UserOutlined />} style={{ background: '#1890ff' }} />
-                  {!isMobile && (
-                    <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                      <Text strong style={{ fontSize: 14 }}>{user.username}</Text>
-                      <Text type="secondary" style={{ fontSize: 11 }}>
-                        {user.role === 'admin' ? 'ผู้ดูแลระบบ' : 'ผู้ใช้'}
-                      </Text>
-                    </div>
-                  )}
-                </Space>
-              </Dropdown>
-            ) : (
-              <Button
-                type="primary"
-                icon={<LoginOutlined />}
-                onClick={() => setShowLoginModal(true)}
-                size={isMobile ? 'middle' : 'large'}
-              >
-                {isMobile ? '' : 'เข้าสู่ระบบ'}
-              </Button>
-            )}
-          </div>
         </div>
         
         {/* Login Modal */}
@@ -346,6 +376,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           }}
         >
           {children(activeView)}
+          <Footer />
         </Content>
       </Layout>
     </Layout>

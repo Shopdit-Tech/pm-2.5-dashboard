@@ -2,13 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import { Card, Select, Typography, Space, Spin, Alert } from 'antd';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
 import { SensorData } from '@/types/sensor';
-import { TimeRange, getTimeRangeLabel, getTimeRangeId } from '../types/chartTypes';
+import { TimeRange, getTimeRangeId } from '../types/chartTypes';
 import { TIME_RANGES, getTimeRangeByIdOrDefault } from '../constants/timeRanges';
-import { aggregateDataPoints } from '../services/chartDataService';
 import { useChartData } from '../hooks/useChartData';
-import { getParameterLabel, getParameterUnit } from '@/features/sensor-table/utils/parameterThresholds';
+import { getParameterUnit } from '@/features/sensor-table/utils/parameterThresholds';
 import { getParameterColor } from '@/utils/airQualityUtils';
 
 const { Text } = Typography;
@@ -53,18 +52,60 @@ export const BarChartPanel = ({
   const chartData = useMemo(() => {
     if (!apiChartData) return null;
     
-    // Aggregate to ~24 bars for readability
-    const aggregated = aggregateDataPoints(apiChartData.data, 24);
+    // Show all data points without aggressive aggregation
+    // This ensures we display all hourly data from the API
+    const data = apiChartData.data;
+    
+    // Calculate 24-hour average (for all parameters)
+    let avg24h = null;
+    if (data.length > 0) {
+      const last24 = data.slice(-Math.min(24, data.length));
+      const sum = last24.reduce((acc, p) => acc + (p.value || 0), 0);
+      avg24h = sum / last24.length;
+    }
     
     return {
       ...apiChartData,
-      data: aggregated.map((point) => ({
-        ...point,
-        // Color based on value - Use 0 for null values
-        fill: getParameterColor(parameter as any, point.value ?? 0),
-      })),
+      data,
+      avg24h,
     };
   }, [apiChartData, parameter]);
+
+  // Calculate intelligent X-axis tick interval based on data length
+  const xAxisInterval = useMemo(() => {
+    if (!chartData) return 0;
+    const len = chartData.data.length;
+    if (len <= 12) return 0;      // Show all (< 12 hours)
+    if (len <= 24) return 1;      // Every 2nd (12-24 hours)
+    if (len <= 48) return 3;      // Every 4th (1-2 days)
+    if (len <= 96) return 7;      // Every 8th (2-4 days)
+    if (len <= 168) return 11;    // Every 12th (4-7 days)
+    return Math.floor(len / 12);  // Show max ~12 ticks for very long ranges
+  }, [chartData]);
+
+  // Get bar color based on value and parameter using threshold config
+  const getBarColor = (value: number) => {
+    return getParameterColor(parameter as any, value ?? 0);
+  };
+
+  // Format hour for x-axis (e.g., "3AM", "4PM")
+  const formatHourLabel = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const hour = date.getHours();
+    const hour12 = hour % 12 || 12;
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    return `${hour12}${ampm}`;
+  };
+
+  // Get current timestamp for "Last update"
+  const lastUpdate = useMemo(() => {
+    const now = new Date();
+    const day = now.getDate();
+    const month = now.toLocaleString('en-US', { month: 'short' });
+    const year = now.getFullYear().toString().slice(-2);
+    const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    return `Last update: ${day} ${month} ${year}, ${time}`;
+  }, [chartData]);
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload }: any) => {
@@ -83,6 +124,42 @@ export const BarChartPanel = ({
     }
     return null;
   };
+
+  // Custom label component for average line with gold background
+  const GoldAverageLabel = (props: any) => {
+    const { viewBox, value } = props;
+    if (!viewBox || !value) return null;
+    
+    const chartWidth = viewBox.width;
+    const centerX = chartWidth / 2;
+    const text = `24h Avg: ${value.toFixed(1)} ${getParameterUnit(parameter)}`;
+    
+    return (
+      <g>
+        <rect
+          x={centerX - 42}
+          y={viewBox.y - 19}
+          width={180}
+          height={28}
+          fill="#1d63dc"
+          rx={14}
+          stroke="#1d63dc"
+          strokeWidth={2}
+        />
+        <text
+          x={centerX + 50}
+          y={viewBox.y - 1}
+          textAnchor="middle"
+          fill="white"
+          fontSize={10}
+          fontWeight={700}
+        >
+          {text}
+        </text>
+      </g>
+    );
+  };
+
 
   return (
     <Card
@@ -164,65 +241,80 @@ export const BarChartPanel = ({
 
       {/* Chart */}
       {!loading && chartData && (
-        <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={chartData.data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+        <div>
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart 
+              data={chartData.data} 
+              margin={{ top: 20, right: 20, left: -10, bottom: 5 }}
+              barGap={0}
+              barCategoryGap={0}
+            >
+              <CartesianGrid 
+                strokeDasharray="0" 
+                stroke="#E0E0E0" 
+                vertical={false}
+              />
+              
+              {/* X-Axis: Time labels with intelligent interval and rotation */}
+              <XAxis
+                dataKey="timestamp"
+                tickFormatter={formatHourLabel}
+                tick={{ fontSize: 12, fill: '#424242' }}
+                stroke="#BDBDBD"
+                tickLine={false}
+                height={80}
+                interval={xAxisInterval}
+                angle={-45}
+                textAnchor="end"
+              />
+              
+              {/* Y-Axis: Auto-scaled based on data */}
+              <YAxis
+                tick={{ fontSize: 13, fill: '#424242' }}
+                stroke="#BDBDBD"
+                tickLine={false}
+                axisLine={false}
+              />
+              
+              <Tooltip content={<CustomTooltip />} />
+              
+              {/* Bars with dynamic colors using threshold config */}
+              <Bar 
+                dataKey="value"
+                isAnimationActive={false}
+                maxBarSize={100}
+              >
+                {chartData.data.map((entry: any, index: number) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={getBarColor(entry.value ?? 0)}
+                  />
+                ))}
+              </Bar>
+              
+              {/* 24-Hour Average Line - AFTER bars for top layer rendering */}
+              {chartData.avg24h && (
+                <ReferenceLine
+                  y={chartData.avg24h}
+                  stroke="#1d63dc"
+                  strokeWidth={3}
+                  strokeDasharray="5 5"
+                  label={<GoldAverageLabel value={chartData.avg24h} />}
+                  isFront={true}
+                />
+              )}
+            </BarChart>
+          </ResponsiveContainer>
           
-          <XAxis
-            dataKey="formattedTime"
-            tick={{ fontSize: 11 }}
-            stroke="#8c8c8c"
-            angle={-45}
-            textAnchor="end"
-            height={60}
-          />
-          
-          <YAxis
-            domain={[0, (dataMax: number) => {
-              // For TVOC and low-value parameters, use appropriate scaling
-              if (dataMax < 50) return Math.ceil(dataMax * 1.2);
-              return Math.ceil(dataMax * 1.1);
-            }]}
-            tick={{ fontSize: 11 }}
-            stroke="#8c8c8c"
-            label={{
-              value: `${getParameterLabel(parameter)} (${getParameterUnit(parameter)})`,
-              angle: -90,
-              position: 'insideLeft',
-              style: { fontSize: 11, fill: '#595959' },
-            }}
-            scale="linear"
-            allowDataOverflow={false}
-          />
-          
-          <Tooltip content={<CustomTooltip />} />
-          
-          {/* Average line */}
-          <ReferenceLine
-            y={chartData.average}
-            stroke="#faad14"
-            strokeWidth={2}
-            strokeDasharray="5 5"
-            label={{
-              value: `${getTimeRangeLabel(timeRange)} Average: ${chartData.average.toFixed(1)}`,
-              position: 'top',
-              fill: '#faad14',
-              fontSize: 11,
-              fontWeight: 600,
-            }}
-          />
-          
-          <Bar dataKey="value" radius={[4, 4, 0, 0]} />
-        </BarChart>
-        </ResponsiveContainer>
+          {/* Last update timestamp */}
+          <div style={{ marginTop: 12, marginLeft: 10 }}>
+            <Text style={{ fontSize: 13, color: '#757575' }}>
+              {lastUpdate}
+            </Text>
+          </div>
+        </div>
       )}
 
-      {/* Footer */}
-      <div style={{ marginTop: 8, textAlign: 'right' }}>
-        <Text type="secondary" style={{ fontSize: 11 }}>
-          {currentSensor?.name} - {getTimeRangeLabel(timeRange)}
-        </Text>
-      </div>
     </Card>
   );
 };

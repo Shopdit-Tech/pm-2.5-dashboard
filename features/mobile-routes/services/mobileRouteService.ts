@@ -59,6 +59,177 @@ export const mobileRouteService = {
   },
 
   /**
+   * Get historical route for a mobile sensor for a date/time range
+   * @param sensor - Mobile sensor data
+   * @param fromDateTime - Start datetime (ISO string or Date object in UTC+7)
+   * @param toDateTime - End datetime (ISO string or Date object in UTC+7)
+   * @returns MobileRoute with all points for that range
+   */
+  getSensorRouteRange: async (
+    sensor: SensorData,
+    fromDateTime: string | Date,
+    toDateTime: string | Date
+  ): Promise<MobileRoute | null> => {
+    try {
+      if (!sensor.code) {
+        console.warn('⚠️ Sensor has no code, cannot fetch route');
+        return null;
+      }
+
+      console.log(`🗺️ Fetching route for ${sensor.name} from ${fromDateTime} to ${toDateTime}...`);
+
+      // Convert datetime to UTC for API
+      // User selects datetime in UTC+7, API needs UTC
+      const fromDate = new Date(fromDateTime);
+      const toDate = new Date(toDateTime);
+      
+      const fromDateUTC = formatTimestampForApi(fromDate);
+      const toDateUTC = formatTimestampForApi(toDate);
+      
+      console.log('🕐 Timezone conversion:', {
+        fromUTC7: fromDateTime.toString(),
+        toUTC7: toDateTime.toString(),
+        fromUTC: fromDateUTC,
+        toUTC: toDateUTC,
+      });
+
+      // Call history API with All metrics and 1-hour aggregation
+      const response = await axios.get(`${API_CONFIG.baseURL}${API_ENDPOINTS.sensorHistory}`, {
+        params: {
+          sensor_code: sensor.code,
+          metric: 'All',
+          from: fromDateUTC,
+          to: toDateUTC,
+          agg_minutes: 60,
+        },
+        timeout: API_CONFIG.timeout,
+      });
+
+      const apiData = response.data;
+
+      console.log('📊 API Response:', {
+        metricsCount: apiData.metrics?.length,
+        firstMetric: apiData.metrics?.[0]?.metric,
+        firstPointSample: apiData.metrics?.[0]?.points?.[0],
+      });
+
+      // Validate response
+      if (!apiData.metrics || apiData.metrics.length === 0) {
+        console.log('❌ No route data available for this date range');
+        return null;
+      }
+
+      // Transform API response to route points
+      const routePoints: RoutePoint[] = [];
+      
+      const baseMetric = apiData.metrics[0];
+      if (!baseMetric.points || baseMetric.points.length === 0) {
+        console.log('❌ No data points in response');
+        return null;
+      }
+
+      // Create a map of timestamp -> values for each metric
+      const metricsByTimestamp: Record<string, any> = {};
+      
+      console.log('📊 Available metrics:', apiData.metrics.map((m: any) => m.metric));
+      
+      apiData.metrics.forEach((metricData: any) => {
+        metricData.points.forEach((point: any) => {
+          const timestamp = point.ts || point.timestamp || point.time;
+          const pointDate = new Date(timestamp);
+          
+          // Include all points in the range
+          if (pointDate >= fromDate && pointDate <= toDate) {
+            if (!metricsByTimestamp[timestamp]) {
+              metricsByTimestamp[timestamp] = {
+                timestamp,
+                lat: null,
+                lng: null,
+              };
+            }
+            
+            // Extract lat/lng from point properties (not metric names)
+            if (point.lat !== undefined && point.lat !== null) {
+              metricsByTimestamp[timestamp].lat = point.lat;
+            }
+            if (point.lng !== undefined && point.lng !== null) {
+              metricsByTimestamp[timestamp].lng = point.lng;
+            }
+            
+            // Map metric value
+            const metricName = metricData.metric;
+            metricsByTimestamp[timestamp][metricName] = point.value;
+          }
+        });
+      });
+
+      // Convert to route points array
+      Object.values(metricsByTimestamp).forEach((data: any, index: number) => {
+        if (data.lat !== null && data.lng !== null) {
+          routePoints.push({
+            id: `point-${index}-${data.timestamp}`,
+            timestamp: data.timestamp,
+            latitude: data.lat,
+            longitude: data.lng,
+            pm1: data.pm1 || 0,
+            pm25: data.pm25 || 0,
+            pm10: data.pm10 || 0,
+            temperature: data.temperature_c || 0,
+            humidity: data.humidity_rh || 0,
+            co2: data.co2_ppm || 0,
+            tvoc: data.tvoc_index || 0,
+          });
+        }
+      });
+
+      // Sort by timestamp
+      routePoints.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+      if (routePoints.length === 0) {
+        console.log('❌ No valid GPS points found');
+        return null;
+      }
+
+      console.log(`✅ Created route with ${routePoints.length} points`);
+
+      // Calculate route statistics
+      const pm25Values = routePoints.map((p) => p.pm25).filter((v) => v > 0);
+      const avgPm25 = pm25Values.length > 0
+        ? pm25Values.reduce((sum, val) => sum + val, 0) / pm25Values.length
+        : 0;
+      const maxPm25 = pm25Values.length > 0 ? Math.max(...pm25Values) : 0;
+      const minPm25 = pm25Values.length > 0 ? Math.min(...pm25Values) : 0;
+
+      // Calculate total distance (simple approximation)
+      let totalDistance = 0;
+      for (let i = 1; i < routePoints.length; i++) {
+        const prev = routePoints[i - 1];
+        const curr = routePoints[i];
+        const distance = calculateDistance(prev.latitude, prev.longitude, curr.latitude, curr.longitude);
+        totalDistance += distance;
+      }
+
+      const route: MobileRoute = {
+        id: `${sensor.id}-${fromDateUTC}-${toDateUTC}`,
+        deviceName: sensor.name,
+        deviceId: sensor.id,
+        startTime: routePoints[0].timestamp,
+        endTime: routePoints[routePoints.length - 1].timestamp,
+        totalDistance: parseFloat(totalDistance.toFixed(2)),
+        averagePm25: parseFloat(avgPm25.toFixed(1)),
+        maxPm25: parseFloat(maxPm25.toFixed(1)),
+        minPm25: parseFloat(minPm25.toFixed(1)),
+        points: routePoints,
+      };
+
+      return route;
+    } catch (error) {
+      console.error('❌ Error fetching route range:', error);
+      return null;
+    }
+  },
+
+  /**
    * Get historical route for a mobile sensor on a specific date
    * @param sensor - Mobile sensor data
    * @param date - Date in YYYY-MM-DD format
