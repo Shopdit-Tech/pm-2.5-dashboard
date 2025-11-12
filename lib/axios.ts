@@ -1,4 +1,76 @@
-import axios from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+
+const AUTH_STORAGE_KEY = 'pm25_auth_user';
+
+// Track if we're currently refreshing to prevent multiple refresh calls
+let isRefreshing = false;
+let refreshSubscribers: Array<(token: string) => void> = [];
+
+// Function to get stored auth data
+const getAuthData = () => {
+  if (typeof window === 'undefined') return null;
+  const storedData = localStorage.getItem(AUTH_STORAGE_KEY);
+  if (!storedData) return null;
+  try {
+    return JSON.parse(storedData);
+  } catch {
+    return null;
+  }
+};
+
+// Function to update stored access token
+const updateAccessToken = (accessToken: string, refreshToken: string) => {
+  if (typeof window === 'undefined') return;
+  const authData = getAuthData();
+  if (authData) {
+    authData.access_token = accessToken;
+    authData.refresh_token = refreshToken;
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData));
+  }
+};
+
+// Subscribe to token refresh
+const subscribeTokenRefresh = (callback: (token: string) => void) => {
+  refreshSubscribers.push(callback);
+};
+
+// Notify all subscribers when token is refreshed
+const onTokenRefreshed = (token: string) => {
+  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers = [];
+};
+
+// Refresh the access token
+const refreshAccessToken = async (): Promise<string> => {
+  const authData = getAuthData();
+  if (!authData?.refresh_token) {
+    throw new Error('No refresh token available');
+  }
+
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/auth/refresh`,
+      { refresh_token: authData.refresh_token },
+      {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 30000,
+      }
+    );
+
+    const { access_token, refresh_token } = response.data;
+    updateAccessToken(access_token, refresh_token);
+    console.log('✅ Token refreshed successfully');
+    return access_token;
+  } catch (error) {
+    console.error('❌ Token refresh failed:', error);
+    // Clear auth data and redirect to login
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      window.location.href = '/login';
+    }
+    throw error;
+  }
+};
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api',
@@ -8,13 +80,12 @@ const axiosInstance = axios.create({
   },
 });
 
-// Request interceptor
+// Request interceptor - Add auth token
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Add auth token if exists
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const authData = getAuthData();
+    if (authData?.access_token) {
+      config.headers.Authorization = `Bearer ${authData.access_token}`;
     }
     return config;
   },
@@ -23,17 +94,46 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Response interceptor
+// Response interceptor - Handle 401 and refresh token
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
+    // Check if error is 401 and we haven't retried yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // If already refreshing, wait for the new token
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((token: string) => {
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+            }
+            resolve(axiosInstance(originalRequest));
+          });
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const newAccessToken = await refreshAccessToken();
+        isRefreshing = false;
+        onTokenRefreshed(newAccessToken);
+
+        // Retry the original request with new token
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        }
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        isRefreshing = false;
+        refreshSubscribers = [];
+        return Promise.reject(refreshError);
       }
     }
+
     return Promise.reject(error);
   }
 );
