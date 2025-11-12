@@ -223,7 +223,7 @@ export const SensorDataTable = () => {
     ...(visibleColumns.includes('tvoc')
       ? [
           {
-            title: 'TVOC (index)',
+            title: 'TVOC (ppb)',
             dataIndex: 'tvoc',
             key: 'tvoc',
             width: 140,
