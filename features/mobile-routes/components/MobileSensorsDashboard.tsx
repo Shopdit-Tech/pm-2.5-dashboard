@@ -120,12 +120,13 @@ export const MobileSensorsDashboard = () => {
   return (
     <div
       style={{
-        padding: '16px',
         background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)',
         minHeight: '100%',
+        padding: '16px 0',
       }}
     >
-      {/* Header */}
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 50px' }}>
+        {/* Header */}
       <div className="mb-6" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <div
           style={{
@@ -162,11 +163,11 @@ export const MobileSensorsDashboard = () => {
               borderRadius: 10,
               height: 40,
               padding: '0 20px',
-              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+              background: '#00bcd4',
               borderColor: 'transparent',
               color: 'white',
               fontWeight: 600,
-              boxShadow: '0 4px 12px rgba(245,87,108,0.3)',
+              boxShadow: '0 4px 12px rgba(0,188,212,0.3)',
               fontSize: '14px',
             }}
           >
@@ -487,6 +488,7 @@ export const MobileSensorsDashboard = () => {
       )}
       <div style={{ marginTop: 24 }}>
         <MobileSensorDataTable />
+      </div>
       </div>
     </div>
   );

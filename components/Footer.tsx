@@ -1,7 +1,8 @@
 'use client';
 
 import { Typography, Row, Col } from 'antd';
-import { PhoneOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import Image from 'next/image';
+import { PhoneOutlined } from '@ant-design/icons';
 import { usePageViews } from '@/hooks/usePageViews';
 
 const { Text, Link } = Typography;
@@ -12,8 +13,8 @@ export const Footer = () => {
   return (
     <footer
       style={{
-        background: '#f7f9fc',
-        borderTop: '1px solid #e5e7eb',
+        background: '#ffffff',
+        borderTop: '2px solid #00bcd4',
         padding: '32px 20px',
         marginTop: 'auto',
       }}
@@ -28,35 +29,29 @@ export const Footer = () => {
           {/* Logo and Address */}
           <Col xs={24} sm={12} md={6}>
             <div style={{ marginBottom: 12 }}>
-              {/* BMA Logo placeholder */}
-              <div
-                style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: '50%',
-                  background: '#2ca58d',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: 12,
-                }}
-              >
-                <EnvironmentOutlined style={{ fontSize: 32, color: 'white' }} />
-              </div>
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                width={80}
+                height={80}
+                style={{ objectFit: 'contain', marginBottom: 12 }}
+              />
             </div>
-            <Text strong style={{ display: 'block', fontSize: 14, color: '#1a1a1a', marginBottom: 8 }}>
-              สำนักเลขานุการวิชาการ
+            <Text strong style={{ display: 'block', fontSize: 14, color: '#006064', marginBottom: 8 }}>
+              ศูนย์บริการวิชาการด้านศาสตร์เขตเมือง
             </Text>
-            <Text style={{ fontSize: 12, color: '#6b7280', lineHeight: 1.6 }}>
-              คณะวิทยาศาสตร์สุขภาพ และเทคโนโลยีสุขภาพ
+            <Text style={{ fontSize: 12, color: '#00838f', lineHeight: 1.6 }}>
+              Academic Service Center of Urbanology (ASCU)
               <br />
-              มหาวิทยาลัยนวมินทราธิราช กทม. 10400
+              มหาวิทยาลัยนวมินทราธิราช (NMU)
+              <br />
+              เลขที่ 3 ถนนขาว แขวงวชิรพยาบาล เขตดุสิต กทม. 10300
             </Text>
             <div style={{ marginTop: 12 }}>
-              <Text style={{ fontSize: 12, color: '#6b7280' }}>
-                © {new Date().getFullYear()} Bangkok Air Quality,
+              <Text style={{ fontSize: 12, color: '#00838f' }}>
+                © {new Date().getFullYear()} Urban Environmental Monitoring,
                 <br />
-                ALL RIGHT RESERVED
+                ALL RIGHTS RESERVED
               </Text>
             </div>
           </Col>
@@ -136,12 +131,12 @@ export const Footer = () => {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <PhoneOutlined style={{ color: '#2ca58d' }} />
-            <Text style={{ fontSize: 14, color: '#1a1a1a', fontWeight: 600 }}>
-              0-2203-2954
+            <PhoneOutlined style={{ color: '#00bcd4' }} />
+            <Text style={{ fontSize: 14, color: '#006064', fontWeight: 600 }}>
+              02-244-3000 ต่อ 5852 หรือ 064-415-5852
             </Text>
           </div>
-          <Text style={{ fontSize: 13, color: '#2ca58d', fontWeight: 500 }}>
+          <Text style={{ fontSize: 13, color: '#00bcd4', fontWeight: 500 }}>
             Visitor {pageViews.allTime.toLocaleString()} time • Today {pageViews.today}
           </Text>
         </div>

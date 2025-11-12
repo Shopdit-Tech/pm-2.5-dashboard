@@ -11,6 +11,7 @@ import { DataExportPage } from '@/features/data-export/components';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useSensorTableData } from '@/features/sensor-table/hooks/useSensorTableData';
 import { useMobileSensorTableData } from '@/features/mobile-sensor-table/hooks/useMobileSensorTableData';
+import AirQualityInfoPage from './air-quality-info';
 
 export default function Home() {
   // Fetch real sensors from both sources
@@ -48,6 +49,9 @@ export default function Home() {
             }
             if (activeView === 'analytics') {
               return <AnalyticsView sensors={allSensors} />;
+            }
+            if (activeView === 'air-quality-info') {
+              return <AirQualityInfoPage />;
             }
             if (activeView === 'data-export') {
               return (

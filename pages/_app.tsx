@@ -19,7 +19,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <ConfigProvider
         theme={{
           token: {
-            colorPrimary: '#1890ff',
+            colorPrimary: '#00bcd4',
             fontFamily: 'var(--font-noto-sans-thai), -apple-system, BlinkMacSystemFont, sans-serif',
           },
         }}

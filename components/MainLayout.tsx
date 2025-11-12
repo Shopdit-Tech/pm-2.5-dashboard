@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Layout, Menu, Typography, Button, Avatar, Dropdown } from 'antd';
+import Image from 'next/image';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -55,27 +56,25 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     {
       key: 'static-sensors',
       label: 'สถานีตรวจวัดคุณภาพอากาศ',
-      title: 'ศูนย์ข้อมูลเฝ้าระวังคุณภาพอากาศ ศูนย์บริหารวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
+      title:
+        'ศูนย์ข้อมูลเฝ้าระวังคุณภาพอากาศ ศูนย์บริหารวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
     },
     {
       key: 'mobile-routes',
       label: 'เซ็นเซอร์ตรวจวัดคุณภาพอากาศแบบติดตัวบุคคล',
-      title: 'ศูนย์ข้อมูลเฝ้าระวังคุณภาพอากาศ ศูนย์บริหารวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
+      title:
+        'ศูนย์ข้อมูลเฝ้าระวังคุณภาพอากาศ ศูนย์บริหารวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
     },
-    // {
-    //   key: 'sensor-data-table',
-    //   label: 'ตารางข้อมูล',
-    //   title: 'ตารางข้อมูลเซ็นเซอร์',
-    // },
-    // {
-    //   key: 'mobile-data-table',
-    //   label: 'ข้อมูลเคลื่อนที่',
-    //   title: 'ตารางข้อมูลอุปกรณ์เคลื่อนที่',
-    // },
     {
       key: 'analytics',
       label: 'ข้อมูลย้อนหลัง',
-      title: 'ศูนย์ข้อมูลเฝ้าระวังคุณภาพอากาศ ศูนย์บริหารวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
+      title:
+        'ศูนย์ข้อมูลเฝ้าระวังคุณภาพอากาศ ศูนย์บริหารวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
+    },
+    {
+      key: 'air-quality-info',
+      label: 'ข้อมูลความรู้ทางคุณภาพอากาศ',
+      title: 'ข้อมูลดัชนีคุณภาพอากาศและสารมลพิษทางอากาศ',
     },
   ];
 
@@ -103,7 +102,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         trigger={null}
         collapsible
         collapsed={collapsed}
-        width={280}
+        width={350}
         collapsedWidth={0}
         style={{
           position: 'fixed',
@@ -130,27 +129,33 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           }}
         >
           {!collapsed ? (
-            <div>
-              <Title level={4} className="mb-0" style={{ fontSize: 18, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.3px' }}>
-                ศูนย์ข้อมูลคุณภาพอากาศ
-              </Title>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                width={48}
+                height={48}
+                style={{ objectFit: 'contain' }}
+              />
+              <div>
+                <Title
+                  level={4}
+                  className="mb-0"
+                  style={{ fontSize: 18, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.3px' }}
+                >
+                  ศูนย์เฝ้าระวังคุณภาพอากาศ
+                </Title>
+                <Text style={{ fontSize: 12, color: '#666' }}>Urban Environmental Monitoring </Text>
+              </div>
             </div>
           ) : (
-            <div style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(102,126,234,0.3)',
-              fontSize: '18px',
-              fontWeight: 700,
-              color: 'white'
-            }}>
-              AQ
-            </div>
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={44}
+              height={44}
+              style={{ objectFit: 'contain' }}
+            />
           )}
         </div>
 
@@ -161,10 +166,8 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             selectedKeys={[activeView]}
             onClick={({ key }) => {
               setActiveView(key);
-              // Auto-close sidebar on mobile after selecting a menu item
-              if (isMobile) {
-                setCollapsed(true);
-              }
+              // Auto-close sidebar after selecting a menu item
+              setCollapsed(true);
             }}
             items={menuItems}
             style={{
@@ -262,7 +265,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
               style={{
                 height: 48,
                 borderRadius: 12,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: '#00bcd4',
                 border: 'none',
                 fontWeight: 600,
               }}
@@ -287,20 +290,38 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         }
         .modern-menu .ant-menu-item:hover {
           background: #f3f4f6 !important;
-          color: #667eea !important;
+          color: #00bcd4 !important;
         }
         .modern-menu .ant-menu-item-selected {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+          background: #00bcd4 !important;
           color: white !important;
-          box-shadow: 0 6px 16px rgba(102,126,234,0.4) !important;
+          box-shadow: 0 6px 16px rgba(0, 188, 212, 0.4) !important;
         }
         .modern-menu .ant-menu-item-icon {
           font-size: 22px !important;
         }
       `}</style>
 
+      {/* Overlay - Shows when sidebar is open */}
+      {!collapsed && (
+        <div
+          onClick={() => setCollapsed(true)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 999,
+            transition: 'opacity 0.2s',
+            cursor: 'pointer',
+          }}
+        />
+      )}
+
       {/* Main Content */}
-      <Layout style={{ marginLeft: collapsed ? 0 : 280, transition: 'margin-left 0.2s' }}>
+      <Layout style={{ marginLeft: collapsed ? 0 : 350, transition: 'margin-left 0.2s' }}>
         {/* Header with toggle button */}
         <div
           style={{
@@ -337,8 +358,8 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = '#f9fafb';
-                e.currentTarget.style.borderColor = '#667eea';
-                e.currentTarget.style.color = '#667eea';
+                e.currentTarget.style.borderColor = '#00bcd4';
+                e.currentTarget.style.color = '#00bcd4';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'white';
@@ -348,24 +369,37 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             >
               {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             </button>
+                        <Image
+              src="/logo.png"
+              alt="Logo"
+              width={isMobile ? 36 : 48}
+              height={isMobile ? 36 : 48}
+              style={{ objectFit: 'contain' }}
+            />
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {!isMobile && (
                 <Text style={{ color: '#9ca3af', fontSize: 13, display: 'block', fontWeight: 600 }}>
                   {menuItems.find((item) => item.key === activeView)?.title}
                 </Text>
               )}
-              <Title level={3} style={{ margin: 0, fontSize: isMobile ? 18 : 24, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
+              <Title
+                level={3}
+                style={{
+                  margin: 0,
+                  fontSize: isMobile ? 18 : 24,
+                  fontWeight: 700,
+                  color: '#1a1a1a',
+                  letterSpacing: '-0.5px',
+                }}
+              >
                 {menuItems.find((item) => item.key === activeView)?.label}
               </Title>
             </div>
           </div>
         </div>
-        
+
         {/* Login Modal */}
-        <LoginModal
-          visible={showLoginModal}
-          onClose={() => setShowLoginModal(false)}
-        />
+        <LoginModal visible={showLoginModal} onClose={() => setShowLoginModal(false)} />
 
         {/* Content Area */}
         <Content

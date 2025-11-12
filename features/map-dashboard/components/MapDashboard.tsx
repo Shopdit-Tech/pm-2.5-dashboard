@@ -22,44 +22,10 @@ export const MapDashboard = () => {
   };
 
   return (
-    <div style={{ padding: '16px', background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)', minHeight: '100%' }}>
-      {/* Header */}
-      <div className="mb-6" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '200px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
-              การติดตามเซ็นเซอร์ติดตั้ง
-            </h2>
-            <p style={{ margin: '6px 0 0 0', color: '#666', fontSize: 13 }}>
-              ติดตาม PM2.5 และคุณภาพอากาศแบบเรียลไทม์
-            </p>
-          </div>
-          {activeTab === 'map' && (
-            <Button
-              icon={<ReloadOutlined spin={refreshing} />}
-              onClick={handleRefresh}
-              loading={refreshing}
-              size="middle"
-              style={{
-                borderRadius: 10,
-                height: 40,
-                padding: '0 20px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                borderColor: 'transparent',
-                color: 'white',
-                fontWeight: 600,
-                boxShadow: '0 4px 12px rgba(102,126,234,0.3)',
-                fontSize: '14px',
-              }}
-            >
-              รีเฟรช
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <Tabs
+    <div style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)', minHeight: '100%', padding: '16px 0' }}>
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 50px' }}>
+        {/* Tabs */}
+        <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
         size="large"
@@ -74,36 +40,7 @@ export const MapDashboard = () => {
             ),
             children: (
               <>
-                {/* Sensor Selector */}
-                <Card
-                  style={{
-                    borderRadius: 12,
-                    marginBottom: 16,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                  }}
-                  bodyStyle={{ padding: '16px' }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 600, color: '#1a1a1a' }}>เลือกเซ็นเซอร์:</span>
-                    <Select
-                      style={{ minWidth: 250, flex: 1 }}
-                      placeholder="เลือกเซ็นเซอร์เพื่อดูตำแหน่ง"
-                      allowClear
-                      showSearch
-                      optionFilterProp="children"
-                      value={selectedSensorId}
-                      onChange={(value) => setSelectedSensorId(value)}
-                    >
-                      {sensors.map((sensor) => (
-                        <Option key={sensor.id} value={sensor.id}>
-                          {sensor.name} {sensor.status === 'offline' ? '(offline)' : ''}
-                        </Option>
-                      ))}
-                    </Select>
-                  </div>
-                </Card>
-
-                {/* Map Container */}
+                {/* Map Container - Hero Section */}
                 <Card
                   style={{
                     borderRadius: 16,
@@ -111,12 +48,13 @@ export const MapDashboard = () => {
                     boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                     overflow: 'hidden',
                     background: 'rgba(255,255,255,0.95)',
+                    marginBottom: 16,
                   }}
                   bodyStyle={{ padding: 0 }}
                 >
                   <div style={{ 
-                    height: typeof window !== 'undefined' && window.innerWidth < 768 ? '400px' : 'calc(100vh - 480px)', 
-                    minHeight: typeof window !== 'undefined' && window.innerWidth < 768 ? '400px' : '500px' 
+                    height: typeof window !== 'undefined' && window.innerWidth < 768 ? '450px' : '600px', 
+                    minHeight: '450px'
                   }}>
                     <GoogleMapComponent 
                       sensors={sensors} 
@@ -126,9 +64,73 @@ export const MapDashboard = () => {
                 </Card>
 
                 {/* Legend */}
-                <div style={{ marginTop: 16 }}>
+                <div style={{ marginBottom: 16 }}>
                   <AirQualityLegend showRanges compact />
                 </div>
+
+                {/* Info & Controls Card */}
+                <Card
+                  style={{
+                    borderRadius: 12,
+                    marginBottom: 24,
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                    background: 'rgba(255,255,255,0.95)',
+                  }}
+                  bodyStyle={{ padding: '20px' }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {/* Title and Refresh Button */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
+                      <div style={{ flex: 1, minWidth: '200px' }}>
+                        <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#1a1a1a', marginBottom: '4px' }}>
+                          การติดตามเซ็นเซอร์ติดตั้ง
+                        </h3>
+                        <p style={{ margin: 0, color: '#666', fontSize: 13 }}>
+                          ติดตาม PM2.5 และคุณภาพอากาศแบบเรียลไทม์
+                        </p>
+                      </div>
+                      <Button
+                        icon={<ReloadOutlined spin={refreshing} />}
+                        onClick={handleRefresh}
+                        loading={refreshing}
+                        size="middle"
+                        style={{
+                          borderRadius: 10,
+                          height: 38,
+                          padding: '0 18px',
+                          background: '#00bcd4',
+                          borderColor: 'transparent',
+                          color: 'white',
+                          fontWeight: 600,
+                          boxShadow: '0 4px 12px rgba(0,188,212,0.3)',
+                          fontSize: '13px',
+                        }}
+                      >
+                        รีเฟรช
+                      </Button>
+                    </div>
+
+                    {/* Sensor Selector */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 600, color: '#1a1a1a', fontSize: '14px' }}>เลือกเซ็นเซอร์:</span>
+                      <Select
+                        style={{ minWidth: 280, flex: 1, maxWidth: 400 }}
+                        placeholder="เลือกเซ็นเซอร์เพื่อดูตำแหน่งบนแผนที่"
+                        allowClear
+                        showSearch
+                        optionFilterProp="children"
+                        value={selectedSensorId}
+                        onChange={(value) => setSelectedSensorId(value)}
+                      >
+                        {sensors.map((sensor) => (
+                          <Option key={sensor.id} value={sensor.id}>
+                            {sensor.name} {sensor.status === 'offline' ? '(offline)' : ''}
+                          </Option>
+                        ))}
+                      </Select>
+                    </div>
+                  </div>
+                </Card>
 
                 {/* Sensor Data Table */}
                 <div style={{ marginTop: 24 }}>
@@ -149,6 +151,7 @@ export const MapDashboard = () => {
           },
         ]}
       />
+      </div>
     </div>
   );
 };
