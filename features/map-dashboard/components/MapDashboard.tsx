@@ -142,9 +142,9 @@ export const MapDashboard = () => {
                     gap: '8px',
                     fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? '12px' : '14px'
                   }}>
-                    <span style={{ color: '#52c41a', fontWeight: 600 }}>● ดีมาก (0-12)</span>
-                    <span style={{ color: '#faad14', fontWeight: 600 }}>● ปานกลาง (12-35)</span>
-                    <span style={{ color: '#fa8c16', fontWeight: 600 }}>● เริ่มมีผลต่อสุขภาพ (35-55)</span>
+                    <span style={{ color: '#52c41a', fontWeight: 600 }}>● ดีมาก (0-25)</span>
+                    <span style={{ color: '#faad14', fontWeight: 600 }}>● ปานกลาง (25-37.5)</span>
+                    <span style={{ color: '#fa8c16', fontWeight: 600 }}>● เริ่มมีผลต่อสุขภาพ (37.5-55)</span>
                     <span style={{ color: '#f5222d', fontWeight: 600 }}>● อันตรายต่อสุขภาพ (&gt;55)</span>
                   </div>
                 </div>

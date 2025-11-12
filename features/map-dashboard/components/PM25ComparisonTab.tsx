@@ -211,10 +211,10 @@ export const PM25ComparisonTab = () => {
 
         const { avgPm25 } = record;
 
-        if (avgPm25 <= 12) {
+        if (avgPm25 <= 25) {
           return <Tag color="success">ดีมาก</Tag>;
         }
-        if (avgPm25 <= 35) {
+        if (avgPm25 <= 37.5) {
           return <Tag color="warning">ปานกลาง</Tag>;
         }
         if (avgPm25 <= 55) {

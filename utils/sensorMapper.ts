@@ -56,11 +56,11 @@ export const mapApiSensorToAppSensor = (apiSensor: ApiSensorReading): SensorData
   return {
     id: apiSensor.sensor_id,
     code: apiSensor.code, // Keep for API calls
-    name: generateSensorName(apiSensor.code, apiSensor.location_name),
-    type: determineSensorType(apiSensor.is_movable, apiSensor.location_name),
+    name: apiSensor.name, // Use name directly from API
+    type: determineSensorType(apiSensor.is_movable, apiSensor.name),
     latitude: apiSensor.lat,
     longitude: apiSensor.lng,
-    status: determineSensorStatus(apiSensor.ts),
+    status: apiSensor.is_online ? 'online' : 'offline', // Use is_online from API
     timestamp: apiSensor.ts,
     lastUpdate: apiSensor.ts,
     // Sensor readings mapped directly

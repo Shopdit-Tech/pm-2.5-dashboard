@@ -3,26 +3,35 @@
 export type ApiSensorReading = {
   sensor_id: string;
   code: string;
+  name: string; // Sensor display name from API
   model: string;
   is_movable: boolean;
+  is_online: boolean;
   ts: string; // ISO 8601 timestamp
   lat: number;
   lng: number;
-  pm1: number;
+  pm1: number | null;
   pm25: number;
   pm10: number;
-  particle_0p3: number;
-  co2_ppm: number;
+  particle_0p3: number | null;
+  co2_ppm: number | null;
   temperature_c: number;
   humidity_rh: number;
-  tvoc_ppb: number;
-  tvoc_index: number;
-  nox_index: number;
-  tvoc_raw_logr: number;
-  nox_raw_logr: number;
+  tvoc_ppb: number | null;
+  tvoc_index: number | null;
+  nox_index: number | null;
+  tvoc_raw_logr: number | null;
+  nox_raw_logr: number | null;
   channel: string;
+  type: string; // INDOOR, OUTDOOR, MOBILE
   location_id: string | null;
   location_name: string | null;
+  address: string | null;
+  fixed_lat: number | null;
+  fixed_lng: number | null;
+  last_seen: string;
+  created_at: string;
+  meta: Record<string, any> | null;
 };
 
 export type ApiSensorsLatestResponse = {
