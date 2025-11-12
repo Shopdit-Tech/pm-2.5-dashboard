@@ -305,7 +305,7 @@ export const SensorDataTable = () => {
   );
 
   return (
-    <div style={{ padding: isMobile ? '16px' : '24px', background: '#f5f7fa', minHeight: '100%' }}>
+    <div style={{ padding: isMobile ? '16px' : '0px', background: '#f5f7fa', minHeight: '100%' }}>
       {/* Error Alert */}
       {error && (
         <Alert

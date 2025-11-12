@@ -5,6 +5,7 @@ import { GoogleMapComponent } from './GoogleMapComponent';
 import { useSensorData } from '../hooks/useSensorData';
 import { SensorDataTable } from '@/features/sensor-table/components/SensorDataTable';
 import { PM25ComparisonTab } from './PM25ComparisonTab';
+import { AirQualityLegend } from '@/components/AirQualityLegend';
 
 const { Option } = Select;
 
@@ -125,28 +126,8 @@ export const MapDashboard = () => {
                 </Card>
 
                 {/* Legend */}
-                <div
-                  style={{
-                    marginTop: 16,
-                    textAlign: 'center',
-                    padding: '12px 16px',
-                    background: 'rgba(255,255,255,0.9)',
-                    borderRadius: 12,
-                    backdropFilter: 'blur(10px)',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                  }}
-                >
-                  <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: typeof window !== 'undefined' && window.innerWidth < 768 ? '1fr 1fr' : 'repeat(4, 1fr)',
-                    gap: '8px',
-                    fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? '12px' : '14px'
-                  }}>
-                    <span style={{ color: '#52c41a', fontWeight: 600 }}>● ดีมาก (0-25)</span>
-                    <span style={{ color: '#faad14', fontWeight: 600 }}>● ปานกลาง (25-37.5)</span>
-                    <span style={{ color: '#fa8c16', fontWeight: 600 }}>● เริ่มมีผลต่อสุขภาพ (37.5-55)</span>
-                    <span style={{ color: '#f5222d', fontWeight: 600 }}>● อันตรายต่อสุขภาพ (&gt;55)</span>
-                  </div>
+                <div style={{ marginTop: 16 }}>
+                  <AirQualityLegend showRanges compact />
                 </div>
 
                 {/* Sensor Data Table */}

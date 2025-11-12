@@ -25,6 +25,7 @@ import { useMobileSensors } from '../hooks/useMobileSensors';
 import { MobileRoute } from '@/types/route';
 import { mobileRouteService } from '../services/mobileRouteService';
 import { MobileSensorDataTable } from '@/features/mobile-sensor-table/components';
+import { AirQualityLegend } from '@/components/AirQualityLegend';
 
 const { Option } = Select;
 
@@ -458,37 +459,8 @@ export const MobileSensorsDashboard = () => {
       )}
 
       {/* Legend */}
-      <div
-        style={{
-          marginTop: 16,
-          textAlign: 'center',
-          padding: '12px 16px',
-          background: 'rgba(255,255,255,0.9)',
-          borderRadius: 12,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-        }}
-      >
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns:
-              typeof window !== 'undefined' && window.innerWidth < 768
-                ? '1fr 1fr'
-                : 'repeat(5, 1fr)',
-            gap: '8px',
-            fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? '12px' : '13px',
-            color: '#595959',
-            fontWeight: 600,
-          }}
-        >
-          <span>
-            <CarOutlined /> Mobile Sensors
-          </span>
-          <span>🟢 ดีมาก (0-25)</span>
-          <span>🟡 ปานกลาง (25-37.5)</span>
-          <span>🟠 เริ่มมีผลต่อสุขภาพ (37.5-55)</span>
-          <span>🔴 อันตรายต่อสุขภาพ (&gt;55)</span>
-        </div>
+      <div style={{ marginTop: 16 }}>
+        <AirQualityLegend showRanges compact />
       </div>
 
       {/* Info Banner */}
