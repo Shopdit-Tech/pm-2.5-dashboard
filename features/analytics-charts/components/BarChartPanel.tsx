@@ -248,7 +248,7 @@ export const BarChartPanel = ({
               data={chartData.data} 
               margin={{ top: 20, right: 20, left: -10, bottom: 5 }}
               barGap={0}
-              barCategoryGap={0}
+              barCategoryGap="0%"
             >
               <CartesianGrid 
                 strokeDasharray="0" 

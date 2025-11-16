@@ -35,7 +35,7 @@ export const MapDashboard = () => {
             label: (
               <span>
                 <EnvironmentOutlined style={{ marginRight: 6 }} />
-                แผนที่เซ็นเซอร์
+                สถานี
               </span>
             ),
             children: (
@@ -53,8 +53,8 @@ export const MapDashboard = () => {
                   bodyStyle={{ padding: 0 }}
                 >
                   <div style={{ 
-                    height: typeof window !== 'undefined' && window.innerWidth < 768 ? '450px' : '600px', 
-                    minHeight: '450px'
+                    height: typeof window !== 'undefined' && window.innerWidth < 768 ? '300px' : '400px', 
+                    minHeight: '300px'
                   }}>
                     <GoogleMapComponent 
                       sensors={sensors} 
@@ -144,7 +144,7 @@ export const MapDashboard = () => {
             label: (
               <span>
                 <BarChartOutlined style={{ marginRight: 6 }} />
-                เปรียบเทียบ PM2.5
+                อันดับ PM2.5 สูงสุด
               </span>
             ),
             children: <PM25ComparisonTab />,

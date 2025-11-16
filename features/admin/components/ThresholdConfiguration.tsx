@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Table, Button, InputNumber, Select, Space, message, Tag, Spin } from 'antd';
+import { Table, Button, Input, InputNumber, Select, Space, message, Tag, Spin } from 'antd';
 import { EditOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons';
 import { thresholdService } from '../services/thresholdService';
 import { useThreshold } from '@/contexts/ThresholdContext';
@@ -111,14 +111,42 @@ export const ThresholdConfiguration = () => {
       title: 'สี',
       dataIndex: 'color_hex',
       key: 'color_hex',
-      width: isMobile ? 60 : 150,
-      render: (color: string, record: Threshold) => (
-        isMobile ? (
+      width: isMobile ? 100 : 200,
+      render: (color: string, record: Threshold) => {
+        if (editingId === record.id) {
+          return (
+            <Space direction={isMobile ? 'vertical' : 'horizontal'} size="small" style={{ width: '100%' }}>
+              <div
+                style={{
+                  width: isMobile ? 32 : 40,
+                  height: isMobile ? 20 : 24,
+                  backgroundColor: editForm.colorHex,
+                  borderRadius: 4,
+                  border: '1px solid #d9d9d9',
+                }}
+              />
+              <Input
+                value={editForm.colorHex}
+                onChange={(e) => setEditForm({ ...editForm, colorHex: e.target.value })}
+                placeholder="#RRGGBB"
+                maxLength={7}
+                style={{ 
+                  width: isMobile ? '100%' : 100, 
+                  fontFamily: 'monospace',
+                  fontSize: 12,
+                }}
+                size={isMobile ? 'small' : 'middle'}
+              />
+            </Space>
+          );
+        }
+        
+        return isMobile ? (
           <div
             style={{
               width: 32,
               height: 20,
-              backgroundColor: editingId === record.id ? editForm.colorHex : color,
+              backgroundColor: color,
               borderRadius: 4,
               border: '1px solid #d9d9d9',
               margin: '0 auto',
@@ -130,17 +158,17 @@ export const ThresholdConfiguration = () => {
               style={{
                 width: 40,
                 height: 24,
-                backgroundColor: editingId === record.id ? editForm.colorHex : color,
+                backgroundColor: color,
                 borderRadius: 4,
                 border: '1px solid #d9d9d9',
               }}
             />
             <span style={{ fontFamily: 'monospace', fontSize: 12 }}>
-              {editingId === record.id ? editForm.colorHex : color}
+              {color}
             </span>
           </Space>
-        )
-      ),
+        );
+      },
     },
     {
       title: isMobile ? 'ต่ำสุด' : 'ค่าต่ำสุด',

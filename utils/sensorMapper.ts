@@ -53,13 +53,22 @@ const determineSensorStatus = (timestamp: string): 'online' | 'offline' => {
  * @param apiSensor - API sensor reading
  */
 export const mapApiSensorToAppSensor = (apiSensor: ApiSensorReading): SensorData => {
+  // For static sensors, use fixed_lat/fixed_lng if available, otherwise fallback to lat/lng
+  // For mobile sensors, always use lat/lng (current position)
+  const latitude = apiSensor.is_movable 
+    ? apiSensor.lat 
+    : (apiSensor.fixed_lat ?? apiSensor.lat);
+  const longitude = apiSensor.is_movable 
+    ? apiSensor.lng 
+    : (apiSensor.fixed_lng ?? apiSensor.lng);
+
   return {
     id: apiSensor.sensor_id,
     code: apiSensor.code, // Keep for API calls
     name: apiSensor.name, // Use name directly from API
     type: determineSensorType(apiSensor.is_movable, apiSensor.name),
-    latitude: apiSensor.lat,
-    longitude: apiSensor.lng,
+    latitude,
+    longitude,
     status: apiSensor.is_online ? 'online' : 'offline', // Use is_online from API
     timestamp: apiSensor.ts,
     lastUpdate: apiSensor.ts,

@@ -17,6 +17,7 @@ type PM25ComparisonData = {
   code: string;
   avgPm25: number;
   status: 'online' | 'offline';
+  hasData: boolean;
 };
 
 export const PM25ComparisonTab = () => {
@@ -36,16 +37,17 @@ export const PM25ComparisonTab = () => {
       try {
         const comparisons: PM25ComparisonData[] = [];
 
-        // Fetch 24h average for each sensor
+        // Fetch 24h average for each sensor (including offline sensors)
         for (const sensor of sensors) {
-          if (sensor.status === 'offline' || !sensor.code) {
+          if (!sensor.code) {
             comparisons.push({
               id: sensor.id,
               rank: 0,
               name: sensor.name,
-              code: sensor.code || sensor.id,
+              code: sensor.id,
               avgPm25: 0,
-              status: 'offline',
+              status: sensor.status,
+              hasData: false,
             });
             continue;
           }
@@ -64,10 +66,10 @@ export const PM25ComparisonTab = () => {
               .map((p) => p.value)
               .filter((v) => v !== null && v !== undefined) as number[];
 
-            const avgPm25 =
-              pm25Values.length > 0
-                ? pm25Values.reduce((sum, val) => sum + val, 0) / pm25Values.length
-                : sensor.pm25; // Fallback to current value
+            const hasData = pm25Values.length > 0;
+            const avgPm25 = hasData
+              ? pm25Values.reduce((sum, val) => sum + val, 0) / pm25Values.length
+              : 0;
 
             comparisons.push({
               id: sensor.id,
@@ -75,18 +77,20 @@ export const PM25ComparisonTab = () => {
               name: sensor.name,
               code: sensor.code,
               avgPm25,
-              status: 'online',
+              status: sensor.status,
+              hasData,
             });
           } catch (err) {
             console.error(`Error fetching history for ${sensor.code}:`, err);
-            // Use current value as fallback
+            // If error, mark as no data
             comparisons.push({
               id: sensor.id,
               rank: 0,
               name: sensor.name,
               code: sensor.code,
-              avgPm25: sensor.pm25,
-              status: 'online',
+              avgPm25: 0,
+              status: sensor.status,
+              hasData: false,
             });
           }
         }
@@ -198,12 +202,16 @@ export const PM25ComparisonTab = () => {
       title: 'PM2.5 เฉลี่ย 24 ชม.',
       dataIndex: 'avgPm25',
       key: 'avgPm25',
-      width: 180,
+      width: 250,
       align: 'center',
       sorter: (a, b) => a.avgPm25 - b.avgPm25,
       render: (avgPm25: number, record: PM25ComparisonData) => {
-        if (record.status === 'offline') {
-          return <Text type="secondary">ออฟไลน์</Text>;
+        if (!record.hasData) {
+          return (
+            <Text type="secondary" style={{ fontSize: 13 }}>
+              ไม่มีข้อมูลใน 24 ชม.
+            </Text>
+          );
         }
 
         const color = getColorForValue('pm25', avgPm25);
@@ -231,6 +239,11 @@ export const PM25ComparisonTab = () => {
             <Text type="secondary" style={{ fontSize: 12 }}>
               µg/m³
             </Text>
+            {record.status === 'offline' && (
+              <Text type="secondary" style={{ fontSize: 11, marginLeft: 4 }}>
+                (ออฟไลน์)
+              </Text>
+            )}
           </div>
         );
       },
@@ -241,8 +254,8 @@ export const PM25ComparisonTab = () => {
       width: 150,
       align: 'center',
       render: (_: any, record: PM25ComparisonData) => {
-        if (record.status === 'offline') {
-          return <Tag color="default">ออฟไลน์</Tag>;
+        if (!record.hasData) {
+          return <Tag color="default">ไม่มีข้อมูล</Tag>;
         }
 
         const { avgPm25 } = record;

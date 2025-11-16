@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Table, Button, Input, Select, Space, message, Tag, Modal, Form, InputNumber, Spin } from 'antd';
-import { EditOutlined, SaveOutlined, CloseOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { Table, Button, Input, Select, Space, message, Tag, Modal, Form, InputNumber, Spin, Popconfirm } from 'antd';
+import { EditOutlined, SaveOutlined, CloseOutlined, EnvironmentOutlined, DeleteOutlined } from '@ant-design/icons';
 import { sensorService } from '../services/sensorService';
 import type { AdminSensor, SensorType } from '../types/sensor';
 
@@ -12,10 +12,18 @@ export const SensorConfiguration = () => {
   const [sensors, setSensors] = useState<AdminSensor[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<{ name: string; code: string; type: SensorType }>({ 
+  const [editForm, setEditForm] = useState<{ 
+    name: string; 
+    code: string; 
+    type: SensorType;
+    fixed_lat: number | null;
+    fixed_lng: number | null;
+  }>({ 
     name: '', 
     code: '',
-    type: 'INDOOR' 
+    type: 'INDOOR',
+    fixed_lat: null,
+    fixed_lng: null,
   });
   const [isMobile, setIsMobile] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
@@ -49,7 +57,13 @@ export const SensorConfiguration = () => {
 
   const handleEdit = (sensor: AdminSensor) => {
     setEditingId(sensor.id);
-    setEditForm({ name: sensor.name || '', code: sensor.code, type: sensor.type });
+    setEditForm({ 
+      name: sensor.name || '', 
+      code: sensor.code, 
+      type: sensor.type,
+      fixed_lat: sensor.fixed_lat,
+      fixed_lng: sensor.fixed_lng,
+    });
   };
 
   const handleSave = async (sensorId: string) => {
@@ -61,6 +75,8 @@ export const SensorConfiguration = () => {
         code: sensor.code,
         name: editForm.name,
         type: editForm.type,
+        fixed_lat: editForm.fixed_lat ?? undefined,
+        fixed_lng: editForm.fixed_lng ?? undefined,
       });
 
       message.success('บันทึกการตั้งค่าเซ็นเซอร์แล้ว');
@@ -73,7 +89,17 @@ export const SensorConfiguration = () => {
 
   const handleCancel = () => {
     setEditingId(null);
-    setEditForm({ name: '', code: '', type: 'INDOOR' });
+    setEditForm({ name: '', code: '', type: 'INDOOR', fixed_lat: null, fixed_lng: null });
+  };
+
+  const handleDelete = async (sensorId: string, sensorName: string) => {
+    try {
+      await sensorService.deleteSensor(sensorId);
+      message.success(`ลบเซ็นเซอร์ "${sensorName}" แล้ว`);
+      await loadSensors();
+    } catch (error: any) {
+      message.error(error.message || 'Failed to delete sensor');
+    }
   };
 
   const handleOpenCreateModal = () => {
@@ -186,6 +212,50 @@ export const SensorConfiguration = () => {
       },
     },
     {
+      title: 'ละติจูด',
+      dataIndex: 'fixed_lat',
+      key: 'fixed_lat',
+      width: 150,
+      responsive: isMobile ? ['lg' as const] : undefined,
+      render: (lat: number | null, record: AdminSensor) => {
+        if (editingId === record.id) {
+          return (
+            <InputNumber
+              value={editForm.fixed_lat}
+              onChange={(value) => setEditForm({ ...editForm, fixed_lat: value })}
+              style={{ width: '100%' }}
+              placeholder="ละติจูด"
+              step={0.0001}
+              size="small"
+            />
+          );
+        }
+        return <span style={{ fontSize: 12, color: '#8c8c8c' }}>{lat?.toFixed(4) || '-'}</span>;
+      },
+    },
+    {
+      title: 'ลองจิจูด',
+      dataIndex: 'fixed_lng',
+      key: 'fixed_lng',
+      width: 150,
+      responsive: isMobile ? ['lg' as const] : undefined,
+      render: (lng: number | null, record: AdminSensor) => {
+        if (editingId === record.id) {
+          return (
+            <InputNumber
+              value={editForm.fixed_lng}
+              onChange={(value) => setEditForm({ ...editForm, fixed_lng: value })}
+              style={{ width: '100%' }}
+              placeholder="ลองจิจูด"
+              step={0.0001}
+              size="small"
+            />
+          );
+        }
+        return <span style={{ fontSize: 12, color: '#8c8c8c' }}>{lng?.toFixed(4) || '-'}</span>;
+      },
+    },
+    {
       title: 'สถานะ',
       dataIndex: 'is_online',
       key: 'is_online',
@@ -200,7 +270,7 @@ export const SensorConfiguration = () => {
     {
       title: 'ดำเนินการ',
       key: 'actions',
-      width: 150,
+      width: 180,
       render: (_: any, record: AdminSensor) => {
         if (editingId === record.id) {
           return (
@@ -224,14 +294,33 @@ export const SensorConfiguration = () => {
           );
         }
         return (
-          <Button
-            type="text"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          >
-            แก้ไข
-          </Button>
+          <Space size="small">
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+            >
+              แก้ไข
+            </Button>
+            <Popconfirm
+              title="ลบเซ็นเซอร์"
+              description={`คุณแน่ใจหรือไม่ว่าต้องการลบเซ็นเซอร์ "${record.name || record.code}"?`}
+              onConfirm={() => handleDelete(record.id, record.name || record.code)}
+              okText="ลบ"
+              cancelText="ยกเลิก"
+              okButtonProps={{ danger: true }}
+            >
+              <Button
+                type="text"
+                size="small"
+                icon={<DeleteOutlined />}
+                danger
+              >
+                ลบ
+              </Button>
+            </Popconfirm>
+          </Space>
         );
       },
     },

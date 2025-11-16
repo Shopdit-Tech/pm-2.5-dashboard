@@ -210,7 +210,7 @@ export const ParameterHistoryModal = ({
             <Card style={{ borderRadius: 12, textAlign: 'center', padding: 60, marginBottom: 24 }}>
               <Spin size="large" />
               <div style={{ marginTop: 16, color: '#8c8c8c' }}>
-                กำลังโหลดเส้นทาง...
+                กำลังโหลดข้อมูล...
               </div>
             </Card>
           )}

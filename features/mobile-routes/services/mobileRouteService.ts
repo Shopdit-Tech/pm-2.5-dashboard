@@ -100,7 +100,7 @@ export const mobileRouteService = {
           metric: 'All',
           from: fromDateUTC,
           to: toDateUTC,
-          agg_minutes: 60,
+          agg_minutes: 1,
         },
         timeout: API_CONFIG.timeout,
       });
@@ -164,8 +164,12 @@ export const mobileRouteService = {
       });
 
       // Convert to route points array
+      // Filter: only include points with valid coordinates (> 0) AND valid pm2.5 value
       Object.values(metricsByTimestamp).forEach((data: any, index: number) => {
-        if (data.lat !== null && data.lng !== null) {
+        const hasValidCoordinates = data.lat !== null && data.lng !== null && data.lat > 0 && data.lng > 0;
+        const hasValidPm25 = data.pm25 !== null && data.pm25 !== undefined;
+        
+        if (hasValidCoordinates && hasValidPm25) {
           routePoints.push({
             id: `point-${index}-${data.timestamp}`,
             timestamp: data.timestamp,
@@ -369,8 +373,12 @@ export const mobileRouteService = {
       timestamps.forEach((timestamp, index) => {
         const data = metricsByTimestamp[timestamp];
         
-        // Skip points without valid GPS coordinates
-        if (!data.latitude || !data.longitude) {
+        // Skip points without valid GPS coordinates (> 0) OR without valid pm2.5 value
+        const hasValidCoordinates = data.latitude && data.longitude && data.latitude > 0 && data.longitude > 0;
+        const pm25Value = data.pm25 || data.pm2_5;
+        const hasValidPm25 = pm25Value !== null && pm25Value !== undefined;
+        
+        if (!hasValidCoordinates || !hasValidPm25) {
           skippedCount++;
           return;
         }
@@ -393,7 +401,7 @@ export const mobileRouteService = {
           latitude: data.latitude,
           longitude: data.longitude,
           pm1: data.pm1 || 0,
-          pm25: data.pm25 || data.pm2_5 || 0,
+          pm25: pm25Value || 0,
           pm10: data.pm10 || 0,
           particle_0p3: data.particle_0p3 !== undefined ? data.particle_0p3 : undefined,
           temperature: data.temperature || data.temperature_c || 0,
@@ -410,7 +418,7 @@ export const mobileRouteService = {
       });
 
       if (skippedCount > 0) {
-        console.warn(`⚠️ Skipped ${skippedCount} points without GPS coordinates`);
+        console.warn(`⚠️ Skipped ${skippedCount} points without valid GPS coordinates (> 0) or PM2.5 values`);
       }
 
       if (routePoints.length === 0) {

@@ -164,8 +164,7 @@ export const MobileSensorDataTable = () => {
             key: 'pm1',
             width: 140,
             responsive: ['lg'] as Breakpoint[],
-            render: (value: number, record: SensorData) =>
-              record.status === 'online' ? renderParameterCell(value, 'pm1', record) : <Text type="secondary">-</Text>,
+            render: (value: number, record: SensorData) => renderParameterCell(value, 'pm1', record),
           },
         ]
       : []),
@@ -176,8 +175,7 @@ export const MobileSensorDataTable = () => {
             dataIndex: 'pm25',
             key: 'pm25',
             width: 140,
-            render: (value: number, record: SensorData) =>
-              record.status === 'online' ? renderParameterCell(value, 'pm25', record) : <Text type="secondary">-</Text>,
+            render: (value: number, record: SensorData) => renderParameterCell(value, 'pm25', record),
           },
         ]
       : []),
@@ -189,8 +187,7 @@ export const MobileSensorDataTable = () => {
             key: 'pm10',
             width: 140,
             responsive: ['lg'] as Breakpoint[],
-            render: (value: number, record: SensorData) =>
-              record.status === 'online' ? renderParameterCell(value, 'pm10', record) : <Text type="secondary">-</Text>,
+            render: (value: number, record: SensorData) => renderParameterCell(value, 'pm10', record),
           },
         ]
       : []),
@@ -202,8 +199,7 @@ export const MobileSensorDataTable = () => {
             key: 'co2',
             width: 140,
             responsive: ['lg'] as Breakpoint[],
-            render: (value: number, record: SensorData) =>
-              record.status === 'online' ? renderParameterCell(value, 'co2', record) : <Text type="secondary">-</Text>,
+            render: (value: number, record: SensorData) => renderParameterCell(value, 'co2', record),
           },
         ]
       : []),
@@ -215,8 +211,7 @@ export const MobileSensorDataTable = () => {
             key: 'temperature',
             width: 130,
             responsive: ['lg'] as Breakpoint[],
-            render: (value: number, record: SensorData) =>
-              record.status === 'online' ? renderParameterCell(value, 'temperature', record) : <Text type="secondary">-</Text>,
+            render: (value: number, record: SensorData) => renderParameterCell(value, 'temperature', record),
           },
         ]
       : []),
@@ -228,8 +223,7 @@ export const MobileSensorDataTable = () => {
             key: 'humidity',
             width: 130,
             responsive: ['lg'] as Breakpoint[],
-            render: (value: number, record: SensorData) =>
-              record.status === 'online' ? renderParameterCell(value, 'humidity', record) : <Text type="secondary">-</Text>,
+            render: (value: number, record: SensorData) => renderParameterCell(value, 'humidity', record),
           },
         ]
       : []),
@@ -241,8 +235,7 @@ export const MobileSensorDataTable = () => {
             key: 'tvoc',
             width: 140,
             responsive: ['lg'] as Breakpoint[],
-            render: (value: number, record: SensorData) =>
-              record.status === 'online' ? renderParameterCell(value, 'tvoc', record) : <Text type="secondary">-</Text>,
+            render: (value: number, record: SensorData) => renderParameterCell(value, 'tvoc', record),
           },
         ]
       : []),
@@ -253,10 +246,6 @@ export const MobileSensorDataTable = () => {
       width: 180,
       responsive: ['md'] as Breakpoint[],
       render: (timestamp: string, record: SensorData) => {
-        if (record.status === 'offline') {
-          return <Text type="secondary">Offline</Text>;
-        }
-        
         const date = new Date(timestamp);
         const now = new Date();
         const diffMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
@@ -273,6 +262,7 @@ export const MobileSensorDataTable = () => {
             <br />
             <Text type="secondary" style={{ fontSize: 12 }}>
               {timeAgo}
+              {record.status === 'offline' && <span style={{ color: '#ff4d4f', marginLeft: 4 }}>(Offline)</span>}
             </Text>
           </div>
         );
