@@ -240,9 +240,9 @@ export const BarChartPanel = ({
         </div>
       )}
 
-      {/* Chart */}
+      {/* Chart - Wrapped with key to force remount on sensor change */}
       {!loading && chartData && (
-        <div>
+        <div key={`chart-${sensorId}-${parameter}`}>
           <ResponsiveContainer width="100%" height={350}>
             <BarChart 
               data={chartData.data} 
@@ -269,58 +269,66 @@ export const BarChartPanel = ({
                 textAnchor="end"
               />
               
-              {/* Y-Axis: Auto-scaled based on data */}
+              {/* Y-Axis: Auto-scaled with domain to ensure reference lines are visible for PM2.5 */}
               <YAxis
                 tick={{ fontSize: 13, fill: '#424242' }}
                 stroke="#BDBDBD"
                 tickLine={false}
                 axisLine={false}
+                domain={parameter === 'pm25' ? [0, (dataMax: number) => Math.max(dataMax, 50)] : [0, 'auto']}
               />
               
               <Tooltip content={<CustomTooltip />} />
               
-              {/* Bars with dynamic colors using threshold config */}
+              {/* Bars with dynamic colors using threshold config - stroke covers gaps */}
               <Bar 
                 dataKey="value"
                 isAnimationActive={false}
-                maxBarSize={100}
+                maxBarSize={40}
               >
-                {chartData.data.map((entry: any, index: number) => (
-                  <Cell 
-                    key={`cell-${index}`} 
-                    fill={getBarColor(entry.value ?? 0)}
-                  />
-                ))}
+                {chartData.data.map((entry: any, index: number) => {
+                  const barColor = getBarColor(entry.value ?? 0);
+                  return (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={barColor}
+                      stroke={barColor}
+                      strokeWidth={2}
+                    />
+                  );
+                })}
               </Bar>
               
-              {/* PM2.5 Reference Lines - Good (25) and Warning (37.5) thresholds */}
+              {/* PM2.5 Reference Lines - Good (25) and Warning (37.5) thresholds - Render on top */}
               {parameter === 'pm25' && (
                 <>
                   <ReferenceLine
                     y={25}
                     stroke="#48BB78"
-                    strokeWidth={2}
+                    strokeWidth={3}
                     strokeDasharray="5 5"
+                    isFront={true}
                     label={{
-                      // value: 'ดี (25)',
+                      value: 'Good (25)',
                       position: 'insideTopRight',
                       fill: '#48BB78',
                       fontSize: 11,
-                      fontWeight: 600,
+                      fontWeight: 700,
                       offset: 10,
                     }}
                   />
                   <ReferenceLine
                     y={37.5}
-                    stroke="yellow"
-                    strokeWidth={2}
+                    stroke="#FFA500"
+                    strokeWidth={3}
                     strokeDasharray="5 5"
+                    isFront={true}
                     label={{
-                      // value: 'เฝ้าระวัง (37.5)',
+                      value: 'Moderate (37.5)',
                       position: 'insideTopRight',
-                      fill: 'yellow',
+                      fill: '#FFA500',
                       fontSize: 11,
-                      fontWeight: 600,
+                      fontWeight: 700,
                       offset: 10,
                     }}
                   />
