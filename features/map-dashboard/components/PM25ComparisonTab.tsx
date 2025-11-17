@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card, Table, Tag, Spin, Alert, Typography, Space } from 'antd';
-import { TrophyOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { useState, useEffect, useCallback } from 'react';
+import { Card, Table, Tag, Spin, Alert, Typography, Space, Button } from 'antd';
+import { TrophyOutlined, EnvironmentOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useSensorData } from '../hooks/useSensorData';
 import { getSensorHistory } from '@/services/sensorApi';
@@ -26,9 +26,9 @@ export const PM25ComparisonTab = () => {
   const [comparisonData, setComparisonData] = useState<PM25ComparisonData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const fetchComparisons = async () => {
+  const fetchComparisons = useCallback(async () => {
       if (sensors.length === 0) return;
 
       setLoading(true);
@@ -114,10 +114,19 @@ export const PM25ComparisonTab = () => {
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchComparisons();
   }, [sensors]);
+
+  // Fetch only on initial mount
+  useEffect(() => {
+    fetchComparisons();
+  }, [fetchComparisons]);
+
+  // Manual refresh handler
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchComparisons();
+    setRefreshing(false);
+  };
 
   const columns: ColumnsType<PM25ComparisonData> = [
     {
@@ -312,15 +321,34 @@ export const PM25ComparisonTab = () => {
           border: 'none',
           boxShadow: '0 4px 16px rgba(102,126,234,0.3)',
         }}
-        bodyStyle={{ padding: '24px' }}
+        bodyStyle={{ padding: '20px' }}
       >
-        <Title level={4} style={{ margin: 0, color: 'white' }}>
-          <TrophyOutlined style={{ marginRight: 8 }} />
-          เปรียบเทียบค่า PM2.5 เฉลี่ย 24 ชั่วโมง
-        </Title>
-        <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13 }}>
-          แสดงค่าเฉลี่ย PM2.5 ย้อนหลัง 24 ชั่วโมง เรียงจากสูงสุดไปต่ำสุด
-        </Text>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <Title level={4} style={{ margin: 0, color: 'white' }}>
+              <TrophyOutlined style={{ marginRight: 8 }} />
+              เปรียบเทียบค่า PM2.5 เฉลี่ย 24 ชั่วโมง
+            </Title>
+            <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13 }}>
+              แสดงค่าเฉลี่ย PM2.5 ย้อนหลัง 24 ชั่วโมง เรียงจากสูงสุดไปต่ำสุด
+            </Text>
+          </div>
+          <Button
+            icon={<ReloadOutlined spin={refreshing} />}
+            onClick={handleRefresh}
+            loading={refreshing}
+            style={{
+              borderRadius: 8,
+              background: 'rgba(255,255,255,0.2)',
+              borderColor: 'rgba(255,255,255,0.3)',
+              color: 'white',
+              fontWeight: 600,
+            }}
+            size="middle"
+          >
+            รีเฟรช
+          </Button>
+        </div>
       </Card>
 
       {/* Comparison Table */}

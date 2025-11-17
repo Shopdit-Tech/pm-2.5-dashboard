@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, Button, Select, Tabs } from 'antd';
 import { ReloadOutlined, EnvironmentOutlined, BarChartOutlined } from '@ant-design/icons';
 import { GoogleMapComponent } from './GoogleMapComponent';
@@ -14,6 +14,14 @@ export const MapDashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedSensorId, setSelectedSensorId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('map');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -22,8 +30,8 @@ export const MapDashboard = () => {
   };
 
   return (
-    <div style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)', minHeight: '100%', padding: '16px 0' }}>
-      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 50px' }}>
+    <div style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)', minHeight: '100%', padding: isMobile ? '12px 0' : '16px 0' }}>
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: isMobile ? '0 16px' : '0 50px' }}>
         {/* Tabs */}
         <Tabs
         activeKey={activeTab}

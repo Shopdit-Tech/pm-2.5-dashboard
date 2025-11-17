@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axiosInstance from '../../../lib/axios';
 import type {
   AdminSensor,
   GetSensorsResponse,
@@ -9,44 +9,6 @@ import type {
   DeleteSensorResponse,
 } from '../types/sensor';
 
-// Use Next.js API proxy to avoid CORS issues
-const API_BASE_URL = '/api';
-
-/**
- * Get authorization token from localStorage
- */
-const getAuthToken = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  
-  const authUser = localStorage.getItem('pm25_auth_user');
-  if (authUser) {
-    try {
-      const parsed = JSON.parse(authUser);
-      return parsed.access_token || parsed.token || null;
-    } catch (error) {
-      console.error('Failed to parse auth user:', error);
-      return null;
-    }
-  }
-  return null;
-};
-
-/**
- * Create axios instance with auth header
- */
-const createAuthClient = () => {
-  const token = getAuthToken();
-  
-  return axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    timeout: 30000,
-  });
-};
-
 export const sensorService = {
   /**
    * Get all sensors (admin only)
@@ -55,8 +17,7 @@ export const sensorService = {
     try {
       console.log('📊 Fetching all sensors...');
       
-      const client = createAuthClient();
-      const response = await client.get<GetSensorsResponse>('/sensors-admin');
+      const response = await axiosInstance.get<GetSensorsResponse>('/sensors-admin');
       
       console.log('✅ Fetched', response.data.sensors.length, 'sensors');
       return response.data.sensors;
@@ -73,8 +34,7 @@ export const sensorService = {
     try {
       console.log('➕ Creating sensor:', data.code);
       
-      const client = createAuthClient();
-      const response = await client.post<CreateSensorResponse>('/sensors-admin', data);
+      const response = await axiosInstance.post<CreateSensorResponse>('/sensors-admin', data);
       
       console.log('✅ Sensor created:', response.data.sensor.id);
       return response.data.sensor;
@@ -100,8 +60,7 @@ export const sensorService = {
     try {
       console.log('✏️ Updating sensor:', data.code);
       
-      const client = createAuthClient();
-      const response = await client.patch<UpdateSensorResponse>('/sensors-admin', data);
+      const response = await axiosInstance.patch<UpdateSensorResponse>('/sensors-admin', data);
       
       console.log('✅ Sensor updated:', response.data.sensor.id);
       return response.data.sensor;
@@ -125,8 +84,7 @@ export const sensorService = {
     try {
       console.log('🗑️ Deleting sensor:', id);
       
-      const client = createAuthClient();
-      const response = await client.delete<DeleteSensorResponse>('/sensors-admin', {
+      const response = await axiosInstance.delete<DeleteSensorResponse>('/sensors-admin', {
         params: { id },
       });
       

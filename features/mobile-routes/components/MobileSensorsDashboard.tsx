@@ -32,6 +32,7 @@ const { Option } = Select;
 export const MobileSensorsDashboard = () => {
   const { sensors, error, refetch, loading } = useMobileSensors(30000); // Auto-refresh every 30 seconds
   const [refreshing, setRefreshing] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Route viewing state
   const [selectedSensorId, setSelectedSensorId] = useState<string | null>(null);
@@ -39,6 +40,13 @@ export const MobileSensorsDashboard = () => {
   const [selectedRoute, setSelectedRoute] = useState<MobileRoute | null>(null);
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -122,10 +130,10 @@ export const MobileSensorsDashboard = () => {
       style={{
         background: 'linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%)',
         minHeight: '100%',
-        padding: '16px 0',
+        padding: isMobile ? '12px 0' : '16px 0',
       }}
     >
-      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 50px' }}>
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: isMobile ? '0 16px' : '0 50px' }}>
 
       {/* Route Selector */}
       <Card

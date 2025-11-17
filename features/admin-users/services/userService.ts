@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axiosInstance from '../../../lib/axios';
 import type {
   AdminUser,
   CreateUserRequest,
@@ -6,45 +6,6 @@ import type {
   DeleteUserResponse,
   GetUsersResponse,
 } from '../types/user';
-
-// Use Next.js API proxy to avoid CORS issues
-const API_BASE_URL = '/api';
-
-/**
- * Get authorization token from localStorage
- */
-const getAuthToken = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  
-  // Try to get token from localStorage (adjust key based on your auth implementation)
-  const authUser = localStorage.getItem('pm25_auth_user');
-  if (authUser) {
-    try {
-      const parsed = JSON.parse(authUser);
-      return parsed.access_token || parsed.token || null;
-    } catch (error) {
-      console.error('Failed to parse auth user:', error);
-      return null;
-    }
-  }
-  return null;
-};
-
-/**
- * Create axios instance with auth header
- */
-const createAuthClient = () => {
-  const token = getAuthToken();
-  
-  return axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    timeout: 30000,
-  });
-};
 
 export const userService = {
   /**
@@ -54,8 +15,7 @@ export const userService = {
     try {
       console.log('📊 Fetching all users...');
       
-      const client = createAuthClient();
-      const response = await client.get<GetUsersResponse>('/users');
+      const response = await axiosInstance.get<GetUsersResponse>('/users');
       
       console.log('✅ Fetched', response.data.users.length, 'users');
       return response.data.users;
@@ -72,8 +32,7 @@ export const userService = {
     try {
       console.log('➕ Creating user:', userData.email);
       
-      const client = createAuthClient();
-      const response = await client.post<CreateUserResponse>('/users', userData);
+      const response = await axiosInstance.post<CreateUserResponse>('/users', userData);
       
       console.log('✅ User created:', response.data.user_id);
       return response.data;
@@ -100,8 +59,7 @@ export const userService = {
     try {
       console.log('🗑️ Deleting user:', userId);
       
-      const client = createAuthClient();
-      const response = await client.delete<DeleteUserResponse>('/users', {
+      const response = await axiosInstance.delete<DeleteUserResponse>('/users', {
         params: { user_id: userId },
       });
       

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import axiosInstance from '../../../lib/axios';
 import type {
   Threshold,
   GetThresholdsResponse,
@@ -12,41 +13,6 @@ import type {
 
 // Use Next.js API proxy to avoid CORS issues
 const API_BASE_URL = '/api';
-
-/**
- * Get authorization token from localStorage
- */
-const getAuthToken = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  
-  const authUser = localStorage.getItem('pm25_auth_user');
-  if (authUser) {
-    try {
-      const parsed = JSON.parse(authUser);
-      return parsed.access_token || parsed.token || null;
-    } catch (error) {
-      console.error('Failed to parse auth user:', error);
-      return null;
-    }
-  }
-  return null;
-};
-
-/**
- * Create axios instance with auth header
- */
-const createAuthClient = () => {
-  const token = getAuthToken();
-  
-  return axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    timeout: 30000,
-  });
-};
 
 export const thresholdService = {
   /**
@@ -76,8 +42,7 @@ export const thresholdService = {
     try {
       console.log('➕ Creating threshold:', data.metric, data.level);
       
-      const client = createAuthClient();
-      const response = await client.post<CreateThresholdResponse>('/thresholds', data);
+      const response = await axiosInstance.post<CreateThresholdResponse>('/thresholds', data);
       
       console.log('✅ Threshold created:', response.data.item.id);
       return response.data.item;
@@ -101,8 +66,7 @@ export const thresholdService = {
     try {
       console.log('✏️ Updating threshold:', data.id);
       
-      const client = createAuthClient();
-      const response = await client.patch<UpdateThresholdResponse>('/thresholds', data);
+      const response = await axiosInstance.patch<UpdateThresholdResponse>('/thresholds', data);
       
       console.log('✅ Threshold updated:', response.data.item.id);
       return response.data.item;
@@ -126,8 +90,7 @@ export const thresholdService = {
     try {
       console.log('🗑️ Deleting threshold:', id);
       
-      const client = createAuthClient();
-      const response = await client.delete<DeleteThresholdResponse>('/thresholds', {
+      const response = await axiosInstance.delete<DeleteThresholdResponse>('/thresholds', {
         data: { id } as DeleteThresholdRequest,
       });
       

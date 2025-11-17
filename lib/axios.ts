@@ -48,6 +48,7 @@ const refreshAccessToken = async (): Promise<string> => {
   }
 
   try {
+    console.log('🔄 Calling refresh token endpoint...');
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/auth/refresh`,
       { refresh_token: authData.refresh_token },
@@ -58,15 +59,30 @@ const refreshAccessToken = async (): Promise<string> => {
     );
 
     const { access_token, refresh_token } = response.data;
+    if (!access_token || !refresh_token) {
+      throw new Error('Invalid refresh response: missing tokens');
+    }
+    
     updateAccessToken(access_token, refresh_token);
     console.log('✅ Token refreshed successfully');
     return access_token;
-  } catch (error) {
-    console.error('❌ Token refresh failed:', error);
-    // Clear auth data and redirect to login
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-      window.location.href = '/login';
+  } catch (error: any) {
+    console.error('❌ Token refresh failed:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    
+    // Only clear auth if it's an authentication error (invalid/expired refresh token)
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      console.error('🚪 Refresh token is invalid or expired, clearing auth data...');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+        // Reload to reset app state - user will see login button
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
     }
     throw error;
   }
@@ -100,13 +116,18 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    // Check if error is 401 and we haven't retried yet
+    // Check if error is 401/403 and we haven't retried yet
     if (
-      (error.response?.status === 401 || error.response?.status === 403) &&
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403) &&
+      originalRequest &&
       !originalRequest._retry
     ) {
+      console.error(`Received ${error.response.status} error, attempting token refresh...`);
+      
       if (isRefreshing) {
         // If already refreshing, wait for the new token
+        console.error('Token refresh already in progress, waiting...');
         return new Promise((resolve) => {
           subscribeTokenRefresh((token: string) => {
             if (originalRequest.headers) {
@@ -129,8 +150,10 @@ axiosInstance.interceptors.response.use(
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         }
+        console.log('🔁 Retrying original request with new token...');
         return axiosInstance(originalRequest);
       } catch (refreshError) {
+        console.error('❌ Token refresh failed, cannot retry request');
         isRefreshing = false;
         refreshSubscribers = [];
         return Promise.reject(refreshError);
