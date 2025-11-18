@@ -50,7 +50,7 @@ const refreshAccessToken = async (): Promise<string> => {
   try {
     console.log('🔄 Calling refresh token endpoint...');
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/auth/refresh`,
+      '/api/auth/refresh', // Use relative path so it works in both dev and prod
       { refresh_token: authData.refresh_token },
       {
         headers: { 'Content-Type': 'application/json' },
@@ -89,7 +89,7 @@ const refreshAccessToken = async (): Promise<string> => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api',
+  baseURL: '/api', // Use relative path so it works in both dev and prod
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
