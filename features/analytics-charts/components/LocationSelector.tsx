@@ -42,6 +42,7 @@ export const LocationSelector = ({
         showSearch
         optionFilterProp="children"
         suffixIcon={<PlusOutlined />}
+        className="font-noto-sans-thai"
       >
         {availableSensors.map((sensor) => (
           <Option key={sensor.id} value={sensor.id}>

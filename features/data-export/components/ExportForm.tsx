@@ -115,6 +115,7 @@ export const ExportForm = ({ sensors }: ExportFormProps) => {
           size="large"
           showSearch
           optionFilterProp="children"
+          className="font-noto-sans-thai"
         >
           {sensors.map((sensor) => (
             <Option key={sensor.id} value={sensor.id}>
@@ -131,7 +132,7 @@ export const ExportForm = ({ sensors }: ExportFormProps) => {
         rules={[{ required: true, message: 'Please select a bucket size' }]}
         extra=""
       >
-        <Select placeholder="Choose data aggregation interval" size="large">
+        <Select placeholder="Choose data aggregation interval" size="large" className="font-noto-sans-thai">
           {BUCKET_SIZES.map((bucket) => (
             <Option key={bucket.id} value={bucket.id}>
               {bucket.label}

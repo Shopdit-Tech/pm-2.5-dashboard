@@ -36,7 +36,7 @@ export const MapDashboard = () => {
         <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
-        size="large"
+        size="small"
         items={[
           {
             key: 'map',
@@ -48,35 +48,7 @@ export const MapDashboard = () => {
             ),
             children: (
               <>
-                {/* Map Container - Hero Section */}
-                <Card
-                  style={{
-                    borderRadius: 16,
-                    border: '1px solid rgba(255,255,255,0.6)',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                    overflow: 'hidden',
-                    background: 'rgba(255,255,255,0.95)',
-                    marginBottom: 16,
-                  }}
-                  bodyStyle={{ padding: 0 }}
-                >
-                  <div style={{ 
-                    height: typeof window !== 'undefined' && window.innerWidth < 768 ? '300px' : '400px', 
-                    minHeight: '300px'
-                  }}>
-                    <GoogleMapComponent 
-                      sensors={sensors} 
-                      selectedSensorId={selectedSensorId}
-                    />
-                  </div>
-                </Card>
-
-                {/* Legend */}
-                <div style={{ marginBottom: 16 }}>
-                  <AirQualityLegend showRanges compact />
-                </div>
-
-                {/* Info & Controls Card */}
+              {/* Info & Controls Card */}
                 <Card
                   style={{
                     borderRadius: 12,
@@ -129,6 +101,7 @@ export const MapDashboard = () => {
                         optionFilterProp="children"
                         value={selectedSensorId}
                         onChange={(value) => setSelectedSensorId(value)}
+                        className="font-noto-sans-thai"
                       >
                         {sensors.map((sensor) => (
                           <Option key={sensor.id} value={sensor.id}>
@@ -139,6 +112,33 @@ export const MapDashboard = () => {
                     </div>
                   </div>
                 </Card>
+                {/* Map Container - Hero Section */}
+                <Card
+                  style={{
+                    borderRadius: 16,
+                    border: '1px solid rgba(255,255,255,0.6)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                    overflow: 'hidden',
+                    background: 'rgba(255,255,255,0.95)',
+                    marginBottom: 16,
+                  }}
+                  bodyStyle={{ padding: 0 }}
+                >
+                  <div style={{ 
+                    height: typeof window !== 'undefined' && window.innerWidth < 768 ? '300px' : '400px', 
+                    minHeight: '300px'
+                  }}>
+                    <GoogleMapComponent 
+                      sensors={sensors} 
+                      selectedSensorId={selectedSensorId}
+                    />
+                  </div>
+                </Card>
+
+                {/* Legend */}
+                <div style={{ marginBottom: 16 }}>
+                  <AirQualityLegend showRanges compact />
+                </div>
 
                 {/* Sensor Data Table */}
                 <div style={{ marginTop: 24 }}>

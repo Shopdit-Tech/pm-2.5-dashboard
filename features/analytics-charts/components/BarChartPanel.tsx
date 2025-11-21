@@ -56,12 +56,15 @@ export const BarChartPanel = ({
     // This ensures we display all hourly data from the API
     const data = apiChartData.data;
     
-    // Calculate 24-hour average (for all parameters)
+    // Calculate 24-hour average (for all parameters) - excluding null/0 values
     let avg24h = null;
     if (data.length > 0) {
       const last24 = data.slice(-Math.min(24, data.length));
-      const sum = last24.reduce((acc, p) => acc + (p.value || 0), 0);
-      avg24h = sum / last24.length;
+      const validValues = last24.filter((p) => p.value && p.value > 0).map((p) => p.value);
+      if (validValues.length > 0) {
+        const sum = validValues.reduce((acc: any, val: any) => acc + val, 0);
+        avg24h = sum / validValues.length;
+      }
     }
     
     return {
@@ -190,6 +193,7 @@ export const BarChartPanel = ({
             onChange={setParameter}
             style={{ width: 150 }}
             size="middle"
+            className="font-noto-sans-thai"
           >
             <Option value="pm1">PM₁</Option>
             <Option value="pm25">PM₂.₅</Option>
@@ -207,6 +211,7 @@ export const BarChartPanel = ({
             size="middle"
             showSearch
             optionFilterProp="children"
+            className="font-noto-sans-thai"
           >
             {sensors.map((sensor) => (
               <Option key={sensor.id} value={sensor.id}>
@@ -220,6 +225,7 @@ export const BarChartPanel = ({
             onChange={(id) => setTimeRange(getTimeRangeByIdOrDefault(id))}
             style={{ width: 250 }}
             size="middle"
+            className="font-noto-sans-thai"
           >
             {TIME_RANGES.map((range) => (
               <Option key={range.id} value={range.id}>
@@ -306,13 +312,12 @@ export const BarChartPanel = ({
                     y={25}
                     stroke="#48BB78"
                     strokeWidth={3}
-                    strokeDasharray="5 5"
                     isFront={true}
                     label={{
                       value: 'Good (25)',
                       position: 'insideTopRight',
                       fill: '#48BB78',
-                      fontSize: 11,
+                      fontSize: 8,
                       fontWeight: 700,
                       offset: 10,
                     }}
@@ -321,13 +326,12 @@ export const BarChartPanel = ({
                     y={37.5}
                     stroke="#FFA500"
                     strokeWidth={3}
-                    strokeDasharray="5 5"
                     isFront={true}
                     label={{
                       value: 'Moderate (37.5)',
                       position: 'insideTopRight',
                       fill: '#FFA500',
-                      fontSize: 11,
+                      fontSize: 8,
                       fontWeight: 700,
                       offset: 10,
                     }}
@@ -341,7 +345,6 @@ export const BarChartPanel = ({
                   y={chartData.avg24h}
                   stroke="#1d63dc"
                   strokeWidth={3}
-                  strokeDasharray="5 5"
                   label={<GoldAverageLabel value={chartData.avg24h} />}
                   isFront={true}
                 />

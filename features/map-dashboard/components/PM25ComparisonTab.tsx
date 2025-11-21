@@ -36,11 +36,12 @@ export const PM25ComparisonTab = () => {
 
       try {
         const comparisons: PM25ComparisonData[] = [];
+        const BATCH_SIZE = 10; // Max 10 concurrent API calls
 
-        // Fetch 24h average for each sensor (including offline sensors)
-        for (const sensor of sensors) {
+        // Helper function to fetch single sensor data
+        const fetchSensorData = async (sensor: typeof sensors[0]): Promise<PM25ComparisonData> => {
           if (!sensor.code) {
-            comparisons.push({
+            return {
               id: sensor.id,
               rank: 0,
               name: sensor.name,
@@ -48,8 +49,7 @@ export const PM25ComparisonTab = () => {
               avgPm25: 0,
               status: sensor.status,
               hasData: false,
-            });
-            continue;
+            };
           }
 
           try {
@@ -71,7 +71,7 @@ export const PM25ComparisonTab = () => {
               ? pm25Values.reduce((sum, val) => sum + val, 0) / pm25Values.length
               : 0;
 
-            comparisons.push({
+            return {
               id: sensor.id,
               rank: 0,
               name: sensor.name,
@@ -79,11 +79,11 @@ export const PM25ComparisonTab = () => {
               avgPm25,
               status: sensor.status,
               hasData,
-            });
+            };
           } catch (err) {
             console.error(`Error fetching history for ${sensor.code}:`, err);
             // If error, mark as no data
-            comparisons.push({
+            return {
               id: sensor.id,
               rank: 0,
               name: sensor.name,
@@ -91,8 +91,16 @@ export const PM25ComparisonTab = () => {
               avgPm25: 0,
               status: sensor.status,
               hasData: false,
-            });
+            };
           }
+        };
+
+        // Process sensors in batches of 10 for parallel requests
+        for (let i = 0; i < sensors.length; i += BATCH_SIZE) {
+          const batch = sensors.slice(i, i + BATCH_SIZE);
+          const batchResults = await Promise.all(batch.map(fetchSensorData));
+          comparisons.push(...batchResults);
+          console.log(`✅ Processed batch ${Math.floor(i / BATCH_SIZE) + 1}: ${batchResults.length} sensors`);
         }
 
         // Sort by PM2.5 (descending - worst first)

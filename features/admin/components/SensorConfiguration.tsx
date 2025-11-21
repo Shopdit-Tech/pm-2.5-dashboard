@@ -105,8 +105,7 @@ export const SensorConfiguration = () => {
   const handleOpenCreateModal = () => {
     createForm.resetFields();
     createForm.setFieldsValue({
-      type: 'indoor',
-      is_movable: false,
+      type: 'fixed',
       latitude: 0,
       longitude: 0,
     });
@@ -122,11 +121,15 @@ export const SensorConfiguration = () => {
     try {
       const values = await createForm.validateFields();
 
+      // Map simple type to sensor configuration
+      const isMobile = values.type === 'mobile';
+      const sensorType = isMobile ? 'MOBILE' : 'OUTDOOR';
+
       await sensorService.createSensor({
         code: values.code,
         name: values.name,
-        type: values.type.toUpperCase() as SensorType,
-        is_movable: values.is_movable || false,
+        type: sensorType as SensorType,
+        is_movable: isMobile,
         fixed_lat: values.latitude,
         fixed_lng: values.longitude,
         address: values.address,
@@ -186,6 +189,7 @@ export const SensorConfiguration = () => {
               value={editForm.type}
               onChange={(value) => setEditForm({ ...editForm, type: value })}
               style={{ width: '100%' }}
+              className="font-noto-sans-thai"
             >
               <Option value="INDOOR">ภายใน</Option>
               <Option value="OUTDOOR">ภายนอก</Option>
@@ -194,21 +198,12 @@ export const SensorConfiguration = () => {
           );
         }
         
-        // Determine type based on is_movable
-        if (isMovable) {
-          return (
-            <Tag color="orange">
-              เคลื่อนที่ (Mobile)
-            </Tag>
-          );
-        } else {
-          // Fixed sensor - check type
-          return (
-            <Tag color={record.type === 'INDOOR' ? 'blue' : 'green'}>
-              {record.type === 'INDOOR' ? 'ภายใน (Indoor)' : 'ภายนอก (Outdoor)'}
-            </Tag>
-          );
-        }
+        // Simple display: Fixed vs Mobile
+        return (
+          <Tag color={isMovable ? 'orange' : 'blue'}>
+            {isMovable ? 'เคลื่อนที่' : 'ติดตั้ง'}
+          </Tag>
+        );
       },
     },
     {
@@ -388,10 +383,9 @@ export const SensorConfiguration = () => {
             label="ประเภท"
             rules={[{ required: true, message: 'กรุณาเลือกประเภทเซ็นเซอร์' }]}
           >
-            <Select placeholder="เลือกประเภท">
-              <Option value="indoor">ภายใน (Indoor)</Option>
-              <Option value="outdoor">ภายนอก (Outdoor)</Option>
-              <Option value="mobile">เคลื่อนที่ (Mobile)</Option>
+            <Select placeholder="เลือกประเภท" className="font-noto-sans-thai">
+              <Option value="fixed">ติดตั้ง</Option>
+              <Option value="mobile">เคลื่อนที่</Option>
             </Select>
           </Form.Item>
           <Form.Item name="address" label="ที่อยู่">

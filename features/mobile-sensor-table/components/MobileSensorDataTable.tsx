@@ -138,7 +138,7 @@ export const MobileSensorDataTable = () => {
       dataIndex: 'name',
       key: 'name',
       fixed: isMobile ? false : 'left',
-      width: isMobile ? 150 : 180,
+      width: isMobile ? 120 : 150,
       render: (name: string) => (
         <Text strong style={{ fontSize: isMobile ? 12 : 13, wordBreak: 'break-word' }}>
           {name}
@@ -149,7 +149,7 @@ export const MobileSensorDataTable = () => {
       title: 'สถานะ',
       dataIndex: 'status',
       key: 'status',
-      width: 100,
+      width: 80,
       render: (status: string) => (
         <Tag color={status === 'online' ? 'green' : 'red'} style={{ fontSize: 11 }}>
           {status === 'online' ? 'online' : 'offline'}
@@ -162,7 +162,7 @@ export const MobileSensorDataTable = () => {
             title: 'PM₁ (μg/m³)',
             dataIndex: 'pm1',
             key: 'pm1',
-            width: 140,
+            width: 110,
             responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'pm1', record),
           },
@@ -174,7 +174,7 @@ export const MobileSensorDataTable = () => {
             title: 'PM2.5(μg/m³)',
             dataIndex: 'pm25',
             key: 'pm25',
-            width: 140,
+            width: 110,
             render: (value: number, record: SensorData) => renderParameterCell(value, 'pm25', record),
           },
         ]
@@ -185,7 +185,7 @@ export const MobileSensorDataTable = () => {
             title: 'PM₁₀ (μg/m³)',
             dataIndex: 'pm10',
             key: 'pm10',
-            width: 140,
+            width: 110,
             responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'pm10', record),
           },
@@ -197,7 +197,7 @@ export const MobileSensorDataTable = () => {
             title: 'CO₂ (ppm)',
             dataIndex: 'co2',
             key: 'co2',
-            width: 140,
+            width: 110,
             responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'co2', record),
           },
@@ -209,7 +209,7 @@ export const MobileSensorDataTable = () => {
             title: 'Temp. (°C)',
             dataIndex: 'temperature',
             key: 'temperature',
-            width: 130,
+            width: 100,
             responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'temperature', record),
           },
@@ -221,7 +221,7 @@ export const MobileSensorDataTable = () => {
             title: 'R.Hum. (%)',
             dataIndex: 'humidity',
             key: 'humidity',
-            width: 130,
+            width: 100,
             responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'humidity', record),
           },
@@ -233,7 +233,7 @@ export const MobileSensorDataTable = () => {
             title: 'TVOC (ppb)',
             dataIndex: 'tvoc',
             key: 'tvoc',
-            width: 140,
+            width: 110,
             responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'tvoc', record),
           },
@@ -243,7 +243,7 @@ export const MobileSensorDataTable = () => {
       title: 'Last Update',
       dataIndex: 'timestamp',
       key: 'timestamp',
-      width: 180,
+      width: 150,
       responsive: ['md'] as Breakpoint[],
       render: (timestamp: string, record: SensorData) => {
         const date = new Date(timestamp);
@@ -417,7 +417,7 @@ export const MobileSensorDataTable = () => {
           columns={columns as any}
           dataSource={filteredSensors}
           rowKey="id"
-          scroll={{ x: isMobile ? 600 : 1600 }}
+          scroll={{ x: isMobile ? 600 : 1200 }}
           pagination={{
             pageSize: isMobile ? 10 : 20,
             showSizeChanger: !isMobile,

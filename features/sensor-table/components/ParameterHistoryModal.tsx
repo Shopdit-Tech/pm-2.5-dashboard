@@ -93,9 +93,20 @@ export const ParameterHistoryModal = ({
         max: currentValue,
       };
     }
+    
+    // Calculate average from frontend data - only points with value > 0
+    let calculatedAverage = currentValue;
+    if (chartData.data && chartData.data.length > 0) {
+      const validPoints = chartData.data.filter((p) => p.value && p.value > 0);
+      if (validPoints.length > 0) {
+        const sum = validPoints.reduce((acc: any, p: any) => acc + p.value, 0);
+        calculatedAverage = sum / validPoints.length;
+      }
+    }
+    
     return {
       current: currentValue,
-      average: chartData.average,
+      average: calculatedAverage,
       min: chartData.min,
       max: chartData.max,
     };
@@ -196,6 +207,7 @@ export const ParameterHistoryModal = ({
               onChange={(id) => setTimeRange(getTimeRangeByIdOrDefault(id))}
               style={{ width: isMobile ? '100%' : 250 }}
               size={isMobile ? 'middle' : 'large'}
+              className="font-noto-sans-thai"
             >
               {TIME_RANGES.map((range) => (
                 <Select.Option key={range.id} value={range.id}>
@@ -251,20 +263,22 @@ export const ParameterHistoryModal = ({
                   />
                 ))}
 
-                {/* Average line */}
-                <ReferenceLine
-                  y={stats.average}
-                  stroke="#faad14"
-                  strokeDasharray="5 5"
-                  strokeWidth={2}
-                  label={{
-                    value: `Avg: ${stats.average.toFixed(1)}`,
-                    position: 'right',
-                    fill: '#faad14',
-                    fontSize: 12,
-                    fontWeight: 600,
-                  }}
-                />
+                {/* Average line - only show if valid number */}
+                {stats.average != null && isFinite(stats.average) && (
+                  <ReferenceLine
+                    y={stats.average}
+                    stroke="#faad14"
+                    strokeDasharray="5 5"
+                    strokeWidth={2}
+                    label={{
+                      value: `Avg: ${stats.average.toFixed(1)}`,
+                      position: 'right',
+                      fill: '#faad14',
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}
+                  />
+                )}
 
                 <XAxis
                   dataKey="timestamp"
