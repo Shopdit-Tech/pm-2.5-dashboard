@@ -190,6 +190,7 @@ export const SensorConfiguration = () => {
               onChange={(value) => setEditForm({ ...editForm, type: value })}
               style={{ width: '100%' }}
               className="font-noto-sans-thai"
+              getPopupContainer={(trigger) => trigger.parentElement}
             >
               <Option value="INDOOR">ภายใน</Option>
               <Option value="OUTDOOR">ภายนอก</Option>
@@ -383,7 +384,7 @@ export const SensorConfiguration = () => {
             label="ประเภท"
             rules={[{ required: true, message: 'กรุณาเลือกประเภทเซ็นเซอร์' }]}
           >
-            <Select placeholder="เลือกประเภท" className="font-noto-sans-thai">
+            <Select placeholder="เลือกประเภท" className="font-noto-sans-thai" getPopupContainer={(trigger) => trigger.parentElement}>
               <Option value="fixed">ติดตั้ง</Option>
               <Option value="mobile">เคลื่อนที่</Option>
             </Select>

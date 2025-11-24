@@ -285,6 +285,8 @@ export const MultiLocationLineChart = ({ sensors }: MultiLocationLineChartProps)
                 onChange={(id) => setTimeRange(getTimeRangeByIdOrDefault(id))}
                 style={{ width: '100%' }}
                 size={isMobile ? 'middle' : 'large'}
+                className="font-noto-sans-thai"
+                getPopupContainer={(trigger) => trigger.parentElement}
               >
                 {TIME_RANGES.map((range) => (
                   <Option key={range.id} value={range.id}>

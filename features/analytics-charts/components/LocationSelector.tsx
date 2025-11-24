@@ -43,6 +43,7 @@ export const LocationSelector = ({
         optionFilterProp="children"
         suffixIcon={<PlusOutlined />}
         className="font-noto-sans-thai"
+        getPopupContainer={(trigger) => trigger.parentElement}
       >
         {availableSensors.map((sensor) => (
           <Option key={sensor.id} value={sensor.id}>

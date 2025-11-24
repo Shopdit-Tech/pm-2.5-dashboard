@@ -102,6 +102,7 @@ export const MapDashboard = () => {
                         value={selectedSensorId}
                         onChange={(value) => setSelectedSensorId(value)}
                         className="font-noto-sans-thai"
+                        getPopupContainer={(trigger) => trigger.parentElement}
                       >
                         {sensors.map((sensor) => (
                           <Option key={sensor.id} value={sensor.id}>

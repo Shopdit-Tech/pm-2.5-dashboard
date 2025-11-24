@@ -208,6 +208,7 @@ export const ParameterHistoryModal = ({
               style={{ width: isMobile ? '100%' : 250 }}
               size={isMobile ? 'middle' : 'large'}
               className="font-noto-sans-thai"
+              getPopupContainer={(trigger) => trigger.parentElement}
             >
               {TIME_RANGES.map((range) => (
                 <Select.Option key={range.id} value={range.id}>

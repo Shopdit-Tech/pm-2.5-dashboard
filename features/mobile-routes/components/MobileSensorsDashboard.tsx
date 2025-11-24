@@ -87,13 +87,11 @@ export const MobileSensorsDashboard = () => {
     setRouteError(null);
 
     try {
-      // Set end date to end of day (23:59:59)
-      const endOfDay = end.clone().endOf('day');
-      
-      console.log('🗺️ Loading route for:', sensor.name, 'from:', start.toISOString(), 'to:', endOfDay.toISOString());
+      // Use selected time directly
+      console.log('🗺️ Loading route for:', sensor.name, 'from:', start.toISOString(), 'to:', end.toISOString());
 
       // Call real API to fetch route
-      const route = await mobileRouteService.getSensorRouteRange(sensor, start.toISOString(), endOfDay.toISOString());
+      const route = await mobileRouteService.getSensorRouteRange(sensor, start.toISOString(), end.toISOString());
 
       if (route) {
         setSelectedRoute(route);
@@ -162,6 +160,8 @@ export const MobileSensorsDashboard = () => {
               allowClear
               onClear={handleClearRoute}
               className="font-noto-sans-thai"
+              popupClassName="font-noto-sans-thai"
+              getPopupContainer={(trigger) => trigger.parentElement}
             >
               {sensors.map((sensor) => (
                 <Option key={sensor.id} value={sensor.id}>

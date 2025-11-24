@@ -194,6 +194,7 @@ export const BarChartPanel = ({
             style={{ width: 150 }}
             size="middle"
             className="font-noto-sans-thai"
+            getPopupContainer={(trigger) => trigger.parentElement}
           >
             <Option value="pm1">PM₁</Option>
             <Option value="pm25">PM₂.₅</Option>
@@ -212,6 +213,7 @@ export const BarChartPanel = ({
             showSearch
             optionFilterProp="children"
             className="font-noto-sans-thai"
+            getPopupContainer={(trigger) => trigger.parentElement}
           >
             {sensors.map((sensor) => (
               <Option key={sensor.id} value={sensor.id}>
@@ -226,6 +228,7 @@ export const BarChartPanel = ({
             style={{ width: 250 }}
             size="middle"
             className="font-noto-sans-thai"
+            getPopupContainer={(trigger) => trigger.parentElement}
           >
             {TIME_RANGES.map((range) => (
               <Option key={range.id} value={range.id}>
