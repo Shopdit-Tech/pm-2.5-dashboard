@@ -62,7 +62,10 @@ export const MobileSensorsDashboard = () => {
   // Auto-submit when both sensor and date range are selected
   useEffect(() => {
     if (selectedSensorId && dateRange && dateRange[0] && dateRange[1]) {
-      loadRoute(selectedSensorId, dateRange[0], dateRange[1]);
+      // Set start time to beginning of day (00:00:00) and end time to end of day (23:59:59)
+      const startOfDay = dateRange[0].startOf('day');
+      const endOfDay = dateRange[1].endOf('day');
+      loadRoute(selectedSensorId, startOfDay, endOfDay);
     }
   }, [selectedSensorId, dateRange]);
 
@@ -172,8 +175,39 @@ export const MobileSensorsDashboard = () => {
             </Select>
           </Col>
           <Col xs={24} sm={12} md={12}>
-            <div style={{ marginBottom: 4, fontSize: 13, color: '#595959' }}>เลือกช่วงวันที่และเวลา (สูงสุด 5 วัน)</div>
+            <div style={{ marginBottom: 4, fontSize: 13, color: '#595959' }}>เลือกช่วงวันที่ (สูงสุด 5 วัน)</div>
             <DatePicker.RangePicker
+              format="YYYY-MM-DD"
+              value={dateRange}
+              onChange={(dates) => {
+                console.log('✅ Date range selected:', dates);
+                // Validate max 5-day range
+                if (dates && dates[0] && dates[1]) {
+                  const daysDiff = dates[1].diff(dates[0], 'days');
+                  if (daysDiff > 5) {
+                    alert('กรุณาเลือกช่วงเวลาไม่เกิน 5 วัน');
+                    return;
+                  }
+                }
+                setDateRange(dates);
+              }}
+              disabledDate={(current) => {
+                if (!current || !dateRange || !dateRange[0] || dateRange[1]) {
+                  return false;
+                }
+                // Disable dates more than 5 days from the selected start date
+                const startDate = dateRange[0];
+                const maxDate = startDate.clone().add(5, 'days');
+                const minDate = startDate.clone().subtract(5, 'days');
+                return current.isAfter(maxDate) || current.isBefore(minDate);
+              }}
+              placeholder={['วันที่เริ่มต้น', 'วันที่สิ้นสุด']}
+              style={{ width: '100%' }}
+              size="large"
+              className="font-noto-sans-thai"
+            />
+            {/* TIME SELECTION - Commented for future use */}
+            {/* <DatePicker.RangePicker
               format="YYYY-MM-DD HH:mm"
               showTime={{ format: 'HH:mm' }}
               value={dateRange}
@@ -203,7 +237,7 @@ export const MobileSensorsDashboard = () => {
               style={{ width: '100%' }}
               size="large"
               className="font-noto-sans-thai"
-            />
+            /> */}
           </Col>
           {selectedRoute && (
             <Col xs={24} sm={24} md={8}>
