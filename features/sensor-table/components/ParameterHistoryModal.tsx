@@ -124,7 +124,8 @@ export const ParameterHistoryModal = ({
     return thresholds.map((threshold) => ({
       min: threshold.min_value,
       max: threshold.max_value,
-      label: threshold.level.replace('_', ' ').charAt(0).toUpperCase() + threshold.level.slice(1).replace('_', ' '),
+      // Use name if available, otherwise format level as fallback
+      label: threshold.name || (threshold.level.replace('_', ' ').charAt(0).toUpperCase() + threshold.level.slice(1).replace('_', ' ')),
       color: threshold.color_hex,
       opacity: 0.15,
     }));
