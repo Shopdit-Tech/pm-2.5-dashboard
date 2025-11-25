@@ -25,10 +25,11 @@ export const ThresholdConfiguration = () => {
   const [thresholds, setThresholds] = useState<Threshold[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<{ min: number; max: number; colorHex: string }>({ 
-    min: 0, 
-    max: 0, 
-    colorHex: '' 
+  const [editForm, setEditForm] = useState<{ name: string; min: number; max: number; colorHex: string }>({
+    name: '',
+    min: 0,
+    max: 0,
+    colorHex: ''
   });
   const [isMobile, setIsMobile] = useState(false);
 
@@ -64,10 +65,11 @@ export const ThresholdConfiguration = () => {
 
   const handleEdit = (threshold: Threshold) => {
     setEditingId(threshold.id);
-    setEditForm({ 
-      min: threshold.min_value, 
+    setEditForm({
+      name: threshold.name || '',
+      min: threshold.min_value,
       max: threshold.max_value,
-      colorHex: threshold.color_hex 
+      colorHex: threshold.color_hex
     });
   };
 
@@ -75,6 +77,7 @@ export const ThresholdConfiguration = () => {
     try {
       await thresholdService.updateThreshold({
         id: thresholdId,
+        name: editForm.name || undefined,
         min_value: editForm.min,
         max_value: editForm.max,
         color_hex: editForm.colorHex,
@@ -92,7 +95,7 @@ export const ThresholdConfiguration = () => {
 
   const handleCancel = () => {
     setEditingId(null);
-    setEditForm({ min: 0, max: 0, colorHex: '' });
+    setEditForm({ name: '', min: 0, max: 0, colorHex: '' });
   };
 
   const columns = [
@@ -100,12 +103,35 @@ export const ThresholdConfiguration = () => {
       title: 'ระดับ',
       dataIndex: 'level',
       key: 'level',
-      width: isMobile ? 80 : undefined,
+      width: isMobile ? 80 : 120,
       render: (level: string) => (
         <span style={{ fontWeight: 500, textTransform: 'capitalize', fontSize: isMobile ? 12 : 14 }}>
           {level}
         </span>
       ),
+    },
+    {
+      title: 'ชื่อ',
+      dataIndex: 'name',
+      key: 'name',
+      width: isMobile ? 100 : 180,
+      render: (name: string | null, record: Threshold) => {
+        if (editingId === record.id) {
+          return (
+            <Input
+              value={editForm.name}
+              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+              placeholder="ชื่อเกณฑ์"
+              size={isMobile ? 'small' : 'middle'}
+            />
+          );
+        }
+        return (
+          <span style={{ fontSize: isMobile ? 12 : 14, color: name ? '#262626' : '#8c8c8c' }}>
+            {name || '-'}
+          </span>
+        );
+      },
     },
     {
       title: 'สี',

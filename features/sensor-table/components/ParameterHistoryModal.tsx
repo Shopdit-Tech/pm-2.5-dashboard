@@ -141,6 +141,41 @@ export const ParameterHistoryModal = ({
     }));
   }, [chartData]);
 
+  // Calculate chart Y-axis domain for gradient
+  const chartDomain = useMemo(() => {
+    if (!formattedChartData.length) return { min: 0, max: 100 };
+    const values = formattedChartData.map((d) => d.value).filter((v) => v != null);
+    if (!values.length) return { min: 0, max: 100 };
+    const dataMin = Math.min(...values);
+    const dataMax = Math.max(...values);
+    return {
+      min: Math.floor(Math.max(0, dataMin * 0.8)),
+      max: Math.ceil(dataMax * 1.2),
+    };
+  }, [formattedChartData]);
+
+  // Generate gradient stops based on threshold zones
+  const gradientStops = useMemo(() => {
+    if (!zones.length || chartDomain.max === chartDomain.min) return [];
+    const range = chartDomain.max - chartDomain.min;
+    const stops: { offset: string; color: string }[] = [];
+    const sortedZones = [...zones].sort((a, b) => a.min - b.min);
+
+    sortedZones.forEach((zone) => {
+      const zoneMin = Math.max(zone.min, chartDomain.min);
+      const zoneMax = Math.min(zone.max, chartDomain.max);
+      if (zoneMin >= chartDomain.max || zoneMax <= chartDomain.min) return;
+
+      const minPercent = ((zoneMin - chartDomain.min) / range) * 100;
+      const maxPercent = ((zoneMax - chartDomain.min) / range) * 100;
+
+      stops.push({ offset: `${minPercent}%`, color: zone.color });
+      stops.push({ offset: `${maxPercent}%`, color: zone.color });
+    });
+
+    return stops;
+  }, [zones, chartDomain]);
+
   // Custom tooltip
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -299,17 +334,21 @@ export const ParameterHistoryModal = ({
                   textAnchor="end"
                 />
                 
+                {/* Gradient definition for colored line */}
+                <defs>
+                  <linearGradient id="lineColorGradient" x1="0" y1="1" x2="0" y2="0">
+                    {gradientStops.length > 0 ? (
+                      gradientStops.map((stop, i) => (
+                        <stop key={i} offset={stop.offset} stopColor={stop.color} />
+                      ))
+                    ) : (
+                      <stop offset="0%" stopColor="#1890ff" />
+                    )}
+                  </linearGradient>
+                </defs>
+
                 <YAxis
-                  domain={[
-                    (dataMin: number) => {
-                      const min = Math.max(0, dataMin * 0.8); // 20% padding below, but not negative
-                      return Math.floor(min);
-                    },
-                    (dataMax: number) => {
-                      const max = dataMax * 1.2; // 20% padding above
-                      return Math.ceil(max);
-                    }
-                  ]}
+                  domain={[chartDomain.min, chartDomain.max]}
                   tick={{ fontSize: 11 }}
                   stroke="#8c8c8c"
                   label={{
@@ -327,10 +366,10 @@ export const ParameterHistoryModal = ({
                 <Line
                   type="monotone"
                   dataKey="value"
-                  stroke="#1890ff"
-                  strokeWidth={2}
+                  stroke="url(#lineColorGradient)"
+                  strokeWidth={3}
                   dot={false}
-                  activeDot={{ r: 6 }}
+                  activeDot={{ r: 6, fill: '#1890ff', stroke: 'white', strokeWidth: 2 }}
                 />
               </LineChart>
             </ResponsiveContainer>

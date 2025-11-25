@@ -13,6 +13,7 @@ export type Threshold = {
   id: string;
   metric: ThresholdMetric;
   level: ThresholdLevel;
+  name: string | null;
   sort_order: number;
   color_hex: string;
   min_value: number;
@@ -27,6 +28,7 @@ export type GetThresholdsResponse = {
 export type CreateThresholdRequest = {
   metric: ThresholdMetric;
   level: ThresholdLevel;
+  name?: string;
   sort_order: number;
   color_hex: string;
   min_value: number;
@@ -39,6 +41,7 @@ export type CreateThresholdResponse = {
 
 export type UpdateThresholdRequest = {
   id: string;
+  name?: string;
   color_hex?: string;
   min_value?: number;
   max_value?: number;
