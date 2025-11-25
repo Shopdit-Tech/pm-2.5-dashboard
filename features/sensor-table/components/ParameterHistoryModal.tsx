@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { Modal, Typography, Card, Row, Col, Spin, Alert, Select } from 'antd';
-import { LineChartOutlined, RiseOutlined, FallOutlined, DashboardOutlined } from '@ant-design/icons';
+import { LineChartOutlined, RiseOutlined, FallOutlined } from '@ant-design/icons';
 import { SensorData } from '@/types/sensor';
 import {
   LineChart,
@@ -83,34 +83,31 @@ export const ParameterHistoryModal = ({
   // Fetch real historical data from API
   const { chartData, loading, error } = useChartData(sensor, paramKey, timeRange);
 
-  // Calculate statistics from real data
+  // Calculate statistics from API history data only
   const stats = useMemo(() => {
-    if (!chartData) {
+    if (!chartData || !chartData.data || chartData.data.length === 0) {
       return {
-        current: currentValue,
-        average: currentValue,
-        min: currentValue,
-        max: currentValue,
+        average: 0,
+        min: 0,
+        max: 0,
       };
     }
     
-    // Calculate average from frontend data - only points with value > 0
-    let calculatedAverage = currentValue;
-    if (chartData.data && chartData.data.length > 0) {
-      const validPoints = chartData.data.filter((p) => p.value && p.value > 0);
-      if (validPoints.length > 0) {
-        const sum = validPoints.reduce((acc: any, p: any) => acc + p.value, 0);
-        calculatedAverage = sum / validPoints.length;
-      }
+    // Calculate all values from API data only
+    const validPoints = chartData.data.filter((p: { value: number }) => p.value != null && p.value > 0);
+    
+    let calculatedAverage = 0;
+    if (validPoints.length > 0) {
+      const sum = validPoints.reduce((acc: number, p: { value: number }) => acc + p.value, 0);
+      calculatedAverage = sum / validPoints.length;
     }
     
     return {
-      current: currentValue,
       average: calculatedAverage,
-      min: chartData.min,
-      max: chartData.max,
+      min: chartData.min ?? 0,
+      max: chartData.max ?? 0,
     };
-  }, [chartData, currentValue]);
+  }, [chartData]);
 
   // Get quality zones from threshold configuration
   const zones = useMemo((): QualityZone[] => {
@@ -290,7 +287,7 @@ export const ParameterHistoryModal = ({
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
 
                 {/* Background quality zones */}
-                {zones.map((zone, index) => (
+                {/* {zones.map((zone, index) => (
                   <ReferenceArea
                     key={index}
                     y1={zone.min}
@@ -298,7 +295,7 @@ export const ParameterHistoryModal = ({
                     fill={zone.color}
                     fillOpacity={zone.opacity}
                   />
-                ))}
+                ))} */}
 
                 {/* Average line - only show if valid number */}
                 {stats.average != null && isFinite(stats.average) && (
@@ -401,29 +398,7 @@ export const ParameterHistoryModal = ({
 
           {/* Statistics Cards */}
           <Row gutter={isMobile ? [12, 12] : [16, 16]}>
-            <Col xs={12} sm={6}>
-              <Card
-                style={{
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
-                  border: 'none',
-                }}
-                bodyStyle={{ padding: isMobile ? '16px 12px' : '20px', textAlign: 'center' }}
-              >
-                <DashboardOutlined style={{ fontSize: isMobile ? 20 : 24, color: 'white', marginBottom: isMobile ? 6 : 8 }} />
-                <Text style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.9)', display: 'block' }}>
-                  ค่าปัจจุบัน
-                </Text>
-                <Text style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: 'white', display: 'block' }}>
-                  {stats.current.toFixed(1)}
-                </Text>
-                <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.8)' }}>
-                  {getParameterUnit(parameter)}
-                </Text>
-              </Card>
-            </Col>
-
-            <Col xs={12} sm={6}>
+            <Col xs={8} sm={8}>
               <Card
                 style={{
                   borderRadius: '12px',
@@ -445,7 +420,7 @@ export const ParameterHistoryModal = ({
               </Card>
             </Col>
 
-            <Col xs={12} sm={6}>
+            <Col xs={8} sm={8}>
               <Card
                 style={{
                   borderRadius: '12px',
@@ -467,7 +442,7 @@ export const ParameterHistoryModal = ({
               </Card>
             </Col>
 
-            <Col xs={12} sm={6}>
+            <Col xs={8} sm={8}>
               <Card
                 style={{
                   borderRadius: '12px',
