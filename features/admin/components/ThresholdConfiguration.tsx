@@ -100,17 +100,6 @@ export const ThresholdConfiguration = () => {
 
   const columns = [
     {
-      title: 'ระดับ',
-      dataIndex: 'level',
-      key: 'level',
-      width: isMobile ? 80 : 120,
-      render: (level: string) => (
-        <span style={{ fontWeight: 500, textTransform: 'capitalize', fontSize: isMobile ? 12 : 14 }}>
-          {level}
-        </span>
-      ),
-    },
-    {
       title: 'ชื่อ',
       dataIndex: 'name',
       key: 'name',
