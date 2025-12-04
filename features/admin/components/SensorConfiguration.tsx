@@ -75,8 +75,9 @@ export const SensorConfiguration = () => {
         code: sensor.code,
         name: editForm.name,
         type: editForm.type,
-        fixed_lat: editForm.fixed_lat ?? undefined,
-        fixed_lng: editForm.fixed_lng ?? undefined,
+        // Only send lat/lng for non-mobile sensors
+        fixed_lat: editForm.type === 'MOBILE' ? undefined : (editForm.fixed_lat ?? undefined),
+        fixed_lng: editForm.type === 'MOBILE' ? undefined : (editForm.fixed_lng ?? undefined),
       });
 
       message.success('บันทึกการตั้งค่าเซ็นเซอร์แล้ว');
@@ -130,8 +131,9 @@ export const SensorConfiguration = () => {
         name: values.name,
         type: sensorType as SensorType,
         is_movable: isMobile,
-        fixed_lat: values.latitude,
-        fixed_lng: values.longitude,
+        // Only send lat/lng for fixed sensors
+        fixed_lat: isMobile ? undefined : values.latitude,
+        fixed_lng: isMobile ? undefined : values.longitude,
         address: values.address,
       });
 
@@ -187,7 +189,14 @@ export const SensorConfiguration = () => {
           return (
             <Select
               value={editForm.type}
-              onChange={(value) => setEditForm({ ...editForm, type: value })}
+              onChange={(value) => {
+                // Clear lat/lng when switching to MOBILE
+                if (value === 'MOBILE') {
+                  setEditForm({ ...editForm, type: value, fixed_lat: null, fixed_lng: null });
+                } else {
+                  setEditForm({ ...editForm, type: value });
+                }
+              }}
               style={{ width: '100%' }}
               className="font-noto-sans-thai"
               getPopupContainer={(trigger) => trigger.parentElement}
@@ -214,7 +223,15 @@ export const SensorConfiguration = () => {
       width: 150,
       responsive: isMobile ? ['lg' as const] : undefined,
       render: (lat: number | null, record: AdminSensor) => {
+        // Mobile sensors don't have fixed location
+        if (record.is_movable) {
+          return <span style={{ fontSize: 12, color: '#bfbfbf', fontStyle: 'italic' }}>ไม่ระบุ</span>;
+        }
         if (editingId === record.id) {
+          // Don't show input if type is MOBILE
+          if (editForm.type === 'MOBILE') {
+            return <span style={{ fontSize: 12, color: '#bfbfbf', fontStyle: 'italic' }}>ไม่ระบุ</span>;
+          }
           return (
             <InputNumber
               value={editForm.fixed_lat}
@@ -236,7 +253,15 @@ export const SensorConfiguration = () => {
       width: 150,
       responsive: isMobile ? ['lg' as const] : undefined,
       render: (lng: number | null, record: AdminSensor) => {
+        // Mobile sensors don't have fixed location
+        if (record.is_movable) {
+          return <span style={{ fontSize: 12, color: '#bfbfbf', fontStyle: 'italic' }}>ไม่ระบุ</span>;
+        }
         if (editingId === record.id) {
+          // Don't show input if type is MOBILE
+          if (editForm.type === 'MOBILE') {
+            return <span style={{ fontSize: 12, color: '#bfbfbf', fontStyle: 'italic' }}>ไม่ระบุ</span>;
+          }
           return (
             <InputNumber
               value={editForm.fixed_lng}
@@ -392,14 +417,20 @@ export const SensorConfiguration = () => {
           <Form.Item name="address" label="ที่อยู่">
             <Input placeholder="สถานที่ติดตั้ง" />
           </Form.Item>
-          <Space size={16} style={{ width: '100%' }} direction={isMobile ? 'vertical' : 'horizontal'}>
-            <Form.Item name="latitude" label="ละติจูด" style={{ flex: 1 }}>
-              <InputNumber style={{ width: '100%' }} placeholder="เช่น 13.7563" />
-            </Form.Item>
-            <Form.Item name="longitude" label="ลองจิจูด" style={{ flex: 1 }}>
-              <InputNumber style={{ width: '100%' }} placeholder="เช่น 100.5018" />
-            </Form.Item>
-          </Space>
+          <Form.Item noStyle shouldUpdate={(prev, curr) => prev.type !== curr.type}>
+            {({ getFieldValue }) =>
+              getFieldValue('type') !== 'mobile' && (
+                <Space size={16} style={{ width: '100%' }} direction={isMobile ? 'vertical' : 'horizontal'}>
+                  <Form.Item name="latitude" label="ละติจูด" style={{ flex: 1 }}>
+                    <InputNumber style={{ width: '100%' }} placeholder="เช่น 13.7563" />
+                  </Form.Item>
+                  <Form.Item name="longitude" label="ลองจิจูด" style={{ flex: 1 }}>
+                    <InputNumber style={{ width: '100%' }} placeholder="เช่น 100.5018" />
+                  </Form.Item>
+                </Space>
+              )
+            }
+          </Form.Item>
         </Form>
       </Modal>
       </div>
