@@ -52,18 +52,31 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     localStorage.setItem('activeView', activeView);
   }, [activeView]);
 
-  const baseMenuItems = [
+  type MenuItem = {
+    key: string;
+    label: string;
+    title?: string;
+    children?: MenuItem[];
+  };
+
+  const baseMenuItems: MenuItem[] = [
     {
-      key: 'static-sensors',
+      key: 'air-quality-map',
       label: 'แผนที่แสดงคุณภาพอากาศ',
-      title:
-        'ศูนย์ข้อมูลเฝ้าระวังคุณภาพสิ่งแวดล้อมเมือง ศูนย์บริการวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
-    },
-    {
-      key: 'mobile-routes',
-      label: 'เครื่องตรวจวัดคุณภาพอากาศแบบคลื่อนที่ชนิดติดตัวบุคคล',
-      title:
-        'ศูนย์ข้อมูลเฝ้าระวังคุณภาพสิ่งแวดล้อมเมือง ศูนย์บริการวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
+      children: [
+        {
+          key: 'static-sensors',
+          label: 'สถานีตรวจวัดคุณภาพอากาศ',
+          title:
+            'ศูนย์ข้อมูลเฝ้าระวังคุณภาพสิ่งแวดล้อมเมือง ศูนย์บริการวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
+        },
+        {
+          key: 'mobile-routes',
+          label: 'เส้นทางคุณภาพอากาศ',
+          title:
+            'ศูนย์ข้อมูลเฝ้าระวังคุณภาพสิ่งแวดล้อมเมือง ศูนย์บริการวิชาการด้านศาสตร์เขตเมือง มหาวิทยาลัยนวมินทราธิราช',
+        },
+      ],
     },
     {
       key: 'analytics',
@@ -78,13 +91,23 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     },
   ];
 
-  // Add admin menu items for admin users
-  const menuItems = isAdmin
+  const findMenuItem = (items: MenuItem[], key: string): MenuItem | undefined => {
+    for (const item of items) {
+      if (item.key === key) return item;
+      if (item.children) {
+        const found = findMenuItem(item.children, key);
+        if (found) return found;
+      }
+    }
+    return undefined;
+  };
+
+  const menuItems: MenuItem[] = isAdmin
     ? [
         ...baseMenuItems,
         {
           key: 'data-export',
-          label: 'ส่งออกข้อมูล',
+          label: 'การส่งออกข้อมูล',
           title: 'ส่งออกข้อมูล',
         },
         {
@@ -141,7 +164,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                 <Title
                   level={4}
                   className="mb-0"
-                  style={{ fontSize: 18, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.3px' }}
+                  style={{ fontSize: 18, fontWeight: 700, color: '#666', letterSpacing: '-0.3px' }}
                 >
                   ศูนย์เฝ้าระวังคุณภาพอากาศ
                 </Title>
@@ -164,10 +187,12 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           <Menu
             mode="inline"
             selectedKeys={[activeView]}
+            defaultOpenKeys={['air-quality-map']}
             onClick={({ key }) => {
-              setActiveView(key);
-              // Auto-close sidebar after selecting a menu item
-              setCollapsed(true);
+              if (key !== 'air-quality-map') {
+                setActiveView(key);
+                setCollapsed(true);
+              }
             }}
             items={menuItems}
             style={{
@@ -300,6 +325,32 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         .modern-menu .ant-menu-item-icon {
           font-size: 22px !important;
         }
+        .modern-menu .ant-menu-submenu-title {
+          border-radius: 12px !important;
+          margin: 6px 0 !important;
+          height: 52px !important;
+          line-height: 52px !important;
+          color: #6b7280 !important;
+          font-weight: 600 !important;
+          padding: 0 16px !important;
+          transition: all 0.2s !important;
+        }
+        .modern-menu .ant-menu-submenu-title:hover {
+          background: #f3f4f6 !important;
+          color: #00bcd4 !important;
+        }
+        .modern-menu .ant-menu-submenu-selected > .ant-menu-submenu-title {
+          color: #00bcd4 !important;
+        }
+        .modern-menu .ant-menu-sub {
+          background: transparent !important;
+        }
+        .modern-menu .ant-menu-sub .ant-menu-item {
+          padding-left: 32px !important;
+          height: 44px !important;
+          line-height: 44px !important;
+          font-size: 14px !important;
+        }
       `}</style>
 
       {/* Overlay - Shows when sidebar is open */}
@@ -379,7 +430,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {!isMobile && (
                 <Text style={{ color: '#9ca3af', fontSize: 13, display: 'block', fontWeight: 600 }}>
-                  {menuItems.find((item) => item.key === activeView)?.title}
+                  {findMenuItem(menuItems, activeView)?.title}
                 </Text>
               )}
               <Title
@@ -392,7 +443,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                   letterSpacing: '-0.5px',
                 }}
               >
-                {menuItems.find((item) => item.key === activeView)?.label}
+                {findMenuItem(menuItems, activeView)?.label}
               </Title>
             </div>
           </div>

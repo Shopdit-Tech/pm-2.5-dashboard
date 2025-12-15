@@ -98,9 +98,9 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
                       border: '1px solid #d9d9d9',
                     }}
                   >
-                    {sensor.serialNumber || 'N/A'}
+                    {sensor.code || 'N/A'}
                   </Text>
-                  {sensor.serialNumber && (
+                  {sensor.code && (
                     <Button
                       type="text"
                       icon={<CopyOutlined />}
@@ -112,17 +112,8 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
                 </div>
               </div>
 
-              {/* Monitor Maker */}
-              <Row gutter={16}>
-                <Col xs={24} sm={12}>
-                  <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
-                    Monitor Maker
-                  </Text>
-                  <Text strong style={{ fontSize: 15 }}>
-                    {sensor.maker || 'N/A'}
-                  </Text>
-                </Col>
 
+              <Row gutter={16}>
                 {/* Model */}
                 <Col xs={24} sm={12}>
                   <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
@@ -145,23 +136,7 @@ export const SensorDetailModal = ({ sensor, visible, onClose }: SensorDetailModa
                 </Text>
               </div>
 
-              {/* Commissioning Date */}
               <Row gutter={16}>
-                <Col xs={24} sm={12}>
-                  <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
-                    Monitor Commissioning Date
-                  </Text>
-                  <Text strong style={{ fontSize: 15 }}>
-                    {sensor.commissioningDate
-                      ? new Date(sensor.commissioningDate).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })
-                      : 'N/A'}
-                  </Text>
-                </Col>
-
                 {/* Status */}
                 <Col xs={24} sm={12}>
                   <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
