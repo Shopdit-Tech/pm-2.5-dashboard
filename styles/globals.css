@@ -81,3 +81,25 @@ body {
   background-color: #1890ff;
   color: white;
 }
+
+/* Fix Ant Design Menu submenu popup escaping sidebar */
+.ant-menu-submenu-popup {
+  position: static !important;
+  box-shadow: none !important;
+}
+
+.ant-menu-submenu-popup .ant-menu {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Ensure inline menu submenus don't create floating popups */
+.ant-menu-inline .ant-menu-submenu-popup {
+  display: none !important;
+}
+
+.ant-menu-inline .ant-menu-sub {
+  display: block !important;
+  background: transparent !important;
+}

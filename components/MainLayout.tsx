@@ -351,6 +351,22 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           line-height: 44px !important;
           font-size: 14px !important;
         }
+        /* Force submenu to stay inline, not popup */
+        .modern-menu .ant-menu-submenu-popup {
+          position: relative !important;
+          width: 100% !important;
+          left: 0 !important;
+          top: 0 !important;
+          box-shadow: none !important;
+          background: transparent !important;
+        }
+        .modern-menu .ant-menu-submenu > .ant-menu {
+          background: transparent !important;
+        }
+        .ant-menu-submenu-popup .ant-menu-vertical {
+          border: none !important;
+          box-shadow: none !important;
+        }
       `}</style>
 
       {/* Overlay - Shows when sidebar is open */}
