@@ -8,7 +8,6 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import type { Breakpoint } from 'antd/es/_util/responsiveObserver';
 import { SensorData } from '@/types/sensor';
 import { useThreshold } from '@/contexts/ThresholdContext';
 import { useMobileSensorTableData } from '../hooks/useMobileSensorTableData';
@@ -163,7 +162,6 @@ export const MobileSensorDataTable = () => {
             dataIndex: 'pm1',
             key: 'pm1',
             width: 110,
-            responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'pm1', record),
           },
         ]
@@ -186,7 +184,6 @@ export const MobileSensorDataTable = () => {
             dataIndex: 'pm10',
             key: 'pm10',
             width: 110,
-            responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'pm10', record),
           },
         ]
@@ -198,7 +195,6 @@ export const MobileSensorDataTable = () => {
             dataIndex: 'co2',
             key: 'co2',
             width: 110,
-            responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'co2', record),
           },
         ]
@@ -210,7 +206,6 @@ export const MobileSensorDataTable = () => {
             dataIndex: 'temperature',
             key: 'temperature',
             width: 100,
-            responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'temperature', record),
           },
         ]
@@ -222,7 +217,6 @@ export const MobileSensorDataTable = () => {
             dataIndex: 'humidity',
             key: 'humidity',
             width: 100,
-            responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'humidity', record),
           },
         ]
@@ -234,7 +228,6 @@ export const MobileSensorDataTable = () => {
             dataIndex: 'tvoc',
             key: 'tvoc',
             width: 110,
-            responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'tvoc', record),
           },
         ]
@@ -244,7 +237,6 @@ export const MobileSensorDataTable = () => {
       dataIndex: 'timestamp',
       key: 'timestamp',
       width: 150,
-      responsive: ['md'] as Breakpoint[],
       render: (timestamp: string, record: SensorData) => {
         const date = new Date(timestamp);
         const now = new Date();
@@ -414,10 +406,10 @@ export const MobileSensorDataTable = () => {
         bodyStyle={{ padding: 0 }}
       >
         <Table
-          columns={columns as any}
+          columns={columns}
           dataSource={filteredSensors}
           rowKey="id"
-          scroll={{ x: isMobile ? 600 : 1200 }}
+          scroll={{ x: 'max-content', y: isMobile ? 500 : undefined }}
           pagination={{
             pageSize: isMobile ? 10 : 20,
             showSizeChanger: !isMobile,

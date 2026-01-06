@@ -5,6 +5,11 @@ import type { BucketConfig } from '../types/exportTypes';
  */
 export const BUCKET_SIZES: BucketConfig[] = [
   {
+    id: '1min',
+    label: '1 นาที',
+    agg_minutes: 1,
+  },
+  {
     id: '5min',
     label: '5 นาที',
     agg_minutes: 5,

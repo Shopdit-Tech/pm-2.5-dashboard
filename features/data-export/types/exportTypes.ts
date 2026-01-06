@@ -2,6 +2,7 @@ import type { SensorData } from '@/types/sensor';
 
 export type BucketSize = 
   | 'unbucketed'
+  | '1min'
   | '5min'
   | '10min'
   | '30min'

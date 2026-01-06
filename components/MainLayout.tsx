@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Layout, Menu, Typography, Button, Avatar, Dropdown } from 'antd';
+import { Layout, Typography, Button, Avatar, Dropdown } from 'antd';
+import { CustomSidebarMenu } from './CustomSidebarMenu';
 import Image from 'next/image';
 import {
   MenuFoldOutlined,
@@ -184,23 +185,16 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
 
         {/* Menu */}
         <div style={{ padding: '20px 16px', flex: 1 }}>
-          <Menu
-            mode="inline"
-            selectedKeys={[activeView]}
+          <CustomSidebarMenu
+            items={menuItems}
+            selectedKey={activeView}
             defaultOpenKeys={['air-quality-map']}
-            onClick={({ key }) => {
-              if (key !== 'air-quality-map') {
+            onSelect={(key, item) => {
+              if (!item.children) {
                 setActiveView(key);
                 setCollapsed(true);
               }
             }}
-            items={menuItems}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              fontSize: 15,
-            }}
-            className="modern-menu"
           />
         </div>
 
@@ -301,73 +295,6 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         </div>
       </Sider>
 
-      {/* Add custom styles for modern menu */}
-      <style jsx global>{`
-        .modern-menu .ant-menu-item {
-          border-radius: 12px !important;
-          margin: 6px 0 !important;
-          height: 52px !important;
-          line-height: 52px !important;
-          color: #6b7280 !important;
-          font-weight: 600 !important;
-          padding: 0 16px !important;
-          transition: all 0.2s !important;
-        }
-        .modern-menu .ant-menu-item:hover {
-          background: #f3f4f6 !important;
-          color: #00bcd4 !important;
-        }
-        .modern-menu .ant-menu-item-selected {
-          background: #00bcd4 !important;
-          color: white !important;
-          box-shadow: 0 6px 16px rgba(0, 188, 212, 0.4) !important;
-        }
-        .modern-menu .ant-menu-item-icon {
-          font-size: 22px !important;
-        }
-        .modern-menu .ant-menu-submenu-title {
-          border-radius: 12px !important;
-          margin: 6px 0 !important;
-          height: 52px !important;
-          line-height: 52px !important;
-          color: #6b7280 !important;
-          font-weight: 600 !important;
-          padding: 0 16px !important;
-          transition: all 0.2s !important;
-        }
-        .modern-menu .ant-menu-submenu-title:hover {
-          background: #f3f4f6 !important;
-          color: #00bcd4 !important;
-        }
-        .modern-menu .ant-menu-submenu-selected > .ant-menu-submenu-title {
-          color: #00bcd4 !important;
-        }
-        .modern-menu .ant-menu-sub {
-          background: transparent !important;
-        }
-        .modern-menu .ant-menu-sub .ant-menu-item {
-          padding-left: 32px !important;
-          height: 44px !important;
-          line-height: 44px !important;
-          font-size: 14px !important;
-        }
-        /* Force submenu to stay inline, not popup */
-        .modern-menu .ant-menu-submenu-popup {
-          position: relative !important;
-          width: 100% !important;
-          left: 0 !important;
-          top: 0 !important;
-          box-shadow: none !important;
-          background: transparent !important;
-        }
-        .modern-menu .ant-menu-submenu > .ant-menu {
-          background: transparent !important;
-        }
-        .ant-menu-submenu-popup .ant-menu-vertical {
-          border: none !important;
-          box-shadow: none !important;
-        }
-      `}</style>
 
       {/* Overlay - Shows when sidebar is open */}
       {!collapsed && (
@@ -436,7 +363,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             >
               {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             </button>
-                        <Image
+            <Image
               src="/logo.png"
               alt="Logo"
               width={isMobile ? 36 : 48}

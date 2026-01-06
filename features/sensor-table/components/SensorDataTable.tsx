@@ -8,7 +8,6 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import type { Breakpoint } from 'antd/es/_util/responsiveObserver';
 import { SensorData } from '@/types/sensor';
 import { useThreshold } from '@/contexts/ThresholdContext';
 import { SensorDetailModal } from './SensorDetailModal';
@@ -149,7 +148,6 @@ export const SensorDataTable = () => {
       dataIndex: 'status',
       key: 'status',
       width: 80,
-      responsive: ['md'] as Breakpoint[],
       render: (status: string) => (
         <Tag color={status === 'online' ? 'green' : 'red'} style={{ fontSize: 11 }}>
           {status === 'online' ? 'online' : 'offline'}
@@ -174,7 +172,6 @@ export const SensorDataTable = () => {
             dataIndex: 'co2',
             key: 'co2',
             width: 110,
-            responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'co2', record),
           },
         ]
@@ -186,7 +183,6 @@ export const SensorDataTable = () => {
             dataIndex: 'temperature',
             key: 'temperature',
             width: 100,
-            responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'temperature', record),
           },
         ]
@@ -198,7 +194,6 @@ export const SensorDataTable = () => {
             dataIndex: 'humidity',
             key: 'humidity',
             width: 100,
-            responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'humidity', record),
           },
         ]
@@ -210,7 +205,6 @@ export const SensorDataTable = () => {
             dataIndex: 'pm10',
             key: 'pm10',
             width: 110,
-            responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'pm10', record),
           },
         ]
@@ -222,7 +216,6 @@ export const SensorDataTable = () => {
             dataIndex: 'tvoc',
             key: 'tvoc',
             width: 110,
-            responsive: ['lg'] as Breakpoint[],
             render: (value: number, record: SensorData) => renderParameterCell(value, 'tvoc', record),
           },
         ]
@@ -232,7 +225,6 @@ export const SensorDataTable = () => {
       dataIndex: 'timestamp',
       key: 'timestamp',
       width: 150,
-      responsive: ['md'] as Breakpoint[],
       render: (timestamp: string, record: SensorData) => {
         const date = new Date(timestamp);
         const now = new Date();
@@ -404,7 +396,7 @@ export const SensorDataTable = () => {
           columns={columns as any}
           dataSource={filteredSensors}
           rowKey="id"
-          scroll={{ x: isMobile ? 600 : 1100 }}
+          scroll={{ x: 'max-content', y: isMobile ? 500 : undefined }}
           pagination={{
             pageSize: isMobile ? 10 : 20,
             showSizeChanger: !isMobile,
