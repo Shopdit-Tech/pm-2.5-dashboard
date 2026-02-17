@@ -30,12 +30,12 @@ export const SensorMarker = ({ sensor, onClick, isSelected }: SensorMarkerProps)
   // Format timestamp to Thai format
   const formatTimestamp = (timestamp: string): string => {
     const date = new Date(timestamp);
+    const thaiMonth = date.toLocaleString('th-TH', { month: 'short' });
     const day = date.getDate();
-    const month = date.getMonth() + 1;
     const year = date.getFullYear() + 543; // Thai Buddhist year
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${day} พ.ย. ${year} ${hours}:${minutes} น.`;
+    return `${day} ${thaiMonth} ${year} ${hours}:${minutes} น.`;
   };
 
   // Tooltip content
